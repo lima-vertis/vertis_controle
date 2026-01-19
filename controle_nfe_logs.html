@@ -165,14 +165,36 @@
       </div>
 
       <!-- TOP 3 ERROS -->
-      <div class="bg-white rounded-2xl shadow p-4">
+      <div class="bg-white rounded-2xl shadow p-4 relative">
         <h2 class="text-sm font-semibold text-slate-600 mb-3">Top 3 Erros</h2>
+
+        <!-- ÍCONE TOP 10 -->
+        <button onclick="openTop10ErrosModal()" title="Ver Top 10 Erros" class="absolute top-3 right-3
+                 w-5 h-5 flex items-center justify-center
+                 rounded-full border border-slate-300
+                 text-[11px] font-bold text-slate-500
+                 hover:bg-slate-100 hover:text-slate-700
+                 transition">
+          !
+        </button>
+
         <ul id="kpi_top_erros" class="space-y-1 text-sm"></ul>
       </div>
 
       <!-- TOP UNIDADES -->
-      <div class="bg-white rounded-2xl shadow p-4">
+      <div class="bg-white rounded-2xl shadow p-4 relative">
         <h2 class="text-sm font-semibold text-slate-600 mb-3">Unidades com mais erros</h2>
+
+        <!-- ÍCONE TOP 10 CLIENTES -->
+        <button onclick="openTop10UnidadesModal()" title="Ver Top 10 Unidades" class="absolute top-3 right-3
+           w-5 h-5 flex items-center justify-center
+           rounded-full border border-slate-300
+           text-[11px] font-bold text-slate-500
+           hover:bg-slate-100 hover:text-slate-700
+           transition">
+          !
+        </button>
+
         <ul id="kpi_top_unidades" class="space-y-1 text-sm"></ul>
       </div>
 
@@ -237,8 +259,8 @@
   </main>
 
   <script>
-    // const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle_logs";
-    const endpoint = "/api/nfce/logs";
+    const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle_logs";
+    // const endpoint = "/api/nfce/logs";
 
     const PAGE_SIZE = 10;
     let currentPage = 1;
@@ -313,6 +335,15 @@
         erros[key] = (erros[key] || 0) + 1;
       });
 
+      // 🔥 Top 10 (para o modal)
+      const topErros10 = Object.entries(erros)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([desc, qtd]) => ({ desc, qtd }));
+
+      top10ErrosCache = topErros10;
+
+
       const topErros = Object.entries(erros)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 3);
@@ -322,41 +353,45 @@
         const li = document.createElement('li');
 
         li.innerHTML = `
-        <div class="group flex justify-between gap-2 cursor-pointer relative
-        ${filterInput.value === desc ? 'bg-slate-100 rounded px-1' : ''}">
-        <span class="truncate max-w-[220px] text-slate-700">
-        ${desc}
-        </span>
+    <div class="group flex justify-between gap-2 cursor-pointer relative
+      ${filterInput.value === desc ? 'bg-slate-100 rounded px-1' : ''}">
 
-        <span class="font-semibold text-slate-600">
+      <!-- TEXTO = FILTRO -->
+      <span
+        class="truncate max-w-[220px] text-slate-700 hover:text-slate-900 transition"
+        title="Clique para filtrar">
+        ${desc}
+      </span>
+
+      <!-- QTD = APENAS INFORMATIVO -->
+      <span class="font-semibold text-slate-600">
         ${qtd}
-        </span>
+      </span>
 
-        <div
+      <!-- Tooltip -->
+      <div
         class="absolute z-50 hidden group-hover:block
-             bg-slate-900 text-white text-xs rounded-lg px-3 py-2
-             max-w-sm shadow-lg
-             top-full left-0 mt-1">
+               bg-slate-900 text-white text-xs rounded-lg px-3 py-2
+               max-w-sm shadow-lg
+               top-full left-0 mt-1">
         ${desc}
-        </div>
-        </div>
-        `;
+      </div>
+    </div>
+  `;
 
-        // 👉 Clique filtra a tabela pelo erro
+        // 👉 Clique no TEXTO => filtra (toggle)
         li.onclick = () => {
           if (filterInput.value === desc) {
-            // toggle OFF → limpa filtro
             filterInput.value = '';
           } else {
-            // toggle ON → aplica filtro
             filterInput.value = desc;
           }
           applyFilter();
         };
 
-
         kpi_top_erros.appendChild(li);
       });
+
 
       /* === Top Unidades === */
       const unidades = {};
@@ -364,6 +399,13 @@
         const key = r.nom_unid_oper || 'Não informado';
         unidades[key] = (unidades[key] || 0) + 1;
       });
+
+      // 🔥 Top 10 Unidades (para o modal)
+      top10UnidadesCache = Object.entries(unidades)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([nome, qtd]) => ({ nome, qtd }));
+
 
       const topUnidades = Object.entries(unidades)
         .sort((a, b) => b[1] - a[1])
@@ -721,6 +763,250 @@
       <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h2M7 7h10M7 11h10M7 15h4" />
     </svg>
   </a>
+
+  <!-- MODAL: TOP 10 ERROS -->
+  <div id="modalTop10Erros" class="fixed inset-0 z-[999] hidden">
+    <!-- backdrop -->
+    <div id="modalTop10Backdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+    <!-- dialog -->
+    <div class="relative mx-auto mt-24 w-[92%] max-w-3xl">
+      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <!-- header -->
+        <div class="flex items-center justify-between px-5 py-4 border-b bg-slate-50">
+          <div>
+            <h3 class="text-base font-semibold text-slate-800">Top 10 Erros</h3>
+            <p class="text-xs text-slate-500">Clique em um erro para filtrar a tabela</p>
+          </div>
+
+          <button id="btnCloseTop10" class="p-2 rounded-lg hover:bg-slate-200 transition" aria-label="Fechar modal">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- body -->
+        <div class="max-h-[70vh] overflow-auto">
+          <table class="min-w-full text-sm">
+            <thead class="sticky top-0 bg-white">
+              <tr class="text-left border-b">
+                <th class="px-5 py-3 w-16 text-slate-500 font-semibold">#</th>
+                <th class="px-5 py-3 text-slate-500 font-semibold">Erro</th>
+                <th class="px-5 py-3 w-24 text-right text-slate-500 font-semibold">Qtd</th>
+              </tr>
+            </thead>
+            <tbody id="top10ErrosBody" class="divide-y"></tbody>
+          </table>
+        </div>
+
+        <!-- footer -->
+        <div class="px-5 py-4 border-t bg-white flex justify-end gap-2">
+          <button id="btnLimparFiltroTop10"
+            class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm transition">
+            Limpar filtro
+          </button>
+          <button id="btnFecharTop10"
+            class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm transition">
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // Cache do Top 10 (atualizado a cada updateKPIs)
+    let top10ErrosCache = [];
+
+    function openTop10ErrosModal() {
+      const modal = document.getElementById('modalTop10Erros');
+      const tbody = document.getElementById('top10ErrosBody');
+      if (!modal || !tbody) return;
+
+      tbody.innerHTML = '';
+
+      top10ErrosCache.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 cursor-pointer';
+
+        const desc = item.desc;
+        const qtd = item.qtd;
+
+        tr.innerHTML = `
+          <td class="px-5 py-3 font-semibold text-slate-600">${idx + 1}</td>
+          <td class="px-5 py-3">
+            <div class="text-slate-800">${desc}</div>
+          </td>
+          <td class="px-5 py-3 text-right font-semibold text-slate-700">${qtd}</td>
+        `;
+
+        // Clique no erro => filtra a tabela e fecha o modal
+        tr.addEventListener('click', () => {
+          filterInput.value = desc;
+          applyFilter();
+          closeTop10ErrosModal();
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeTop10ErrosModal() {
+      const modal = document.getElementById('modalTop10Erros');
+      if (!modal) return;
+      modal.classList.add('hidden');
+    }
+
+    // binds
+    (function bindTop10Modal() {
+      const modal = document.getElementById('modalTop10Erros');
+      const backdrop = document.getElementById('modalTop10Backdrop');
+      const btnClose = document.getElementById('btnCloseTop10');
+      const btnFechar = document.getElementById('btnFecharTop10');
+      const btnLimpar = document.getElementById('btnLimparFiltroTop10');
+
+      if (!modal) return;
+
+      backdrop?.addEventListener('click', closeTop10ErrosModal);
+      btnClose?.addEventListener('click', closeTop10ErrosModal);
+      btnFechar?.addEventListener('click', closeTop10ErrosModal);
+
+      btnLimpar?.addEventListener('click', () => {
+        filterInput.value = '';
+        applyFilter();
+        closeTop10ErrosModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+          closeTop10ErrosModal();
+        }
+      });
+    })();
+  </script>
+
+  <!-- MODAL: TOP 10 UNIDADES -->
+  <div id="modalTop10Unidades" class="fixed inset-0 z-[999] hidden">
+    <div id="modalTop10UnidadesBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+    <div class="relative mx-auto mt-24 w-[92%] max-w-3xl">
+      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b bg-slate-50">
+          <div>
+            <h3 class="text-base font-semibold text-slate-800">Top 10 Unidades</h3>
+            <p class="text-xs text-slate-500">Clique em uma unidade para filtrar a tabela</p>
+          </div>
+
+          <button id="btnCloseTop10Unidades" class="p-2 rounded-lg hover:bg-slate-200 transition"
+            aria-label="Fechar modal">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="max-h-[70vh] overflow-auto">
+          <table class="min-w-full text-sm">
+            <thead class="sticky top-0 bg-white">
+              <tr class="text-left border-b">
+                <th class="px-5 py-3 w-16 text-slate-500 font-semibold">#</th>
+                <th class="px-5 py-3 text-slate-500 font-semibold">Unidade / Cliente</th>
+                <th class="px-5 py-3 w-24 text-right text-slate-500 font-semibold">Qtd</th>
+              </tr>
+            </thead>
+            <tbody id="top10UnidadesBody" class="divide-y"></tbody>
+          </table>
+        </div>
+
+        <div class="px-5 py-4 border-t bg-white flex justify-end gap-2">
+          <button id="btnLimparFiltroTop10Unidades"
+            class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm transition">
+            Limpar filtro
+          </button>
+          <button id="btnFecharTop10Unidades"
+            class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm transition">
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let top10UnidadesCache = [];
+
+    function openTop10UnidadesModal() {
+      const modal = document.getElementById('modalTop10Unidades');
+      const tbody = document.getElementById('top10UnidadesBody');
+      if (!modal || !tbody) return;
+
+      tbody.innerHTML = '';
+
+      top10UnidadesCache.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 cursor-pointer';
+
+        tr.innerHTML = `
+          <td class="px-5 py-3 font-semibold text-slate-600">${idx + 1}</td>
+          <td class="px-5 py-3">
+            <div class="text-slate-800">${item.nome}</div>
+          </td>
+          <td class="px-5 py-3 text-right font-semibold text-slate-700">${item.qtd}</td>
+        `;
+
+        tr.addEventListener('click', () => {
+          filterInput.value = item.nome;
+          applyFilter();
+          closeTop10UnidadesModal();
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeTop10UnidadesModal() {
+      const modal = document.getElementById('modalTop10Unidades');
+      if (!modal) return;
+      modal.classList.add('hidden');
+    }
+
+    (function bindTop10UnidadesModal() {
+      const modal = document.getElementById('modalTop10Unidades');
+      const backdrop = document.getElementById('modalTop10UnidadesBackdrop');
+      const btnClose = document.getElementById('btnCloseTop10Unidades');
+      const btnFechar = document.getElementById('btnFecharTop10Unidades');
+      const btnLimpar = document.getElementById('btnLimparFiltroTop10Unidades');
+
+      if (!modal) return;
+
+      backdrop?.addEventListener('click', closeTop10UnidadesModal);
+      btnClose?.addEventListener('click', closeTop10UnidadesModal);
+      btnFechar?.addEventListener('click', closeTop10UnidadesModal);
+
+      btnLimpar?.addEventListener('click', () => {
+        filterInput.value = '';
+        applyFilter();
+        closeTop10UnidadesModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+          closeTop10UnidadesModal();
+        }
+      });
+    })();
+  </script>
+
+
+
 
 </body>
 

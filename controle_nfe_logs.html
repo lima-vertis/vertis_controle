@@ -237,8 +237,8 @@
   </main>
 
   <script>
-    // const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle_logs";
-    const endpoint = "/api/nfce/logs";
+    const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle_logs";
+    // const endpoint = "/api/nfce/logs";
 
     const PAGE_SIZE = 10;
     let currentPage = 1;
@@ -369,16 +369,49 @@
         .sort((a, b) => b[1] - a[1])
         .slice(0, 3);
 
+      /* === Teste Filtro Top 3 === */
       kpi_top_unidades.innerHTML = '';
       topUnidades.forEach(([nome, qtd]) => {
         const li = document.createElement('li');
+
         li.innerHTML = `
-      <div class="flex justify-between gap-2">
-        <span class="truncate">${nome}</span>
-        <span class="font-semibold text-slate-600">${qtd}</span>
-      </div>`;
+    <div class="group flex justify-between gap-2 cursor-pointer relative
+      ${filterInput.value === nome ? 'bg-slate-100 rounded px-1' : ''}">
+
+      <span class="truncate max-w-[220px] text-slate-700">
+        ${nome}
+      </span>
+
+      <span class="font-semibold text-slate-600">
+        ${qtd}
+      </span>
+
+      <!-- Tooltip -->
+      <div
+        class="absolute z-50 hidden group-hover:block
+               bg-slate-900 text-white text-xs rounded-lg px-3 py-2
+               max-w-sm shadow-lg
+               top-full left-0 mt-1">
+        ${nome}
+      </div>
+    </div>
+  `;
+
+        // 👉 Clique filtra a tabela pela UNIDADE
+        li.onclick = () => {
+          if (filterInput.value === nome) {
+            // toggle OFF
+            filterInput.value = '';
+          } else {
+            // toggle ON
+            filterInput.value = nome;
+          }
+          applyFilter();
+        };
+
         kpi_top_unidades.appendChild(li);
       });
+
 
       /* === Total Registros === */
       /* === Registros Hoje x Total === */

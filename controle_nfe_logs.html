@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>NFC-e | Logs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .fade-in {
+      animation: fadeInUp 0.25s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .count {
+      transition: all .3s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <!-- HEADER -->
+  <header
+    class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
+
+    <!-- ESQUERDA -->
+    <div class="flex items-center gap-4">
+
+      <!-- MENU SANDUÍCHE -->
+      <!-- MENU SANDUÍCHE (CLICK + ACCORDION) -->
+      <nav class="relative">
+        <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
+          aria-expanded="false" aria-controls="menuPanel">
+
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <!-- PAINEL -->
+        <div id="menuPanel" class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl
+           hidden overflow-hidden">
+
+          <!-- HEADER DO PAINEL (opcional) -->
+          <div class="px-4 py-3 border-b bg-slate-50">
+            <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
+          </div>
+
+          <div class="py-2 text-sm">
+
+            <!-- DFe (nível 1) -->
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="dfe">
+              <span>DFe (Documentos Fiscais)</span>
+              <span class="text-slate-400">›</span>
+            </button>
+
+            <!-- Conteúdo DFe (nível 2) -->
+            <div class="hidden" data-acc-panel="dfe">
+
+              <!-- NFe -->
+              <button type="button"
+                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                data-acc-btn="nfe">
+                <span>NFe</span>
+                <span class="text-slate-400">›</span>
+              </button>
+
+              <div class="hidden" data-acc-panel="nfe">
+                <a href="controle_nfe.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Visão Geral
+                </a>
+                <a href="controle_nfe_logs.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Erros
+                </a>
+              </div>
+
+              <!-- NFSe -->
+              <button type="button"
+                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                data-acc-btn="nfse">
+                <span>NFSe</span>
+                <span class="text-slate-400">›</span>
+              </button>
+
+              <div class="hidden" data-acc-panel="nfse">
+                <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Visão Geral
+                </a>
+                <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Erros
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </nav>
+
+
+      <!-- TEXTO -->
+      <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
+        Vertis • NFe • Erros
+      </h1>
+    </div>
+
+    <!-- DIREITA -->
+    <div class="flex items-center gap-4">
+      <span id="refreshIndicator" class="text-xs text-slate-300 opacity-0 transition-opacity">
+        Atualizando...
+      </span>
+
+      <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
+    </div>
+
+  </header>
+
+
+  <main class="p-6 flex-1 space-y-6">
+
+    <!-- KPIs -->
+    <!-- KPIs -->
+    <section class="grid grid-cols-1 xl:grid-cols-4 gap-4">
+
+      <!-- TIPO DOCUMENTO -->
+      <div class="bg-white rounded-2xl shadow p-4">
+        <h2 class="text-sm font-semibold text-slate-600 mb-3">Tipo de Documento</h2>
+
+        <div class="space-y-2">
+          <div class="flex justify-between text-sm">
+            <span>NFC-e</span>
+            <span id="kpi_nfce" class="font-bold text-emerald-600">0%</span>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-2">
+            <div id="bar_nfce" class="bg-emerald-500 h-2 rounded-full"></div>
+          </div>
+
+          <div class="flex justify-between text-sm mt-2">
+            <span>NF-e</span>
+            <span id="kpi_nfe" class="font-bold text-indigo-600">0%</span>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-2">
+            <div id="bar_nfe" class="bg-indigo-500 h-2 rounded-full"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP 3 ERROS -->
+      <div class="bg-white rounded-2xl shadow p-4">
+        <h2 class="text-sm font-semibold text-slate-600 mb-3">Top 3 Erros</h2>
+        <ul id="kpi_top_erros" class="space-y-1 text-sm"></ul>
+      </div>
+
+      <!-- TOP UNIDADES -->
+      <div class="bg-white rounded-2xl shadow p-4">
+        <h2 class="text-sm font-semibold text-slate-600 mb-3">Unidades com mais erros</h2>
+        <ul id="kpi_top_unidades" class="space-y-1 text-sm"></ul>
+      </div>
+
+      <!-- TOTAL REGISTROS -->
+      <!-- REGISTROS HOJE x TOTAL -->
+      <div class="bg-white rounded-2xl shadow p-4">
+        <h2 class="text-sm font-semibold text-slate-600 mb-3">Registros</h2>
+
+        <div class="flex justify-between items-end">
+          <div>
+            <p id="kpi_registros_hoje" class="text-2xl font-bold text-indigo-600 leading-none">
+              0
+            </p>
+            <span class="text-xs text-slate-500">hoje</span>
+          </div>
+
+          <div class="text-right">
+            <p id="kpi_registros_total" class="text-xl font-semibold text-slate-700 leading-none">
+              0
+            </p>
+            <span class="text-xs text-slate-500">total</span>
+          </div>
+        </div>
+      </div>
+
+
+    </section>
+
+    <!-- FILTRO -->
+    <div class="bg-white rounded-2xl shadow p-4 flex items-center gap-3">
+      <input id="filterInput" type="text" placeholder="🔍 Filtrar por código, unidade ou erro..."
+        class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" oninput="applyFilter()" />
+
+      <button id="btnClearFilter" onclick="clearFilters()"
+        class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-sm whitespace-nowrap">
+        Limpar filtros
+      </button>
+
+      <span class="text-sm text-slate-500 whitespace-nowrap">Auto-refresh 5 min</span>
+    </div>
+
+
+    <!-- TABELA -->
+    <div class="bg-white rounded-2xl shadow overflow-x-auto max-h-[70vh]">
+      <table class="min-w-full text-sm border-collapse">
+        <thead class="bg-slate-200 sticky top-0 z-40">
+          <tr id="table-head"></tr>
+        </thead>
+        <tbody id="table-body" class="divide-y"></tbody>
+        <tfoot class="bg-slate-100 sticky bottom-0 font-semibold">
+          <tr id="table-footer"></tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- PAGINAÇÃO -->
+    <div class="flex items-center justify-between px-2 text-sm text-slate-600">
+      <span id="pageInfo"></span>
+      <div id="pagination" class="flex gap-1"></div>
+    </div>
+
+  </main>
+
+  <script>
+    const endpoint =
+      'http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle_logs';
+
+    const PAGE_SIZE = 10;
+    let currentPage = 1;
+
+    const columns = [
+      { key: 'cod_unid_negoc', label: 'Neg', sticky: true, width: 50 },
+      { key: 'cod_unid_oper', label: 'Oper', sticky: true, width: 50 },
+      { key: 'nom_unid_oper', label: 'Cliente', sticky: true, width: 250 },
+      { key: 'id_ctrl_pgto', label: 'Ctrl Pgto' },
+      { key: 'num_doc_fiscal', label: 'Nro Doc' },
+      { key: 'tipo_doc_fiscal', label: 'Tipo' },
+      { key: 'dth_emissao', label: 'Emissão' },
+      { key: 'vlr_doc_fiscal', label: 'Valor R$', sum: true },
+      { key: 'desc_log', label: 'Ocorrência' }
+    ];
+
+    let originalData = [], filteredData = [], sortKey = null, sortAsc = true;
+
+    const getPagedData = () =>
+      filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+    const totalPages = () =>
+      Math.ceil(filteredData.length / PAGE_SIZE) || 1;
+
+    /* ===== Função Formatar Monetário ===== */
+    function formatCurrency(value) {
+      const num = Number(value);
+      if (isNaN(num)) return '-';
+
+      return num.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    }
+
+
+    /* ===== Função Limpa Filtros ===== */
+    function clearFilters() {
+      filterInput.value = '';
+      filteredData = [...originalData];
+      currentPage = 1;
+      renderTable();
+      btnClearFilter.disabled = true;
+      btnClearFilter.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+
+    /* ===== KPIs ===== */
+    function updateKPIs() {
+      const total = filteredData.length;
+
+      /* === Tipo Documento === */
+      const countNFCE = filteredData.filter(
+        r => String(r.tipo_doc_fiscal).toLowerCase() === 'nfce'
+      ).length;
+
+      const countNFE = filteredData.filter(
+        r => String(r.tipo_doc_fiscal).toLowerCase() === 'nfe'
+      ).length;
+
+      const pctNFCE = total ? Math.round((countNFCE / total) * 100) : 0;
+      const pctNFE = total ? Math.round((countNFE / total) * 100) : 0;
+
+      kpi_nfce.textContent = `${pctNFCE}%`;
+      kpi_nfe.textContent = `${pctNFE}%`;
+      bar_nfce.style.width = `${pctNFCE}%`;
+      bar_nfe.style.width = `${pctNFE}%`;
+
+      /* === Top 3 Erros === */
+      const erros = {};
+      filteredData.forEach(r => {
+        const key = r.desc_log || 'Erro não informado';
+        erros[key] = (erros[key] || 0) + 1;
+      });
+
+      const topErros = Object.entries(erros)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+
+      kpi_top_erros.innerHTML = '';
+      topErros.forEach(([desc, qtd]) => {
+        const li = document.createElement('li');
+
+        li.innerHTML = `
+        <div class="group flex justify-between gap-2 cursor-pointer relative
+        ${filterInput.value === desc ? 'bg-slate-100 rounded px-1' : ''}">
+        <span class="truncate max-w-[220px] text-slate-700">
+        ${desc}
+        </span>
+
+        <span class="font-semibold text-slate-600">
+        ${qtd}
+        </span>
+
+        <div
+        class="absolute z-50 hidden group-hover:block
+             bg-slate-900 text-white text-xs rounded-lg px-3 py-2
+             max-w-sm shadow-lg
+             top-full left-0 mt-1">
+        ${desc}
+        </div>
+        </div>
+        `;
+
+        // 👉 Clique filtra a tabela pelo erro
+        li.onclick = () => {
+          if (filterInput.value === desc) {
+            // toggle OFF → limpa filtro
+            filterInput.value = '';
+          } else {
+            // toggle ON → aplica filtro
+            filterInput.value = desc;
+          }
+          applyFilter();
+        };
+
+
+        kpi_top_erros.appendChild(li);
+      });
+
+      /* === Top Unidades === */
+      const unidades = {};
+      filteredData.forEach(r => {
+        const key = r.nom_unid_oper || 'Não informado';
+        unidades[key] = (unidades[key] || 0) + 1;
+      });
+
+      const topUnidades = Object.entries(unidades)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+
+      kpi_top_unidades.innerHTML = '';
+      topUnidades.forEach(([nome, qtd]) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+      <div class="flex justify-between gap-2">
+        <span class="truncate">${nome}</span>
+        <span class="font-semibold text-slate-600">${qtd}</span>
+      </div>`;
+        kpi_top_unidades.appendChild(li);
+      });
+
+      /* === Total Registros === */
+      /* === Registros Hoje x Total === */
+      const hoje = new Date().toLocaleDateString('sv-SE');
+
+
+      const registrosHoje = filteredData.filter(r =>
+        String(r.dth_emissao || '').slice(0, 10) === hoje
+      ).length;
+
+      kpi_registros_hoje.textContent = registrosHoje;
+      kpi_registros_total.textContent = total;
+
+
+    }
+
+
+
+    /* ===== TABLE ===== */
+    function createHeader() {
+      const tr = document.getElementById('table-head');
+      tr.innerHTML = '';
+      let left = 0;
+
+      columns.forEach(col => {
+        const th = document.createElement('th');
+        let cls = 'px-3 py-2 whitespace-nowrap cursor-pointer';
+        if (col.key.startsWith('qtd_')) cls += ' text-center';
+
+        if (col.sticky) {
+          cls += ' sticky bg-slate-200 z-50';
+          th.style.left = left + 'px';
+          th.style.width = col.width + 'px';
+          left += col.width;
+        }
+
+        th.className = cls;
+        th.textContent = col.label;
+        th.onclick = () => sortBy(col.key);
+        tr.appendChild(th);
+      });
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+
+      getPagedData().forEach((row, i) => {
+        const tr = document.createElement('tr');
+        tr.className = `${i % 2 ? 'bg-slate-50' : 'bg-white'} hover:bg-slate-100 fade-in`;
+        let left = 0;
+
+        columns.forEach(col => {
+          const td = document.createElement('td');
+          let cls = 'px-3 py-2 whitespace-nowrap';
+
+          if (col.key.startsWith('qtd_')) cls += ' text-center font-medium';
+
+
+
+          if (col.sticky) {
+            cls += ' sticky z-40 ' + (i % 2 ? 'bg-slate-50' : 'bg-white');
+            td.style.left = left + 'px';
+            td.style.width = col.width + 'px';
+            left += col.width;
+          }
+
+          td.className = cls;
+          let value = row[col.key] ?? '';
+
+          if (col.key === 'vlr_doc_fiscal') {
+            value = formatCurrency(value);
+          }
+
+          td.textContent = value;
+
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      renderFooter();
+      updateKPIs();
+      renderPagination();
+    }
+
+    function renderFooter() {
+      const tr = document.getElementById('table-footer');
+      tr.innerHTML = '';
+      let left = 0;
+
+      columns.forEach((col, i) => {
+        const td = document.createElement('td');
+        let cls = 'px-3 py-2';
+
+        if (col.key.startsWith('qtd_')) cls += ' text-center';
+
+        if (col.sticky) {
+          cls += ' sticky bg-slate-100 z-40';
+          td.style.left = left + 'px';
+          td.style.width = col.width + 'px';
+          left += col.width;
+        }
+
+        td.className = cls;
+
+        // 👉 Primeira coluna
+        if (i === 0) {
+          td.textContent = 'Totais';
+        }
+        // 👉 Colunas somáveis
+        else if (col.sum) {
+          const total = filteredData.reduce(
+            (t, r) => t + Number(r[col.key] || 0),
+            0
+          );
+
+          // 💰 Formatação monetária SOMENTE para valor fiscal
+          if (col.key === 'vlr_doc_fiscal') {
+            td.textContent = formatCurrency(total);
+            td.classList.add('text-right', 'font-semibold');
+          } else {
+            td.textContent = total;
+          }
+        }
+        // 👉 Demais colunas
+        else {
+          td.textContent = '';
+        }
+
+        tr.appendChild(td);
+      });
+    }
+
+
+    function renderPagination() {
+      const total = totalPages();
+      const delta = 1; // quantas páginas antes/depois da atual
+      const pages = [];
+      const range = [];
+
+      pageInfo.textContent =
+        `Página ${currentPage} de ${total} • ${filteredData.length} registros`;
+
+      // Sempre inclui primeira e última
+      range.push(1);
+      if (total > 1) range.push(total);
+
+      // Páginas ao redor da atual
+      for (let i = currentPage - delta; i <= currentPage + delta; i++) {
+        if (i > 1 && i < total) range.push(i);
+      }
+
+      // Ordena e remove duplicados
+      [...new Set(range)].sort((a, b) => a - b).forEach(p => pages.push(p));
+
+      pagination.innerHTML = '';
+
+      let last = 0;
+      pages.forEach(p => {
+        if (p - last > 1) {
+          const dots = document.createElement('span');
+          dots.textContent = '…';
+          dots.className = 'px-2 text-slate-400';
+          pagination.appendChild(dots);
+        }
+
+        const btn = document.createElement('button');
+        btn.textContent = p;
+        btn.className =
+          `px-2 py-1 rounded ${p === currentPage
+            ? 'bg-slate-700 text-white'
+            : 'bg-slate-200 hover:bg-slate-300'
+          }`;
+
+        btn.onclick = () => {
+          currentPage = p;
+          renderTable();
+        };
+
+        pagination.appendChild(btn);
+        last = p;
+      });
+    }
+
+
+    function sortBy(key) {
+      sortAsc = sortKey === key ? !sortAsc : true;
+      sortKey = key;
+      currentPage = 1;
+
+      filteredData.sort((a, b) => {
+        const n1 = Number(a[key]), n2 = Number(b[key]);
+        if (!isNaN(n1) && !isNaN(n2)) return sortAsc ? n1 - n2 : n2 - n1;
+        return sortAsc
+          ? String(a[key]).localeCompare(String(b[key]))
+          : String(b[key]).localeCompare(String(a[key]));
+      });
+
+      renderTable();
+    }
+
+    function applyFilter() {
+      const v = filterInput.value.toLowerCase();
+      filteredData = originalData.filter(r =>
+        String(r.cod_unid_negoc).includes(v) ||
+        String(r.cod_unid_oper).includes(v) ||
+        String(r.nom_unid_oper).toLowerCase().includes(v) ||
+        String(r.desc_log).toLowerCase().includes(v)
+      );
+      currentPage = 1;
+      renderTable();
+      btnClearFilter.disabled = !filterInput.value;
+      btnClearFilter.classList.toggle('opacity-50', btnClearFilter.disabled);
+      btnClearFilter.classList.toggle('cursor-not-allowed', btnClearFilter.disabled);
+
+    }
+
+    async function loadData() {
+      refreshIndicator.classList.remove('opacity-0');
+      const r = await fetch(endpoint);
+      originalData = await r.json();
+      filteredData = [...originalData];
+      createHeader();
+      renderTable();
+      setTimeout(() => refreshIndicator.classList.add('opacity-0'), 800);
+    }
+
+    loadData();
+    setInterval(loadData, 300000);
+  </script>
+
+  <!-- MENU -->
+  <script>
+    (function () {
+      const btn = document.getElementById('menuBtn');
+      const panel = document.getElementById('menuPanel');
+
+      if (!btn || !panel) return;
+
+      const openMenu = () => {
+        panel.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+      };
+
+      const closeMenu = () => {
+        panel.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+      };
+
+      const toggleMenu = () => {
+        const isOpen = !panel.classList.contains('hidden');
+        isOpen ? closeMenu() : openMenu();
+      };
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      // Fecha clicando fora
+      document.addEventListener('click', (e) => {
+        if (!panel.contains(e.target) && e.target !== btn) closeMenu();
+      });
+
+      // Fecha no ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMenu();
+      });
+
+      // Accordion
+      const getPanel = (key) => panel.querySelector(`[data-acc-panel="${key}"]`);
+      const getBtn = (key) => panel.querySelector(`[data-acc-btn="${key}"]`);
+
+      panel.querySelectorAll('[data-acc-btn]').forEach((accBtn) => {
+        accBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          const key = accBtn.getAttribute('data-acc-btn');
+          const accPanel = getPanel(key);
+          if (!accPanel) return;
+
+          // Toggle do próprio painel
+          accPanel.classList.toggle('hidden');
+
+          // (Opcional) se fechar DFe, fecha filhos também
+          if (key === 'dfe' && accPanel.classList.contains('hidden')) {
+            const nfePanel = getPanel('nfe');
+            const nfsePanel = getPanel('nfse');
+            if (nfePanel) nfePanel.classList.add('hidden');
+            if (nfsePanel) nfsePanel.classList.add('hidden');
+          }
+        });
+      });
+
+    })();
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,90 @@
+<header
+    class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
+
+    <div class="flex items-center gap-4">
+
+        <!-- MENU SANDUÍCHE -->
+        <nav class="relative">
+            <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
+                aria-expanded="false" aria-controls="menuPanel">
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+
+            <!-- PAINEL -->
+            <div id="menuPanel"
+                class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl hidden overflow-hidden">
+
+                <!-- HEADER DO PAINEL -->
+                <div class="px-4 py-3 border-b bg-slate-50">
+                    <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
+                </div>
+
+                <div class="py-2 text-sm">
+
+                    <!-- DFe -->
+                    <button type="button"
+                        class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                        data-acc-btn="dfe">
+                        <span>DFe (Documentos Fiscais)</span>
+                        <span class="text-slate-400">›</span>
+                    </button>
+
+                    <div class="hidden" data-acc-panel="dfe">
+
+                        <button type="button"
+                            class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 font-medium"
+                            data-acc-btn="nfe">
+                            <span>NFe</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
+
+                        <div class="hidden" data-acc-panel="nfe">
+                            <a href="controle_nfe.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">Visão Geral</a>
+                            <a href="controle_nfe_logs.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">Erros</a>
+                        </div>
+
+                        <button type="button"
+                            class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 font-medium"
+                            data-acc-btn="nfse">
+                            <span>NFSe</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
+
+                        <div class="hidden" data-acc-panel="nfse">
+                            <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">Visão
+                                Geral</a>
+                            <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">Erros</a>
+                        </div>
+
+                    </div>
+
+                    <!-- DESENVOLVIMENTO -->
+                    <button type="button"
+                        class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                        data-acc-btn="dev">
+                        <span>Desenvolvimento</span>
+                        <span class="text-slate-400">›</span>
+                    </button>
+
+                    <div class="hidden" data-acc-panel="dev">
+                        <a href="gerador_pix.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100">Chave PIX</a>
+                    </div>
+
+                </div>
+            </div>
+        </nav>
+
+        <h1 id="pageTitle" class="text-lg font-semibold tracking-wide whitespace-nowrap">
+            Vertis
+        </h1>
+    </div>
+
+    <div class="flex items-center gap-4">
+        <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
+    </div>
+
+</header>

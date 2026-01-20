@@ -7,6 +7,10 @@
         {
             "source": "/api/nfce/logs",
             "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle_logs"
+        },
+        {
+            "source": "/api/pix/gera",
+            "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/gera_chave_pix"
         }
     ]
 }

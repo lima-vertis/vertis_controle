@@ -241,9 +241,9 @@
     }
 
     // Se você já criou o proxy no Vercel, aponte ele para o endpoint público e use /api/pix/gera aqui
-    const ENDPOINT_PIX = isProd()
-      ? '/api/pix/gera'
-      : 'http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/gera_chave_pix';
+    const ENDPOINT_PIX = "/api/pix/gera";
+    // const ENDPOINT_PIX = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle_logs";
+
 
     const els = {
       chave: document.getElementById('pixChave'),

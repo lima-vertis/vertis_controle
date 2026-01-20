@@ -43,7 +43,6 @@
     <div class="flex items-center gap-4">
 
       <!-- MENU SANDUÍCHE -->
-      <!-- MENU SANDUÍCHE (CLICK + ACCORDION) -->
       <nav class="relative">
         <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
           aria-expanded="false" aria-controls="menuPanel">
@@ -110,6 +109,21 @@
                 </a>
               </div>
 
+            </div>
+
+            <!-- DESENVOLVIMENTO (nível 1) -->
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="dev">
+              <span>Desenvolvimento</span>
+              <span class="text-slate-400">›</span>
+            </button>
+
+            <!-- Conteúdo Desenvolvimento (nível 2) -->
+            <div class="hidden" data-acc-panel="dev">
+              <a href="gerador_pix.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                Chave PIX
+              </a>
             </div>
 
           </div>

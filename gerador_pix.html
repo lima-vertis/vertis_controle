@@ -179,6 +179,15 @@
             <input id="pixCidade" type="text" placeholder="Ex.: SAO PAULO"
               class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
           </div>
+
+          <div class="space-y-1 md:col-span-2">
+            <label class="text-xs font-medium text-slate-600">WhatsApp do destinatário</label>
+            <input id="whatsContato" type="text" placeholder="Ex.: 11999998888 (DDD + número)"
+              class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+            <p class="text-xs text-slate-400">Use apenas números. Se não colocar o 55, a página adiciona
+              automaticamente.</p>
+          </div>
+
         </div>
 
         <div class="flex flex-wrap items-center gap-2 pt-2">
@@ -191,6 +200,12 @@
             class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
             disabled>
             Copiar resultado
+          </button>
+
+          <button id="btnWhats"
+            class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled>
+            Enviar WhatsApp
           </button>
 
           <button id="btnLimpar"
@@ -257,7 +272,7 @@
 
     // Se você já criou o proxy no Vercel, aponte ele para o endpoint público e use /api/pix/gera aqui
     const ENDPOINT_PIX = "/api/pix/gera";
-    // const ENDPOINT_PIX = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle_logs";
+    // const ENDPOINT_PIX = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/gera_chave_pix";
 
 
     const els = {
@@ -275,6 +290,8 @@
       qrcode: document.getElementById('qrcode'),
       qrPlaceholder: document.getElementById('qrPlaceholder'),
       statusBadge: document.getElementById('statusBadge'),
+      whatsContato: document.getElementById('whatsContato'),
+      btnWhats: document.getElementById('btnWhats'),
       endpointLabel: document.getElementById('endpointLabel')
     };
 
@@ -375,6 +392,7 @@
 
         els.resultado.value = msg;
         els.btnCopiar.disabled = false;
+        refreshActions();
         renderQRCode(msg);
         setStatus('Gerado', 'ok');
       } catch (e) {
@@ -383,6 +401,7 @@
         els.resultado.value = '';
         els.btnCopiar.disabled = true;
         clearQRCode();
+        refreshActions();
       } finally {
         els.btnGerar.disabled = false;
         els.btnGerar.classList.remove('opacity-60', 'cursor-not-allowed');
@@ -405,6 +424,51 @@
       }
     }
 
+    function normalizeWhatsNumber(raw) {
+      let n = String(raw || '').replace(/\D/g, '');
+      if (!n) return '';
+
+      // se vier com 0 no começo, remove
+      n = n.replace(/^0+/, '');
+
+      // se já tem 55 (Brasil), ok
+      if (n.startsWith('55')) return n;
+
+      // se tem DDD + número (10/11 dígitos), prefixa 55
+      if (n.length === 10 || n.length === 11) return '55' + n;
+
+      // fallback: tenta mesmo assim
+      return n;
+    }
+
+    function buildWhatsMessage() {
+      const payload = buildPayload();
+      const pix = (els.resultado.value || '').trim();
+
+      return [
+        `PIX para ${payload.cliente || 'Cliente'}:`,
+        '',
+        pix,
+        '',
+        `Valor: R$ ${Number(payload.valor || 0).toFixed(2)}`,
+        payload.mensagem ? `Mensagem: ${payload.mensagem}` : ''
+      ].filter(Boolean).join('\n');
+    }
+
+    function enviarWhatsApp() {
+      const to = normalizeWhatsNumber(els.whatsContato.value);
+      const pix = (els.resultado.value || '').trim();
+
+      if (!to) { setError('Informe o WhatsApp do destinatário.'); return; }
+      if (!pix) { setError('Gere a chave PIX antes de enviar.'); return; }
+
+      const text = encodeURIComponent(buildWhatsMessage());
+      const url = `https://wa.me/${to}?text=${text}`;
+
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+
     function limpar() {
       els.chave.value = '';
       els.valor.value = '';
@@ -417,7 +481,15 @@
       setError('');
       setStatus('Pronto', 'idle');
       refreshPreview();
+      refreshActions();
     }
+
+    function refreshActions() {
+      const hasPix = !!(els.resultado.value || '').trim();
+      const hasWhats = !!(els.whatsContato.value || '').replace(/\D/g, '');
+      els.btnWhats.disabled = !(hasPix && hasWhats);
+    }
+
 
     ['input', 'change'].forEach(evt => {
       els.chave.addEventListener(evt, refreshPreview);
@@ -473,6 +545,9 @@
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeMenu();
       });
+
+      els.whatsContato.addEventListener('input', refreshActions);
+      els.btnWhats.addEventListener('click', enviarWhatsApp);
 
       const getPanel = (key) => panel.querySelector(`[data-acc-panel="${key}"]`);
 

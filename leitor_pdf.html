@@ -29,33 +29,25 @@
         }
     </style>
 
-    <!-- PDF.js -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
-
+    <!-- IMPORTANTe: não carregamos PDF.js fixo aqui; vai ser dinâmico -->
 </head>
 
 <body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen flex flex-col">
 
-    <!-- HEADER (igual ao seu) -->
+    <!-- HEADER (igual) -->
     <header
         class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
 
-        <!-- ESQUERDA -->
         <div class="flex items-center gap-4">
-
-            <!-- MENU SANDUÍCHE (CLICK + ACCORDION) -->
             <nav class="relative">
                 <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
                     aria-expanded="false" aria-controls="menuPanel">
-
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
 
-                <!-- PAINEL -->
                 <div id="menuPanel"
                     class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl hidden overflow-hidden">
 
@@ -64,7 +56,6 @@
                     </div>
 
                     <div class="py-2 text-sm">
-                        <!-- DFe (nível 1) -->
                         <button type="button"
                             class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
                             data-acc-btn="dfe">
@@ -72,9 +63,7 @@
                             <span class="text-slate-400">›</span>
                         </button>
 
-                        <!-- Conteúdo DFe (nível 2) -->
                         <div class="hidden" data-acc-panel="dfe">
-                            <!-- NFe -->
                             <button type="button"
                                 class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
                                 data-acc-btn="nfe">
@@ -91,7 +80,6 @@
                                 </a>
                             </div>
 
-                            <!-- NFSe -->
                             <button type="button"
                                 class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
                                 data-acc-btn="nfse">
@@ -109,7 +97,6 @@
                             </div>
                         </div>
 
-                        <!-- DESENVOLVIMENTO (nível 1) -->
                         <button type="button"
                             class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
                             data-acc-btn="dev">
@@ -117,13 +104,13 @@
                             <span class="text-slate-400">›</span>
                         </button>
 
-                        <!-- Conteúdo Desenvolvimento (nível 2) -->
                         <div class="hidden" data-acc-panel="dev">
                             <a href="gerador_pix.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
                                 Chave PIX
                             </a>
-                            <a href="pdf_teste.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
-                                Teste PDF.js
+                            <a href="pdf_teste_versionado.html"
+                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                                Teste PDF.js (Versionado)
                             </a>
                         </div>
                     </div>
@@ -131,18 +118,16 @@
             </nav>
 
             <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
-                Vertis • PDF • Teste PDF.js
+                Vertis • PDF • Teste PDF.js (Versionado)
             </h1>
         </div>
 
-        <!-- DIREITA -->
         <div class="flex items-center gap-4">
             <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
         </div>
     </header>
 
     <main class="p-6 flex-1 space-y-6">
-
         <section class="grid grid-cols-1 xl:grid-cols-2 gap-4">
 
             <!-- CONTROLES -->
@@ -150,26 +135,33 @@
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <h2 class="text-base font-semibold text-slate-800">Abrir e renderizar PDF</h2>
-                        <p class="text-sm text-slate-500">Teste de abertura pelo PDF.js (com erro detalhado quando
-                            falhar).</p>
+                        <p class="text-sm text-slate-500">
+                            PDF.js carregado por CDN, com versão configurável em tempo de execução.
+                        </p>
                     </div>
                     <span id="statusBadge"
                         class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600">Pronto</span>
                 </div>
 
-                <div class="space-y-2">
-                    <label class="text-xs font-medium text-slate-600">PDF por URL</label>
-                    <div class="flex gap-2">
-                        <input id="pdfUrl" type="text" placeholder="https://.../arquivo.pdf"
-                            class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
-                        <button id="btnAbrirUrl"
-                            class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition">
-                            Abrir
-                        </button>
+                <!-- NOVO: versão PDF.js -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div class="md:col-span-2 space-y-1">
+                        <label class="text-xs font-medium text-slate-600">Versão PDF.js (2.9.359 / 2.16.105)</label>
+                        <div class="flex gap-2">
+                            <input id="pdfjsVersion" type="text" value="2.16.105" placeholder="ex: 2.16.105"
+                                class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+
+                            <button id="btnAplicarVersao"
+                                class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition whitespace-nowrap">
+                                Aplicar
+                            </button>
+                        </div>
+
+                        <p class="text-xs text-slate-400">
+                            Isso troca <span class="font-mono">pdf.min.js</span> e
+                            <span class="font-mono">pdf.worker.min.js</span>.
+                        </p>
                     </div>
-                    <p class="text-xs text-slate-400">
-                        Dica: o endpoint precisa permitir download (CORS se estiver em outro domínio).
-                    </p>
                 </div>
 
                 <div class="space-y-2">
@@ -215,6 +207,7 @@
                         <div class="text-xs uppercase tracking-wide text-slate-500">Status</div>
                         <div id="pageInfo" class="font-mono">Página: - / -</div>
                         <div id="zoomInfo" class="font-mono">Zoom: 100%</div>
+                        <div id="libInfo" class="font-mono">PDF.js: -</div>
                     </div>
 
                     <div class="bg-slate-50 border rounded-2xl p-4 text-sm text-slate-600 space-y-1">
@@ -250,37 +243,43 @@
 
     <script>
         // ====== CONFIG: coloque aqui o PDF "apontado" para testar automaticamente ======
-        // Ex: const PDF_URL_PADRAO = "https://seu-dominio.com/arquivo.pdf";
         const PDF_URL_PADRAO = "";
-
-        // Worker PDF.js
-        pdfjsLib.GlobalWorkerOptions.workerSrc =
-            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js";
 
         const els = {
             statusBadge: document.getElementById('statusBadge'),
             errorBox: document.getElementById('errorBox'),
-            pdfUrl: document.getElementById('pdfUrl'),
+
+            pdfjsVersion: document.getElementById('pdfjsVersion'),
+            btnAplicarVersao: document.getElementById('btnAplicarVersao'),
+            libInfo: document.getElementById('libInfo'),
+
             pdfFile: document.getElementById('pdfFile'),
-            btnAbrirUrl: document.getElementById('btnAbrirUrl'),
             btnAbrirArquivo: document.getElementById('btnAbrirArquivo'),
+
             btnPrev: document.getElementById('btnPrev'),
             btnNext: document.getElementById('btnNext'),
             btnZoomIn: document.getElementById('btnZoomIn'),
             btnZoomOut: document.getElementById('btnZoomOut'),
+
             pageInfo: document.getElementById('pageInfo'),
             zoomInfo: document.getElementById('zoomInfo'),
             sourceInfo: document.getElementById('sourceInfo'),
+
             canvas: document.getElementById('pdfCanvas'),
         };
 
         const ctx = els.canvas.getContext('2d');
 
+        let pdfjsLibRef = null;       // referência atual da lib
+        let currentVersion = null;    // versão carregada
         let pdfDoc = null;
         let pageNum = 1;
         let totalPages = 0;
         let scale = 1.0;
         let rendering = false;
+
+        // guarda a última fonte pra reabrir após trocar versão
+        let lastSource = { type: null, value: null }; // type: 'url' | 'file'
 
         function setStatus(text, tone) {
             els.statusBadge.textContent = text || '—';
@@ -304,12 +303,78 @@
         function updateUI() {
             els.pageInfo.textContent = `Página: ${pdfDoc ? pageNum : '-'} / ${pdfDoc ? totalPages : '-'}`;
             els.zoomInfo.textContent = `Zoom: ${Math.round(scale * 100)}%`;
+            els.libInfo.textContent = `PDF.js: ${currentVersion || '-'}`;
 
             const enabled = !!pdfDoc && !rendering;
             els.btnPrev.disabled = !enabled || pageNum <= 1;
             els.btnNext.disabled = !enabled || pageNum >= totalPages;
             els.btnZoomIn.disabled = !enabled;
             els.btnZoomOut.disabled = !enabled;
+        }
+
+        function normalizeVersion(v) {
+            return (v || '').trim();
+        }
+
+        function buildPdfJsCdnUrls(version) {
+            // cloudflare CDN
+            const base = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${version}`;
+            return {
+                lib: `${base}/pdf.min.js`,
+                worker: `${base}/pdf.worker.min.js`,
+            };
+        }
+
+        function removeExistingPdfJsScript() {
+            document.querySelectorAll('script[data-pdfjs]').forEach(s => s.remove());
+            // limpa ref global pra garantir novo carregamento
+            if (window.pdfjsLib) delete window.pdfjsLib;
+        }
+
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = src;
+                s.async = true;
+                s.dataset.pdfjs = "1";
+                s.onload = resolve;
+                s.onerror = () => reject(new Error(`Falha ao carregar script: ${src}`));
+                document.head.appendChild(s);
+            });
+        }
+
+        async function ensurePdfJs(version) {
+            const v = normalizeVersion(version);
+            if (!v) throw new Error('Versão PDF.js vazia.');
+
+            // Se já está carregada a mesma versão, reaproveita
+            if (pdfjsLibRef && currentVersion === v) return;
+
+            setStatus('Carregando PDF.js...', 'busy');
+            setError('');
+
+            // reseta estado do documento
+            pdfDoc = null;
+            totalPages = 0;
+            pageNum = 1;
+            scale = 1.0;
+            updateUI();
+
+            removeExistingPdfJsScript();
+
+            const urls = buildPdfJsCdnUrls(v);
+            await loadScript(urls.lib);
+
+            // pdfjsLib fica exposto globalmente
+            pdfjsLibRef = window.pdfjsLib;
+            if (!pdfjsLibRef) throw new Error('pdfjsLib não disponível após carregar o script.');
+
+            // configura worker
+            pdfjsLibRef.GlobalWorkerOptions.workerSrc = urls.worker;
+
+            currentVersion = v;
+            setStatus('PDF.js carregado', 'ok');
+            updateUI();
         }
 
         async function renderPage(num) {
@@ -337,55 +402,20 @@
             }
         }
 
-        async function loadFromUrl(url) {
-            setError('');
-            setStatus('Abrindo...', 'busy');
-            els.sourceInfo.textContent = url;
-
-            try {
-                const loadingTask = pdfjsLib.getDocument({
-                    url,
-                    // flags opcionais úteis em PDFs problemáticos:
-                    // stopAtErrors: false,
-                });
-
-                pdfDoc = await loadingTask.promise;
-                totalPages = pdfDoc.numPages;
-                pageNum = 1;
-                scale = 1.0;
-
-                updateUI();
-                await renderPage(pageNum);
-            } catch (err) {
-                pdfDoc = null;
-                totalPages = 0;
-                pageNum = 1;
-                updateUI();
-
-                setStatus('Falhou', 'err');
-                setError(
-                    'Falha ao abrir o PDF no PDF.js.\n\n' +
-                    'Mensagem:\n' + (err?.message || String(err))
-                );
-            }
-        }
-
         async function loadFromFile(file) {
             setError('');
             setStatus('Abrindo...', 'busy');
             els.sourceInfo.textContent = file?.name ? `Arquivo: ${file.name}` : 'Arquivo';
 
+            lastSource = { type: 'file', value: file };
+
             try {
                 const buf = await file.arrayBuffer();
                 const uint8 = new Uint8Array(buf);
 
-                const loadingTask = pdfjsLib.getDocument({
-                    data: uint8,
-                    // flags opcionais úteis em PDFs problemáticos:
-                    // stopAtErrors: false,
-                });
-
+                const loadingTask = pdfjsLibRef.getDocument({ data: uint8 });
                 pdfDoc = await loadingTask.promise;
+
                 totalPages = pdfDoc.numPages;
                 pageNum = 1;
                 scale = 1.0;
@@ -406,22 +436,38 @@
             }
         }
 
-        // Ações
-        els.btnAbrirUrl.addEventListener('click', async () => {
-            const url = (els.pdfUrl.value || '').trim();
-            if (!url) { setError('Informe uma URL de PDF.'); setStatus('Campos incompletos', 'err'); return; }
-            await loadFromUrl(url);
+        // ===== Eventos =====
+        els.btnAplicarVersao.addEventListener('click', async () => {
+            const v = normalizeVersion(els.pdfjsVersion.value);
+
+            try {
+                await ensurePdfJs(v);
+
+                // se já tinha PDF aberto, tenta reabrir usando a nova versão
+                if (lastSource.type === 'url' && lastSource.value) {
+                    await loadFromUrl(lastSource.value);
+                } else if (lastSource.type === 'file' && lastSource.value) {
+                    await loadFromFile(lastSource.value);
+                } else {
+                    setStatus('Pronto', 'ok');
+                }
+            } catch (err) {
+                setStatus('Falha ao carregar lib', 'err');
+                setError(err?.message || String(err));
+            }
         });
 
         els.btnAbrirArquivo.addEventListener('click', async () => {
             const file = els.pdfFile.files?.[0];
             if (!file) { setError('Selecione um arquivo PDF.'); setStatus('Campos incompletos', 'err'); return; }
+            if (!pdfjsLibRef) { setError('Carregue o PDF.js primeiro.'); setStatus('PDF.js não carregado', 'err'); return; }
             await loadFromFile(file);
         });
 
         els.pdfFile.addEventListener('change', async () => {
             const file = els.pdfFile.files?.[0];
             if (!file) return;
+            if (!pdfjsLibRef) { setError('Carregue o PDF.js primeiro.'); setStatus('PDF.js não carregado', 'err'); return; }
             await loadFromFile(file);
         });
 
@@ -449,66 +495,52 @@
             await renderPage(pageNum);
         });
 
-        // Auto-load (se você setar PDF_URL_PADRAO)
-        (function init() {
-            setStatus('Pronto', 'idle');
+        // ===== Init =====
+        (async function init() {
             updateUI();
+            setStatus('Inicializando...', 'busy');
 
-            if (PDF_URL_PADRAO) {
-                els.pdfUrl.value = PDF_URL_PADRAO;
-                loadFromUrl(PDF_URL_PADRAO);
+            try {
+                const v = normalizeVersion(els.pdfjsVersion.value) || '2.16.105';
+                await ensurePdfJs(v);
+                setStatus('Pronto', 'ok');
+
+                if (PDF_URL_PADRAO) {
+                    els.pdfUrl.value = PDF_URL_PADRAO;
+                    await loadFromUrl(PDF_URL_PADRAO);
+                }
+            } catch (err) {
+                setStatus('Falha ao iniciar', 'err');
+                setError(err?.message || String(err));
             }
         })();
     </script>
 
-    <!-- MENU (igual ao seu) -->
+    <!-- MENU (igual) -->
     <script>
         (function () {
             const btn = document.getElementById('menuBtn');
             const panel = document.getElementById('menuPanel');
-
             if (!btn || !panel) return;
 
-            const openMenu = () => {
-                panel.classList.remove('hidden');
-                btn.setAttribute('aria-expanded', 'true');
-            };
+            const openMenu = () => { panel.classList.remove('hidden'); btn.setAttribute('aria-expanded', 'true'); };
+            const closeMenu = () => { panel.classList.add('hidden'); btn.setAttribute('aria-expanded', 'false'); };
+            const toggleMenu = () => { const isOpen = !panel.classList.contains('hidden'); isOpen ? closeMenu() : openMenu(); };
 
-            const closeMenu = () => {
-                panel.classList.add('hidden');
-                btn.setAttribute('aria-expanded', 'false');
-            };
-
-            const toggleMenu = () => {
-                const isOpen = !panel.classList.contains('hidden');
-                isOpen ? closeMenu() : openMenu();
-            };
-
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleMenu();
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!panel.contains(e.target) && e.target !== btn) closeMenu();
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') closeMenu();
-            });
+            btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+            document.addEventListener('click', (e) => { if (!panel.contains(e.target) && e.target !== btn) closeMenu(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
 
             const getPanel = (key) => panel.querySelector(`[data-acc-panel="${key}"]`);
 
             panel.querySelectorAll('[data-acc-btn]').forEach((accBtn) => {
                 accBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-
                     const key = accBtn.getAttribute('data-acc-btn');
                     const accPanel = getPanel(key);
                     if (!accPanel) return;
 
                     accPanel.classList.toggle('hidden');
-
                     if (key === 'dfe' && accPanel.classList.contains('hidden')) {
                         getPanel('nfe')?.classList.add('hidden');
                         getPanel('nfse')?.classList.add('hidden');

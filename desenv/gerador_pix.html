@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIX | Gerador</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png" sizes="180x180">
+  <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32">
+
+  <style>
+    .fade-in {
+      animation: fadeInUp 0.25s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header
+    class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
+
+    <!-- ESQUERDA -->
+    <div class="flex items-center gap-4">
+
+      <!-- MENU SANDUÍCHE (CLICK + ACCORDION) -->
+      <nav class="relative">
+        <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
+          aria-expanded="false" aria-controls="menuPanel">
+
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <!-- PAINEL -->
+        <div id="menuPanel"
+          class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl hidden overflow-hidden">
+
+          <div class="px-4 py-3 border-b bg-slate-50">
+            <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
+          </div>
+
+          <div class="py-2 text-sm">
+
+            <!-- LAUDOS (nível 1) -->
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="lol">
+              <span>Publicação de Laudos</span>
+              <span class="text-slate-400">›</span>
+            </button>
+
+            <!-- Conteúdo LAUDOS (nível 2) -->
+            <div class="hidden" data-acc-panel="lol">
+              <a href="../laudos/index.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                Visão Geral
+              </a>
+            </div>
+
+            <!-- DFe (nível 1) -->
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="dfe">
+              <span>DFe (Documentos Fiscais)</span>
+              <span class="text-slate-400">›</span>
+            </button>
+
+            <!-- Conteúdo DFe (nível 2) -->
+            <div class="hidden" data-acc-panel="dfe">
+
+              <!-- NFe -->
+              <button type="button"
+                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                data-acc-btn="nfe">
+                <span>NFe</span>
+                <span class="text-slate-400">›</span>
+              </button>
+
+              <div class="hidden" data-acc-panel="nfe">
+                <a href="controle_nfe.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Visão Geral
+                </a>
+                <a href="controle_nfe_logs.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Erros
+                </a>
+              </div>
+
+              <!-- NFSe -->
+              <button type="button"
+                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                data-acc-btn="nfse">
+                <span>NFSe</span>
+                <span class="text-slate-400">›</span>
+              </button>
+
+              <div class="hidden" data-acc-panel="nfse">
+                <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Visão Geral
+                </a>
+                <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Erros
+                </a>
+              </div>
+
+            </div>
+
+            <!-- DESENVOLVIMENTO (nível 1) -->
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="dev">
+              <span>Desenvolvimento</span>
+              <span class="text-slate-400">›</span>
+            </button>
+
+            <!-- Conteúdo Desenvolvimento (nível 2) -->
+            <div class="hidden" data-acc-panel="dev">
+              <a href="gerador_pix.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                Chave PIX
+              </a>
+              <a href="leitor_pdf.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                Leitor PDF (PDF.js)
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </nav>
+
+      <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
+        Vertis • PIX • Gerador
+      </h1>
+    </div>
+
+    <!-- DIREITA -->
+    <div class="flex items-center gap-4">
+      <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
+    </div>
+  </header>
+
+
+  <main class="p-6 flex-1 space-y-6">
+    <section class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+      <!-- FORM -->
+      <div class="bg-white rounded-2xl shadow p-5 space-y-4 fade-in">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-base font-semibold text-slate-800">Gerar PIX</h2>
+            <p class="text-sm text-slate-500">Preencha os dados e gere o PIX (copia e cola + QR Code).</p>
+          </div>
+          <span id="statusBadge" class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600">Pronto</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-xs font-medium text-slate-600">Chave PIX</label>
+            <input id="pixChave" type="text" placeholder="CPF/CNPJ, e-mail, telefone, EVP..."
+              class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-xs font-medium text-slate-600">Valor (R$)</label>
+            <input id="pixValor" type="number" step="0.01" min="0" placeholder="10.00"
+              class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+          </div>
+
+          <div class="space-y-1 md:col-span-2">
+            <label class="text-xs font-medium text-slate-600">Mensagem</label>
+            <input id="pixMensagem" type="text" placeholder="Ex.: Pedido 123 / Mensagem curta"
+              class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-xs font-medium text-slate-600">Cliente</label>
+            <input id="pixCliente" type="text" placeholder="Ex.: Vertis"
+              class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-xs font-medium text-slate-600">cidade</label>
+            <input id="pixCidade" type="text" placeholder="Ex.: SAO PAULO"
+              class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+          </div>
+
+          <div class="space-y-1 md:col-span-2">
+            <label class="text-xs font-medium text-slate-600">WhatsApp do destinatário</label>
+            <input id="whatsContato" type="text" placeholder="Ex.: 11999998888 (DDD + número)"
+              class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+            <p class="text-xs text-slate-400">Use apenas números. Se não colocar o 55, a página adiciona
+              automaticamente.</p>
+          </div>
+
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 pt-2">
+          <button id="btnGerar"
+            class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition">
+            Gerar
+          </button>
+
+          <button id="btnCopiar"
+            class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled>
+            Copiar resultado
+          </button>
+
+          <button id="btnWhats"
+            class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled>
+            Enviar WhatsApp
+          </button>
+
+          <button id="btnLimpar"
+            class="ml-auto px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm transition">
+            Limpar
+          </button>
+        </div>
+
+        <div class="pt-2 space-y-2">
+          <label class="text-xs font-medium text-slate-600">JSON (payload)</label>
+          <pre id="jsonPreview"
+            class="bg-slate-50 border rounded-2xl p-4 text-xs text-slate-700 overflow-auto max-h-44"></pre>
+        </div>
+
+        <div id="errorBox" class="hidden bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl p-4 text-sm"></div>
+      </div>
+
+      <!-- RESULT -->
+      <div class="bg-white rounded-2xl shadow p-5 space-y-4 fade-in">
+        <div>
+          <h2 class="text-base font-semibold text-slate-800">Resultado</h2>
+          <p class="text-sm text-slate-500">Use o QR Code no celular ou copie o código.</p>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-xs font-medium text-slate-600">Chave PIX gerada (message)</label>
+          <textarea id="pixResultado" rows="5" readonly
+            class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring bg-slate-50"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div class="space-y-2">
+            <label class="text-xs font-medium text-slate-600">QR Code</label>
+            <div class="border rounded-2xl p-4 bg-white flex items-center justify-center min-h-[240px]">
+              <div id="qrcode"></div>
+              <div id="qrPlaceholder" class="text-sm text-slate-400">Gere um PIX para ver o QR Code</div>
+            </div>
+            <p class="text-xs text-slate-500">Se o QR não aparecer, verifique se o retorno contém um payload EMV válido.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-medium text-slate-600">Endpoint</label>
+            <div class="bg-slate-50 border rounded-2xl p-4 text-sm text-slate-600 space-y-2">
+              <p class="break-all"><span class="font-semibold">POST</span> <span id="endpointLabel"
+                  class="font-mono"></span></p>
+              <p class="text-xs text-slate-500">Em produção (Vercel), recomenda-se proxy para evitar CORS/mixed content.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    function isProd() {
+      const h = location.hostname;
+      if (location.protocol === 'file:') return false;
+      if (h === 'localhost' || h === '127.0.0.1') return false;
+      return true;
+    }
+
+    // Se você já criou o proxy no Vercel, aponte ele para o endpoint público e use /api/pix/gera aqui
+    const ENDPOINT_PIX = "/api/pix/gera";
+    // const ENDPOINT_PIX = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/gera_chave_pix";
+
+
+    const els = {
+      chave: document.getElementById('pixChave'),
+      valor: document.getElementById('pixValor'),
+      mensagem: document.getElementById('pixMensagem'),
+      cliente: document.getElementById('pixCliente'),
+      cidade: document.getElementById('pixCidade'),
+      jsonPreview: document.getElementById('jsonPreview'),
+      btnGerar: document.getElementById('btnGerar'),
+      btnCopiar: document.getElementById('btnCopiar'),
+      btnLimpar: document.getElementById('btnLimpar'),
+      resultado: document.getElementById('pixResultado'),
+      errorBox: document.getElementById('errorBox'),
+      qrcode: document.getElementById('qrcode'),
+      qrPlaceholder: document.getElementById('qrPlaceholder'),
+      statusBadge: document.getElementById('statusBadge'),
+      whatsContato: document.getElementById('whatsContato'),
+      btnWhats: document.getElementById('btnWhats'),
+      endpointLabel: document.getElementById('endpointLabel')
+    };
+
+    els.endpointLabel.textContent = ENDPOINT_PIX;
+
+    function buildPayload() {
+      const valorNum = Number(String(els.valor.value || '').replace(',', '.'));
+      return {
+        chave: (els.chave.value || '').trim(),
+        valor: isNaN(valorNum) ? 0 : valorNum,
+        mensagem: (els.mensagem.value || '').trim(),
+        cliente: (els.cliente.value || '').trim(),
+        cidade: (els.cidade.value || '').trim().toUpperCase()
+      };
+    }
+
+    function refreshPreview() {
+      els.jsonPreview.textContent = JSON.stringify(buildPayload(), null, 2);
+    }
+
+    function setError(msg) {
+      if (!msg) {
+        els.errorBox.classList.add('hidden');
+        els.errorBox.textContent = '';
+        return;
+      }
+      els.errorBox.textContent = msg;
+      els.errorBox.classList.remove('hidden');
+    }
+
+    function setStatus(text, tone) {
+      els.statusBadge.textContent = text || '—';
+      els.statusBadge.classList.remove('bg-slate-100', 'text-slate-600', 'bg-emerald-50', 'text-emerald-700', 'bg-amber-50', 'text-amber-800', 'bg-rose-50', 'text-rose-700');
+      if (tone === 'ok') els.statusBadge.classList.add('bg-emerald-50', 'text-emerald-700');
+      else if (tone === 'busy') els.statusBadge.classList.add('bg-amber-50', 'text-amber-800');
+      else if (tone === 'err') els.statusBadge.classList.add('bg-rose-50', 'text-rose-700');
+      else els.statusBadge.classList.add('bg-slate-100', 'text-slate-600');
+    }
+
+    function clearQRCode() {
+      els.qrcode.innerHTML = '';
+      els.qrPlaceholder.classList.remove('hidden');
+      els.qrPlaceholder.textContent = 'Gere um PIX para ver o QR Code';
+    }
+
+    function renderQRCode(text) {
+      clearQRCode();
+      if (!text) return;
+      els.qrPlaceholder.classList.add('hidden');
+      new QRCode(els.qrcode, {
+        text: text,
+        width: 210,
+        height: 210,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    function validate(p) {
+      if (!p.chave) return 'Informe a Chave PIX.';
+      if (!p.valor || p.valor <= 0) return 'Informe um Valor maior que zero.';
+      if (!p.mensagem) return 'Informe a Mensagem.';
+      if (!p.cliente) return 'Informe o Cliente.';
+      if (!p.cidade) return 'Informe a Cidade.';
+      return '';
+    }
+
+    async function gerar() {
+      setError('');
+      const payload = buildPayload();
+      const err = validate(payload);
+      if (err) { setError(err); setStatus('Campos incompletos', 'err'); return; }
+
+      els.btnGerar.disabled = true;
+      els.btnGerar.classList.add('opacity-60', 'cursor-not-allowed');
+      setStatus('Gerando...', 'busy');
+
+      try {
+        const res = await fetch(ENDPOINT_PIX, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const ct = (res.headers.get('content-type') || '').toLowerCase();
+        let data;
+        if (ct.includes('application/json')) data = await res.json();
+        else {
+          const txt = await res.text();
+          try { data = JSON.parse(txt); } catch { data = { message: txt }; }
+        }
+
+        if (!res.ok) {
+          throw new Error((data && (data.error || data.message)) ? (data.error || data.message) : ('HTTP ' + res.status));
+        }
+
+        const msg = (data && data.message) ? String(data.message) : '';
+        if (!msg) throw new Error('Resposta sem campo "message".');
+
+        els.resultado.value = msg;
+        els.btnCopiar.disabled = false;
+        refreshActions();
+        renderQRCode(msg);
+        setStatus('Gerado', 'ok');
+      } catch (e) {
+        setError('Falha ao gerar PIX: ' + (e && e.message ? e.message : e));
+        setStatus('Erro', 'err');
+        els.resultado.value = '';
+        els.btnCopiar.disabled = true;
+        clearQRCode();
+        refreshActions();
+      } finally {
+        els.btnGerar.disabled = false;
+        els.btnGerar.classList.remove('opacity-60', 'cursor-not-allowed');
+      }
+    }
+
+    async function copiar() {
+      const t = els.resultado.value || '';
+      if (!t) return;
+      try {
+        await navigator.clipboard.writeText(t);
+        setStatus('Copiado', 'ok');
+        setTimeout(() => setStatus('Pronto', 'idle'), 1200);
+      } catch {
+        els.resultado.focus();
+        els.resultado.select();
+        document.execCommand('copy');
+        setStatus('Copiado', 'ok');
+        setTimeout(() => setStatus('Pronto', 'idle'), 1200);
+      }
+    }
+
+    function normalizeWhatsNumber(raw) {
+      let n = String(raw || '').replace(/\D/g, '');
+      if (!n) return '';
+
+      // se vier com 0 no começo, remove
+      n = n.replace(/^0+/, '');
+
+      // se já tem 55 (Brasil), ok
+      if (n.startsWith('55')) return n;
+
+      // se tem DDD + número (10/11 dígitos), prefixa 55
+      if (n.length === 10 || n.length === 11) return '55' + n;
+
+      // fallback: tenta mesmo assim
+      return n;
+    }
+
+    function buildWhatsMessage() {
+      const payload = buildPayload();
+      const pix = (els.resultado.value || '').trim();
+
+      return [
+        `PIX para ${payload.cliente || 'Cliente'}:`,
+        '',
+        pix,
+        '',
+        `Valor: R$ ${Number(payload.valor || 0).toFixed(2)}`,
+        payload.mensagem ? `Mensagem: ${payload.mensagem}` : ''
+      ].filter(Boolean).join('\n');
+    }
+
+    function enviarWhatsApp() {
+      const to = normalizeWhatsNumber(els.whatsContato.value);
+      const pix = (els.resultado.value || '').trim();
+
+      if (!to) { setError('Informe o WhatsApp do destinatário.'); return; }
+      if (!pix) { setError('Gere a chave PIX antes de enviar.'); return; }
+
+      const text = encodeURIComponent(buildWhatsMessage());
+      const url = `https://wa.me/${to}?text=${text}`;
+
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+
+    function limpar() {
+      els.chave.value = '';
+      els.valor.value = '';
+      els.mensagem.value = '';
+      els.cliente.value = 'Vertis';
+      els.cidade.value = 'SAO PAULO';
+      els.resultado.value = '';
+      els.btnCopiar.disabled = true;
+      clearQRCode();
+      setError('');
+      setStatus('Pronto', 'idle');
+      refreshPreview();
+      refreshActions();
+    }
+
+    function refreshActions() {
+      const hasPix = !!(els.resultado.value || '').trim();
+      const hasWhats = !!(els.whatsContato.value || '').replace(/\D/g, '');
+      els.btnWhats.disabled = !(hasPix && hasWhats);
+    }
+
+
+    ['input', 'change'].forEach(evt => {
+      els.chave.addEventListener(evt, refreshPreview);
+      els.valor.addEventListener(evt, refreshPreview);
+      els.mensagem.addEventListener(evt, refreshPreview);
+      els.cliente.addEventListener(evt, refreshPreview);
+      els.cidade.addEventListener(evt, refreshPreview);
+    });
+
+    els.btnGerar.addEventListener('click', gerar);
+    els.btnCopiar.addEventListener('click', copiar);
+    els.btnLimpar.addEventListener('click', limpar);
+
+    // defaults
+    els.cliente.value = 'Vertis';
+    els.cidade.value = 'SAO PAULO';
+    setStatus('Pronto', 'idle');
+    refreshPreview();
+  </script>
+
+
+  <script>
+    (function () {
+      const btn = document.getElementById('menuBtn');
+      const panel = document.getElementById('menuPanel');
+
+      if (!btn || !panel) return;
+
+      const openMenu = () => {
+        panel.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+      };
+
+      const closeMenu = () => {
+        panel.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+      };
+
+      const toggleMenu = () => {
+        const isOpen = !panel.classList.contains('hidden');
+        isOpen ? closeMenu() : openMenu();
+      };
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!panel.contains(e.target) && e.target !== btn) closeMenu();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMenu();
+      });
+
+      els.whatsContato.addEventListener('input', refreshActions);
+      els.btnWhats.addEventListener('click', enviarWhatsApp);
+
+      const getPanel = (key) => panel.querySelector(`[data-acc-panel="${key}"]`);
+
+      panel.querySelectorAll('[data-acc-btn]').forEach((accBtn) => {
+        accBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          const key = accBtn.getAttribute('data-acc-btn');
+          const accPanel = getPanel(key);
+          if (!accPanel) return;
+
+          accPanel.classList.toggle('hidden');
+
+          if (key === 'dfe' && accPanel.classList.contains('hidden')) {
+            getPanel('nfe')?.classList.add('hidden');
+            getPanel('nfse')?.classList.add('hidden');
+          }
+        });
+      });
+    })();
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF | Teste PDF.js</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png"
+        sizes="180x180">
+    <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32">
+
+    <style>
+        .fade-in {
+            animation: fadeInUp 0.25s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <!-- IMPORTANTe: não carregamos PDF.js fixo aqui; vai ser dinâmico -->
+</head>
+
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen flex flex-col">
+
+    <!-- HEADER (igual) -->
+    <header
+        class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
+
+        <div class="flex items-center gap-4">
+
+            <!-- MENU SANDUÍCHE -->
+            <nav class="relative">
+                <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
+                    aria-expanded="false" aria-controls="menuPanel">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <!-- PAINEL -->
+                <div id="menuPanel" class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl
+           hidden overflow-hidden">
+
+                    <!-- HEADER DO PAINEL (opcional) -->
+                    <div class="px-4 py-3 border-b bg-slate-50">
+                        <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
+                    </div>
+
+                    <div class="py-2 text-sm">
+
+                        <!-- LAUDOS (nível 1) -->
+                        <button type="button"
+                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                            data-acc-btn="lol">
+                            <span>Publicação de Laudos</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
+
+                        <!-- Conteúdo LAUDOS (nível 2) -->
+                        <div class="hidden" data-acc-panel="lol">
+                            <a href="../laudos/index.html"
+                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                                Visão Geral
+                            </a>
+                        </div>
+
+                        <!-- DFe (nível 1) -->
+                        <button type="button"
+                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                            data-acc-btn="dfe">
+                            <span>DFe (Documentos Fiscais)</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
+
+                        <!-- Conteúdo DFe (nível 2) -->
+                        <div class="hidden" data-acc-panel="dfe">
+
+                            <!-- NFe -->
+                            <button type="button"
+                                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                                data-acc-btn="nfe">
+                                <span>NFe</span>
+                                <span class="text-slate-400">›</span>
+                            </button>
+
+                            <div class="hidden" data-acc-panel="nfe">
+                                <a href="controle_nfe.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Visão Geral
+                                </a>
+                                <a href="controle_nfe_logs.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Erros
+                                </a>
+                            </div>
+
+                            <!-- NFSe -->
+                            <button type="button"
+                                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                                data-acc-btn="nfse">
+                                <span>NFSe</span>
+                                <span class="text-slate-400">›</span>
+                            </button>
+
+                            <div class="hidden" data-acc-panel="nfse">
+                                <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Visão Geral
+                                </a>
+                                <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Erros
+                                </a>
+                            </div>
+
+                        </div>
+
+                        <!-- DESENVOLVIMENTO (nível 1) -->
+                        <button type="button"
+                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                            data-acc-btn="dev">
+                            <span>Desenvolvimento</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
+
+                        <!-- Conteúdo Desenvolvimento (nível 2) -->
+                        <div class="hidden" data-acc-panel="dev">
+                            <a href="gerador_pix.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                                Chave PIX
+                            </a>
+                            <a href="leitor_pdf.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                                Leitor PDF (PDF.js)
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </nav>
+
+            <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
+                Vertis • PDF • Teste PDF.js (Versionado)
+            </h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
+        </div>
+    </header>
+
+    <main class="p-6 flex-1 space-y-6">
+        <section class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+
+            <!-- CONTROLES -->
+            <div class="bg-white rounded-2xl shadow p-5 space-y-4 fade-in">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-base font-semibold text-slate-800">Abrir e renderizar PDF</h2>
+                        <p class="text-sm text-slate-500">
+                            PDF.js carregado por CDN, com versão configurável em tempo de execução.
+                        </p>
+                    </div>
+                    <span id="statusBadge"
+                        class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600">Pronto</span>
+                </div>
+
+                <!-- NOVO: versão PDF.js -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div class="md:col-span-2 space-y-1">
+                        <label class="text-xs font-medium text-slate-600">Versão PDF.js (2.9.359 / 2.16.105)</label>
+                        <div class="flex gap-2">
+                            <input id="pdfjsVersion" type="text" value="2.16.105" placeholder="ex: 2.16.105"
+                                class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+
+                            <button id="btnAplicarVersao"
+                                class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium transition whitespace-nowrap">
+                                Aplicar
+                            </button>
+                        </div>
+
+                        <p class="text-xs text-slate-400">
+                            Isso troca <span class="font-mono">pdf.min.js</span> e
+                            <span class="font-mono">pdf.worker.min.js</span>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-medium text-slate-600">PDF local (upload)</label>
+                    <div class="flex items-center gap-2">
+                        <input id="pdfFile" type="file" accept="application/pdf"
+                            class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+                        <button id="btnAbrirArquivo"
+                            class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition">
+                            Abrir
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2">
+                    <button id="btnPrev"
+                        class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                        ← Página
+                    </button>
+
+                    <button id="btnNext"
+                        class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                        Página →
+                    </button>
+
+                    <button id="btnZoomOut"
+                        class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                        Zoom −
+                    </button>
+
+                    <button id="btnZoomIn"
+                        class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                        Zoom +
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                    <div class="bg-slate-50 border rounded-2xl p-4 text-sm text-slate-600 space-y-1">
+                        <div class="text-xs uppercase tracking-wide text-slate-500">Status</div>
+                        <div id="pageInfo" class="font-mono">Página: - / -</div>
+                        <div id="zoomInfo" class="font-mono">Zoom: 100%</div>
+                        <div id="libInfo" class="font-mono">PDF.js: -</div>
+                    </div>
+
+                    <div class="bg-slate-50 border rounded-2xl p-4 text-sm text-slate-600 space-y-1">
+                        <div class="text-xs uppercase tracking-wide text-slate-500">Fonte atual</div>
+                        <div id="sourceInfo" class="font-mono break-all">—</div>
+                    </div>
+                </div>
+
+                <div id="errorBox"
+                    class="hidden bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl p-4 text-sm whitespace-pre-wrap">
+                </div>
+            </div>
+
+            <!-- VIEWER -->
+            <div class="bg-white rounded-2xl shadow p-5 space-y-4 fade-in">
+                <div>
+                    <h2 class="text-base font-semibold text-slate-800">Visualização</h2>
+                    <p class="text-sm text-slate-500">Renderização via canvas (PDF.js).</p>
+                </div>
+
+                <div class="border rounded-2xl p-3 bg-slate-50 overflow-auto">
+                    <canvas id="pdfCanvas" class="mx-auto bg-white rounded-xl shadow"></canvas>
+                </div>
+
+                <p class="text-xs text-slate-500">
+                    Se abrir no leitor do Windows e falhar aqui com “Invalid PDF structure”, geralmente é problema de
+                    xref/trailer.
+                </p>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        // ====== CONFIG: coloque aqui o PDF "apontado" para testar automaticamente ======
+        const PDF_URL_PADRAO = "";
+
+        const els = {
+            statusBadge: document.getElementById('statusBadge'),
+            errorBox: document.getElementById('errorBox'),
+
+            pdfjsVersion: document.getElementById('pdfjsVersion'),
+            btnAplicarVersao: document.getElementById('btnAplicarVersao'),
+            libInfo: document.getElementById('libInfo'),
+
+            pdfFile: document.getElementById('pdfFile'),
+            btnAbrirArquivo: document.getElementById('btnAbrirArquivo'),
+
+            btnPrev: document.getElementById('btnPrev'),
+            btnNext: document.getElementById('btnNext'),
+            btnZoomIn: document.getElementById('btnZoomIn'),
+            btnZoomOut: document.getElementById('btnZoomOut'),
+
+            pageInfo: document.getElementById('pageInfo'),
+            zoomInfo: document.getElementById('zoomInfo'),
+            sourceInfo: document.getElementById('sourceInfo'),
+
+            canvas: document.getElementById('pdfCanvas'),
+        };
+
+        const ctx = els.canvas.getContext('2d');
+
+        let pdfjsLibRef = null;       // referência atual da lib
+        let currentVersion = null;    // versão carregada
+        let pdfDoc = null;
+        let pageNum = 1;
+        let totalPages = 0;
+        let scale = 1.0;
+        let rendering = false;
+
+        // guarda a última fonte pra reabrir após trocar versão
+        let lastSource = { type: null, value: null }; // type: 'url' | 'file'
+
+        function setStatus(text, tone) {
+            els.statusBadge.textContent = text || '—';
+            els.statusBadge.classList.remove('bg-slate-100', 'text-slate-600', 'bg-emerald-50', 'text-emerald-700', 'bg-amber-50', 'text-amber-800', 'bg-rose-50', 'text-rose-700');
+            if (tone === 'ok') els.statusBadge.classList.add('bg-emerald-50', 'text-emerald-700');
+            else if (tone === 'busy') els.statusBadge.classList.add('bg-amber-50', 'text-amber-800');
+            else if (tone === 'err') els.statusBadge.classList.add('bg-rose-50', 'text-rose-700');
+            else els.statusBadge.classList.add('bg-slate-100', 'text-slate-600');
+        }
+
+        function setError(msg) {
+            if (!msg) {
+                els.errorBox.classList.add('hidden');
+                els.errorBox.textContent = '';
+                return;
+            }
+            els.errorBox.textContent = msg;
+            els.errorBox.classList.remove('hidden');
+        }
+
+        function updateUI() {
+            els.pageInfo.textContent = `Página: ${pdfDoc ? pageNum : '-'} / ${pdfDoc ? totalPages : '-'}`;
+            els.zoomInfo.textContent = `Zoom: ${Math.round(scale * 100)}%`;
+            els.libInfo.textContent = `PDF.js: ${currentVersion || '-'}`;
+
+            const enabled = !!pdfDoc && !rendering;
+            els.btnPrev.disabled = !enabled || pageNum <= 1;
+            els.btnNext.disabled = !enabled || pageNum >= totalPages;
+            els.btnZoomIn.disabled = !enabled;
+            els.btnZoomOut.disabled = !enabled;
+        }
+
+        function normalizeVersion(v) {
+            return (v || '').trim();
+        }
+
+        function buildPdfJsCdnUrls(version) {
+            // cloudflare CDN
+            const base = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${version}`;
+            return {
+                lib: `${base}/pdf.min.js`,
+                worker: `${base}/pdf.worker.min.js`,
+            };
+        }
+
+        function removeExistingPdfJsScript() {
+            document.querySelectorAll('script[data-pdfjs]').forEach(s => s.remove());
+            // limpa ref global pra garantir novo carregamento
+            if (window.pdfjsLib) delete window.pdfjsLib;
+        }
+
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = src;
+                s.async = true;
+                s.dataset.pdfjs = "1";
+                s.onload = resolve;
+                s.onerror = () => reject(new Error(`Falha ao carregar script: ${src}`));
+                document.head.appendChild(s);
+            });
+        }
+
+        async function ensurePdfJs(version) {
+            const v = normalizeVersion(version);
+            if (!v) throw new Error('Versão PDF.js vazia.');
+
+            // Se já está carregada a mesma versão, reaproveita
+            if (pdfjsLibRef && currentVersion === v) return;
+
+            setStatus('Carregando PDF.js...', 'busy');
+            setError('');
+
+            // reseta estado do documento
+            pdfDoc = null;
+            totalPages = 0;
+            pageNum = 1;
+            scale = 1.0;
+            updateUI();
+
+            removeExistingPdfJsScript();
+
+            const urls = buildPdfJsCdnUrls(v);
+            await loadScript(urls.lib);
+
+            // pdfjsLib fica exposto globalmente
+            pdfjsLibRef = window.pdfjsLib;
+            if (!pdfjsLibRef) throw new Error('pdfjsLib não disponível após carregar o script.');
+
+            // configura worker
+            pdfjsLibRef.GlobalWorkerOptions.workerSrc = urls.worker;
+
+            currentVersion = v;
+            setStatus('PDF.js carregado', 'ok');
+            updateUI();
+        }
+
+        async function renderPage(num) {
+            if (!pdfDoc) return;
+            rendering = true;
+            updateUI();
+
+            try {
+                const page = await pdfDoc.getPage(num);
+                const viewport = page.getViewport({ scale });
+
+                els.canvas.width = Math.floor(viewport.width);
+                els.canvas.height = Math.floor(viewport.height);
+
+                ctx.clearRect(0, 0, els.canvas.width, els.canvas.height);
+
+                await page.render({ canvasContext: ctx, viewport }).promise;
+                setStatus('Renderizado', 'ok');
+            } catch (err) {
+                setStatus('Erro', 'err');
+                setError('Erro ao renderizar página:\n' + (err?.message || String(err)));
+            } finally {
+                rendering = false;
+                updateUI();
+            }
+        }
+
+        async function loadFromFile(file) {
+            setError('');
+            setStatus('Abrindo...', 'busy');
+            els.sourceInfo.textContent = file?.name ? `Arquivo: ${file.name}` : 'Arquivo';
+
+            lastSource = { type: 'file', value: file };
+
+            try {
+                const buf = await file.arrayBuffer();
+                const uint8 = new Uint8Array(buf);
+
+                const loadingTask = pdfjsLibRef.getDocument({ data: uint8 });
+                pdfDoc = await loadingTask.promise;
+
+                totalPages = pdfDoc.numPages;
+                pageNum = 1;
+                scale = 1.0;
+
+                updateUI();
+                await renderPage(pageNum);
+            } catch (err) {
+                pdfDoc = null;
+                totalPages = 0;
+                pageNum = 1;
+                updateUI();
+
+                setStatus('Falhou', 'err');
+                setError(
+                    'Falha ao abrir o PDF no PDF.js.\n\n' +
+                    'Mensagem:\n' + (err?.message || String(err))
+                );
+            }
+        }
+
+        // ===== Eventos =====
+        els.btnAplicarVersao.addEventListener('click', async () => {
+            const v = normalizeVersion(els.pdfjsVersion.value);
+
+            try {
+                await ensurePdfJs(v);
+
+                // se já tinha PDF aberto, tenta reabrir usando a nova versão
+                if (lastSource.type === 'url' && lastSource.value) {
+                    await loadFromUrl(lastSource.value);
+                } else if (lastSource.type === 'file' && lastSource.value) {
+                    await loadFromFile(lastSource.value);
+                } else {
+                    setStatus('Pronto', 'ok');
+                }
+            } catch (err) {
+                setStatus('Falha ao carregar lib', 'err');
+                setError(err?.message || String(err));
+            }
+        });
+
+        els.btnAbrirArquivo.addEventListener('click', async () => {
+            const file = els.pdfFile.files?.[0];
+            if (!file) { setError('Selecione um arquivo PDF.'); setStatus('Campos incompletos', 'err'); return; }
+            if (!pdfjsLibRef) { setError('Carregue o PDF.js primeiro.'); setStatus('PDF.js não carregado', 'err'); return; }
+            await loadFromFile(file);
+        });
+
+        els.pdfFile.addEventListener('change', async () => {
+            const file = els.pdfFile.files?.[0];
+            if (!file) return;
+            if (!pdfjsLibRef) { setError('Carregue o PDF.js primeiro.'); setStatus('PDF.js não carregado', 'err'); return; }
+            await loadFromFile(file);
+        });
+
+        els.btnPrev.addEventListener('click', async () => {
+            if (!pdfDoc || pageNum <= 1 || rendering) return;
+            pageNum--;
+            await renderPage(pageNum);
+        });
+
+        els.btnNext.addEventListener('click', async () => {
+            if (!pdfDoc || pageNum >= totalPages || rendering) return;
+            pageNum++;
+            await renderPage(pageNum);
+        });
+
+        els.btnZoomIn.addEventListener('click', async () => {
+            if (!pdfDoc || rendering) return;
+            scale = Math.min(scale + 0.15, 3.0);
+            await renderPage(pageNum);
+        });
+
+        els.btnZoomOut.addEventListener('click', async () => {
+            if (!pdfDoc || rendering) return;
+            scale = Math.max(scale - 0.15, 0.4);
+            await renderPage(pageNum);
+        });
+
+        // ===== Init =====
+        (async function init() {
+            updateUI();
+            setStatus('Inicializando...', 'busy');
+
+            try {
+                const v = normalizeVersion(els.pdfjsVersion.value) || '2.16.105';
+                await ensurePdfJs(v);
+                setStatus('Pronto', 'ok');
+
+                if (PDF_URL_PADRAO) {
+                    els.pdfUrl.value = PDF_URL_PADRAO;
+                    await loadFromUrl(PDF_URL_PADRAO);
+                }
+            } catch (err) {
+                setStatus('Falha ao iniciar', 'err');
+                setError(err?.message || String(err));
+            }
+        })();
+    </script>
+
+    <!-- MENU (igual) -->
+    <script>
+        (function () {
+            const btn = document.getElementById('menuBtn');
+            const panel = document.getElementById('menuPanel');
+            if (!btn || !panel) return;
+
+            const openMenu = () => { panel.classList.remove('hidden'); btn.setAttribute('aria-expanded', 'true'); };
+            const closeMenu = () => { panel.classList.add('hidden'); btn.setAttribute('aria-expanded', 'false'); };
+            const toggleMenu = () => { const isOpen = !panel.classList.contains('hidden'); isOpen ? closeMenu() : openMenu(); };
+
+            btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+            document.addEventListener('click', (e) => { if (!panel.contains(e.target) && e.target !== btn) closeMenu(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+            const getPanel = (key) => panel.querySelector(`[data-acc-panel="${key}"]`);
+
+            panel.querySelectorAll('[data-acc-btn]').forEach((accBtn) => {
+                accBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const key = accBtn.getAttribute('data-acc-btn');
+                    const accPanel = getPanel(key);
+                    if (!accPanel) return;
+
+                    accPanel.classList.toggle('hidden');
+                    if (key === 'dfe' && accPanel.classList.contains('hidden')) {
+                        getPanel('nfe')?.classList.add('hidden');
+                        getPanel('nfse')?.classList.add('hidden');
+                    }
+                });
+            });
+        })();
+    </script>
+
+</body>
+
+</html>

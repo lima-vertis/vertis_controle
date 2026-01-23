@@ -11,6 +11,10 @@
         {
             "source": "/api/pix/gera",
             "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/gera_chave_pix"
+        },
+        {
+            "source": "/api/laudos/controle",
+            "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_publicacao_controle"
         }
     ]
 }

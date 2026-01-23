@@ -63,6 +63,21 @@
 
           <div class="py-2 text-sm">
 
+            <!-- LAUDOS (nível 1) -->
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="lol">
+              <span>Publicação de Laudos</span>
+              <span class="text-slate-400">›</span>
+            </button>
+
+            <!-- Conteúdo LAUDOS (nível 2) -->
+            <div class="hidden" data-acc-panel="lol">
+              <a href="../laudos/index.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                Visão Geral
+              </a>
+            </div>
+
             <!-- DFe (nível 1) -->
             <button type="button"
               class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
@@ -83,10 +98,10 @@
               </button>
 
               <div class="hidden" data-acc-panel="nfe">
-                <a href="../nfe/index.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                <a href="controle_nfe.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
                   Visão Geral
                 </a>
-                <a href="../nfe/controle_nfe_logs.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                <a href="controle_nfe_logs.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
                   Erros
                 </a>
               </div>
@@ -190,6 +205,10 @@
             <div class="text-right">
               <p class="text-[11px] text-slate-500">Total</p>
               <p id="kpi_lol_tot" class="text-xl font-bold text-slate-800 count">0</p>
+              <svg id="spark_lol" class="mt-1 h-6 w-24 text-slate-400" viewBox="0 0 100 24" preserveAspectRatio="none"
+                aria-label="Sparkline Internet">
+                <polyline id="spark_lol_line" fill="none" stroke="currentColor" stroke-width="2" points=""></polyline>
+              </svg>
             </div>
           </div>
 
@@ -233,7 +252,11 @@
 
           <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500">
             <span>Último envio</span>
-            <span id="kpi_lol_ult" class="font-medium text-slate-700">—</span>
+            <span class="flex items-center gap-2">
+              <span id="kpi_lol_stale"
+                class="hidden text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">—</span>
+              <span id="kpi_lol_ult" class="font-medium text-slate-700">—</span>
+            </span>
           </div>
         </div>
 
@@ -247,6 +270,10 @@
             <div class="text-right">
               <p class="text-[11px] text-slate-500">Total</p>
               <p id="kpi_loe_tot" class="text-xl font-bold text-slate-800 count">0</p>
+              <svg id="spark_loe" class="mt-1 h-6 w-24 text-slate-400" viewBox="0 0 100 24" preserveAspectRatio="none"
+                aria-label="Sparkline E-mail">
+                <polyline id="spark_loe_line" fill="none" stroke="currentColor" stroke-width="2" points=""></polyline>
+              </svg>
             </div>
           </div>
 
@@ -290,7 +317,11 @@
 
           <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500">
             <span>Último envio</span>
-            <span id="kpi_loe_ult" class="font-medium text-slate-700">—</span>
+            <span class="flex items-center gap-2">
+              <span id="kpi_loe_stale"
+                class="hidden text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">—</span>
+              <span id="kpi_loe_ult" class="font-medium text-slate-700">—</span>
+            </span>
           </div>
         </div>
       </div>
@@ -302,6 +333,10 @@
       <div class="flex items-center gap-2">
         <span id="modeBadge"
           class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">Modo: Hoje</span>
+        <button id="btnOnlyErrors" type="button"
+          class="text-xs px-2 py-1 rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition">
+          👀 Somente erro
+        </button>
         <span class="text-sm text-slate-500 whitespace-nowrap">Auto-refresh 5 min</span>
       </div>
     </div>
@@ -328,8 +363,8 @@
   </main>
 
   <script>
-    //const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_publicacao_controle";
-    const endpoint = "/api/laudos/controle";
+    const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_publicacao_controle";
+    // const endpoint = "/api/nfce/controle";
 
     const PAGE_SIZE = 10;
     let currentPage = 1;
@@ -375,6 +410,10 @@
 
     let originalData = [], filteredData = [], sortKey = null, sortAsc = true;
     let modeBound = false;
+    let onlyErrors = false;
+    const HISTORY_KEY = 'laudos_pub_history_v1';
+    const HISTORY_MAX = 60; // últimos pontos (auto-refresh 5 min)
+
 
     const getPagedData = () =>
       filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -393,6 +432,115 @@
       const pct = total > 0 ? Math.min((valor / total) * 100, 100) : 0;
       el.style.width = pct + '%';
     };
+    const parseBrDateTime = (s) => {
+      // "DD/MM/YYYY HH:MM:SS"
+      if (!s || typeof s !== 'string') return null;
+      const m = s.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?/);
+      if (!m) return null;
+      const [_, dd, mm, yyyy, HH, MI, SS] = m;
+      return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(HH), Number(MI), Number(SS || 0));
+    };
+
+    const minutesSince = (dt) => {
+      if (!dt) return null;
+      const diffMs = Date.now() - dt.getTime();
+      return Math.floor(diffMs / 60000);
+    };
+
+    const setStaleBadge = (badgeId, dt) => {
+      const el = document.getElementById(badgeId);
+      if (!el) return;
+
+      const mins = minutesSince(dt);
+      if (mins == null || mins < 0) {
+        el.classList.add('hidden');
+        el.textContent = '—';
+        return;
+      }
+
+      el.classList.remove('hidden');
+      el.textContent = `sem envio há ${mins} min`;
+
+      // cores por faixa
+      el.classList.remove('bg-slate-100', 'text-slate-700', 'border-slate-200',
+        'bg-amber-50', 'text-amber-700', 'border-amber-200',
+        'bg-rose-50', 'text-rose-700', 'border-rose-200');
+
+      if (mins >= 60) {
+        el.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
+      } else if (mins >= 20) {
+        el.classList.add('bg-amber-50', 'text-amber-700', 'border-amber-200');
+      } else {
+        el.classList.add('bg-slate-100', 'text-slate-700', 'border-slate-200');
+      }
+    };
+
+    const loadHistory = () => {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const saveHistory = (arr) => {
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(-HISTORY_MAX)));
+      } catch { }
+    };
+
+    const updateSpark = (lineId, values) => {
+      const line = document.getElementById(lineId);
+      if (!line) return;
+
+      if (!values || values.length < 2) {
+        line.setAttribute('points', '');
+        return;
+      }
+
+      const minV = Math.min(...values);
+      const maxV = Math.max(...values);
+      const span = (maxV - minV) || 1;
+
+      const pts = values.map((v, i) => {
+        const x = (i / (values.length - 1)) * 100;
+        const y = 22 - ((v - minV) / span) * 20; // padding top/bottom
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+
+      line.setAttribute('points', pts);
+    };
+
+    const updateSparklines = (point) => {
+      // Só em "Hoje"
+      const svgLol = document.getElementById('spark_lol');
+      const svgLoe = document.getElementById('spark_loe');
+
+      if (viewMode !== 'hoje') {
+        if (svgLol) svgLol.classList.add('hidden');
+        if (svgLoe) svgLoe.classList.add('hidden');
+        return;
+      }
+
+      if (svgLol) svgLol.classList.remove('hidden');
+      if (svgLoe) svgLoe.classList.remove('hidden');
+
+      const hist = loadHistory();
+
+      // Dedup simples: evita empilhar pontos em re-render (filtro/paginação)
+      const last = hist[hist.length - 1];
+      const shouldPush = !last || (point.t - last.t) > 60_000;
+
+      const next = shouldPush ? [...hist, point] : [...hist.slice(0, -1), point];
+      const trimmed = next.slice(-HISTORY_MAX);
+      saveHistory(trimmed);
+
+      updateSpark('spark_lol_line', trimmed.map(p => p.lol_tot));
+      updateSpark('spark_loe_line', trimmed.map(p => p.loe_tot));
+    };
+
 
     function updateKPIs() {
       const sum = (k) => filteredData.reduce((t, r) => t + Number(r[k] || 0), 0);
@@ -442,12 +590,37 @@
       setBar('kpi_loe_fil_bar', loe_fil, loe_tot);
       setBar('kpi_loe_err_bar', loe_err, loe_tot);
 
-      // Últimos (só faz sentido no "Hoje", mas mantemos no Mês também)
+      // Últimos (usado também para badge "sem envio há X min")
       const lastLol = filteredData.map(r => r.dth_ult_lol).filter(Boolean).sort().slice(-1)[0] || '—';
       const lastLoe = filteredData.map(r => r.dth_ult_loe).filter(Boolean).sort().slice(-1)[0] || '—';
 
       document.getElementById('kpi_lol_ult').textContent = lastLol;
       document.getElementById('kpi_loe_ult').textContent = lastLoe;
+
+      // Badge "sem envio há X min" (baseado nos últimos envios)
+      setStaleBadge('kpi_lol_stale', parseBrDateTime(lastLol));
+      setStaleBadge('kpi_loe_stale', parseBrDateTime(lastLoe));
+
+      // Highlight automático quando houver erro
+      const internetCard = document.getElementById('kpi_lol_err')?.closest('.rounded-2xl');
+      const emailCard = document.getElementById('kpi_loe_err')?.closest('.rounded-2xl');
+
+      const toggleErrCard = (el, hasErr) => {
+        if (!el) return;
+        el.classList.toggle('ring-2', hasErr);
+        el.classList.toggle('ring-rose-200', hasErr);
+        el.classList.toggle('bg-rose-50/40', hasErr);
+      };
+
+      toggleErrCard(internetCard, lol_err > 0);
+      toggleErrCard(emailCard, loe_err > 0);
+
+      // Sparklines (somente no modo HOJE)
+      updateSparklines({
+        t: Date.now(),
+        lol_tot,
+        loe_tot,
+      });
     }
 
     /* ===== TABLE ===== */
@@ -481,7 +654,9 @@
 
       getPagedData().forEach((row, i) => {
         const tr = document.createElement('tr');
-        tr.className = `${i % 2 ? 'bg-slate-50' : 'bg-white'} hover:bg-slate-100 fade-in`;
+        const errKeys = viewMode === 'hoje' ? ['lol_hoj_err', 'loe_hoj_err'] : ['lol_mes_err', 'loe_mes_err'];
+        const rowHasErr = errKeys.some(k => Number(row[k] || 0) > 0);
+        tr.className = `${i % 2 ? 'bg-slate-50' : 'bg-white'} hover:bg-slate-100 fade-in` + (rowHasErr ? ' border-l-4 border-rose-400' : '');
         let left = 0;
 
         columns.forEach(col => {
@@ -499,6 +674,10 @@
 
           td.className = cls;
           td.textContent = row[col.key] ?? '';
+          const v = Number(row[col.key] || 0);
+          if (col.key.includes('_err') && v > 0) {
+            td.classList.add('bg-rose-50', 'text-rose-700', 'font-semibold');
+          }
           tr.appendChild(td);
         });
         tbody.appendChild(tr);
@@ -605,15 +784,26 @@
 
     function applyFilter() {
       const v = filterInput.value.toLowerCase();
-      filteredData = originalData.filter(r =>
+
+      const base = originalData.filter(r =>
         String(r.cod_unid_negoc).includes(v) ||
         String(r.cod_unid_oper).includes(v) ||
         String(r.nom_unid_oper).toLowerCase().includes(v)
       );
+
+      if (!onlyErrors) {
+        filteredData = base;
+      } else {
+        const errKeys = viewMode === 'hoje'
+          ? ['lol_hoj_err', 'loe_hoj_err']
+          : ['lol_mes_err', 'loe_mes_err'];
+
+        filteredData = base.filter(r => errKeys.some(k => Number(r[k] || 0) > 0));
+      }
+
       currentPage = 1;
       renderTable();
     }
-
 
     function setMode(mode) {
       viewMode = mode;
@@ -650,10 +840,26 @@
     function bindModeToggle() {
       const btnHoje = document.getElementById('btnModeHoje');
       const btnMes = document.getElementById('btnModeMes');
+      const btnOnly = document.getElementById('btnOnlyErrors');
       if (!btnHoje || !btnMes) return;
 
       btnHoje.addEventListener('click', () => setMode('hoje'));
       btnMes.addEventListener('click', () => setMode('mes'));
+
+      if (btnOnly) {
+        btnOnly.addEventListener('click', () => {
+          onlyErrors = !onlyErrors;
+          // estilo
+          if (onlyErrors) {
+            btnOnly.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
+            btnOnly.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+          } else {
+            btnOnly.classList.remove('bg-rose-50', 'text-rose-700', 'border-rose-200');
+            btnOnly.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+          }
+          applyFilter();
+        });
+      }
     }
 
     async function loadData() {

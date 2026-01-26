@@ -350,6 +350,80 @@
       el.style.width = pct + '%';
     };
 
+    const parseBrDateTime = (s) => {
+      // "DD/MM/YYYY HH:MM:SS"
+      if (!s || typeof s !== 'string') return null;
+      const m = s.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?/);
+      if (!m) return null;
+      const [_, dd, mm, yyyy, HH, MI, SS] = m;
+      return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(HH), Number(MI), Number(SS || 0));
+    };
+
+    const parseIsoDateTime = (value) => {
+      if (!value) return null;
+      // Esperado: YYYY-MM-DD HH:mm:SS
+      const [datePart, timePart] = value.split(' ');
+      if (!datePart || !timePart) return null;
+
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute, second] = timePart.split(':').map(Number);
+
+      return new Date(year, month - 1, day, hour, minute, second);
+    };
+
+    const formatDateTimeBR = (date) => {
+      if (!(date instanceof Date) || isNaN(date)) return '';
+
+      const pad = (n) => String(n).padStart(2, '0');
+
+      const day = pad(date.getDate());
+      const month = pad(date.getMonth() + 1);
+      const year = date.getFullYear();
+
+      const hour = pad(date.getHours());
+      const minute = pad(date.getMinutes());
+      const second = pad(date.getSeconds());
+
+      return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
+    };
+
+    const minutesSince = (dt) => {
+      if (!dt) return null;
+      const diffMs = Date.now() - dt.getTime();
+      return Math.floor(diffMs / 60000);
+    };
+
+    const isFresh = (dt, maxMinutes = 30) => {
+      const mins = minutesSince(dt);
+      if (mins == null) return null;     // sem data
+      if (mins < 0) return true;         // data no "futuro" (relógio/servidor), considera OK
+      return mins <= maxMinutes;
+    };
+
+    const renderFreshIcon = (dt, maxMinutes = 30) => {
+      const ok = isFresh(dt, maxMinutes);
+      const dtBr = formatDateTimeBR(dt);
+
+      if (ok === null) {
+        return `<span class="inline-flex items-center gap-2 text-slate-400" title="Sem data">
+      <span class="h-2 w-2 rounded-full bg-slate-300"></span><span class="text-xs">—</span>
+    </span>`;
+      }
+
+      if (ok) {
+        return `<span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200"
+      title="${dtBr}">
+      ✓
+    </span>`;
+      }
+
+      const mins = minutesSince(dt);
+      return `<span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-rose-50 text-rose-700 border border-rose-200"
+    title="${dtBr})">
+    !
+  </span>`;
+    };
+
     function updateKPIs() {
       const sum = k => filteredData.reduce((t, r) => t + Number(r[k] || 0), 0);
 
@@ -449,7 +523,15 @@
           }
 
           td.className = cls;
-          td.textContent = row[col.key] ?? '';
+          if (col.key === 'dth_ult_atualizacao') {
+            const dt = parseIsoDateTime(row[col.key]);
+            td.innerHTML = `<div class="flex items-center justify-center">
+            ${renderFreshIcon(dt, 30)}
+            </div>`;
+            td.classList.add('text-center');
+          } else {
+            td.textContent = row[col.key] ?? '';
+          }
           tr.appendChild(td);
         });
         tbody.appendChild(tr);

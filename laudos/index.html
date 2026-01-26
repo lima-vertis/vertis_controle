@@ -432,6 +432,7 @@
       const pct = total > 0 ? Math.min((valor / total) * 100, 100) : 0;
       el.style.width = pct + '%';
     };
+
     const parseBrDateTime = (s) => {
       // "DD/MM/YYYY HH:MM:SS"
       if (!s || typeof s !== 'string') return null;
@@ -441,11 +442,71 @@
       return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(HH), Number(MI), Number(SS || 0));
     };
 
+    const parseIsoDateTime = (value) => {
+      if (!value) return null;
+      // Esperado: YYYY-MM-DD HH:mm:SS
+      const [datePart, timePart] = value.split(' ');
+      if (!datePart || !timePart) return null;
+
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute, second] = timePart.split(':').map(Number);
+
+      return new Date(year, month - 1, day, hour, minute, second);
+    };
+
+    const formatDateTimeBR = (date) => {
+      if (!(date instanceof Date) || isNaN(date)) return '';
+
+      const pad = (n) => String(n).padStart(2, '0');
+
+      const day = pad(date.getDate());
+      const month = pad(date.getMonth() + 1);
+      const year = date.getFullYear();
+
+      const hour = pad(date.getHours());
+      const minute = pad(date.getMinutes());
+      const second = pad(date.getSeconds());
+
+      return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
+    };
+
     const minutesSince = (dt) => {
       if (!dt) return null;
       const diffMs = Date.now() - dt.getTime();
       return Math.floor(diffMs / 60000);
     };
+
+    const isFresh = (dt, maxMinutes = 30) => {
+      const mins = minutesSince(dt);
+      if (mins == null) return null;     // sem data
+      if (mins < 0) return true;         // data no "futuro" (relógio/servidor), considera OK
+      return mins <= maxMinutes;
+    };
+
+    const renderFreshIcon = (dt, maxMinutes = 30) => {
+      const ok = isFresh(dt, maxMinutes);
+      const dtBr = formatDateTimeBR(dt);
+
+      if (ok === null) {
+        return `<span class="inline-flex items-center gap-2 text-slate-400" title="Sem data">
+      <span class="h-2 w-2 rounded-full bg-slate-300"></span><span class="text-xs">—</span>
+    </span>`;
+      }
+
+      if (ok) {
+        return `<span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200"
+      title="${dtBr}">
+      ✓
+    </span>`;
+      }
+
+      const mins = minutesSince(dt);
+      return `<span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-rose-50 text-rose-700 border border-rose-200"
+    title="${dtBr}">
+    !
+  </span>`;
+    };
+
 
     const setStaleBadge = (badgeId, dt) => {
       const el = document.getElementById(badgeId);
@@ -598,8 +659,8 @@
       document.getElementById('kpi_loe_ult').textContent = lastLoe;
 
       // Badge "sem envio há X min" (baseado nos últimos envios)
-      setStaleBadge('kpi_lol_stale', parseBrDateTime(lastLol));
-      setStaleBadge('kpi_loe_stale', parseBrDateTime(lastLoe));
+      setStaleBadge('kpi_lol_stale', parseIsoDateTime(lastLol));
+      setStaleBadge('kpi_loe_stale', parseIsoDateTime(lastLoe));
 
       // Highlight automático quando houver erro
       const internetCard = document.getElementById('kpi_lol_err')?.closest('.rounded-2xl');
@@ -673,7 +734,17 @@
           }
 
           td.className = cls;
-          td.textContent = row[col.key] ?? '';
+          if (col.key === 'dth_ult_atualizacao') {
+            const dt = parseIsoDateTime(row[col.key]);
+            const dtstr = (row[col.key]);
+            td.innerHTML = `<div class="flex items-center justify-center">
+            ${renderFreshIcon(dt, 30)}
+            </div>`;
+            td.classList.add('text-center');
+          } else {
+            td.textContent = row[col.key] ?? '';
+          }
+
           const v = Number(row[col.key] || 0);
           if (col.key.includes('_err') && v > 0) {
             td.classList.add('bg-rose-50', 'text-rose-700', 'font-semibold');

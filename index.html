@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vertis • Laudos • Publicação por Hora</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Favicons e Icones -->
+    <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png"
+        sizes="180x180">
+    <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32">
+
+    <style>
+        .fade-in {
+            animation: fadeInUp .25s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .count {
+            transition: all .3s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header
+        class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
+
+        <!-- ESQUERDA -->
+        <div class="flex items-center gap-4">
+
+            <!-- MENU SANDUÍCHE -->
+            <nav class="relative">
+                <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
+                    aria-expanded="false" aria-controls="menuPanel">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <!-- PAINEL -->
+                <div id="menuPanel" class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl
+         hidden overflow-hidden">
+
+                    <!-- HEADER DO PAINEL (opcional) -->
+                    <div class="px-4 py-3 border-b bg-slate-50">
+                        <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
+                    </div>
+
+                    <div class="py-2 text-sm">
+
+                        <!-- LAUDOS (nível 1) -->
+                        <button type="button"
+                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                            data-acc-btn="lol">
+                            <span>Publicação de Laudos</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
+
+                        <!-- Conteúdo LAUDOS (nível 2) -->
+                        <div class="hidden" data-acc-panel="lol">
+                            <a href="../laudos/index.html"
+                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                                Visão Geral
+                            </a>
+                        </div>
+
+                        <!-- DFe (nível 1) -->
+                        <button type="button"
+                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                            data-acc-btn="dfe">
+                            <span>DFe (Documentos Fiscais)</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
+
+                        <!-- Conteúdo DFe (nível 2) -->
+                        <div class="hidden" data-acc-panel="dfe">
+
+                            <!-- NFe -->
+                            <button type="button"
+                                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                                data-acc-btn="nfe">
+                                <span>NFe</span>
+                                <span class="text-slate-400">›</span>
+                            </button>
+
+                            <div class="hidden" data-acc-panel="nfe">
+                                <a href="../nfe/index.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Visão Geral
+                                </a>
+                                <a href="../nfe/controle_nfe_logs.html"
+                                    class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Erros
+                                </a>
+                            </div>
+
+                            <!-- NFSe -->
+                            <button type="button"
+                                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                                data-acc-btn="nfse">
+                                <span>NFSe</span>
+                                <span class="text-slate-400">›</span>
+                            </button>
+
+                            <div class="hidden" data-acc-panel="nfse">
+                                <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Visão Geral
+                                </a>
+                                <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Erros
+                                </a>
+                            </div>
+
+                        </div>
+
+                        <!-- DESENVOLVIMENTO (nível 1) -->
+                        <button type="button"
+                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                            data-acc-btn="dev">
+                            <span>Desenvolvimento</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
+
+                        <!-- Conteúdo Desenvolvimento (nível 2) -->
+                        <div class="hidden" data-acc-panel="dev">
+                            <a href="../desenv/gerador_pix.html"
+                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                                Chave PIX
+                            </a>
+                            <a href="../desenv/leitor_pdf.html"
+                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                                Leitor PDF (PDF.js)
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </nav>
+
+
+            <!-- TEXTO -->
+            <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
+                Vertis • Laudos • Publicação
+            </h1>
+        </div>
+
+        <!-- DIREITA -->
+        <div class="flex items-center gap-4">
+            <span id="refreshIndicator" class="text-xs text-slate-300 opacity-0 transition-opacity">
+                Atualizando...
+            </span>
+
+            <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
+        </div>
+
+    </header>
+
+    <main class="p-6 flex-1 space-y-6">
+
+        <!-- Topbar / controles -->
+        <section class="bg-white rounded-2xl shadow p-4">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                <div>
+                    <h2 class="text-sm font-semibold text-slate-700">Distribuição de Publicações (0–23h)</h2>
+                    <p class="text-xs text-slate-500">
+                        Entenda em quais horários há mais publicação e se a curva está subindo ou caindo.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-500">Auto-refresh</span>
+                        <span
+                            class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">5
+                            min</span>
+                    </div>
+
+                    <button id="btnReload" type="button"
+                        class="text-xs px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition shadow">
+                        ↻ Atualizar agora
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPIs -->
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="rounded-2xl border border-slate-200 p-4">
+                    <p class="text-[11px] text-slate-500">Total no período</p>
+                    <p id="kpiTotal" class="text-2xl font-bold text-slate-800 count">—</p>
+                    <p id="kpiMeta" class="text-xs text-slate-500 mt-1">Soma dos totais por hora</p>
+                </div>
+
+                <div class="rounded-2xl border border-slate-200 p-4">
+                    <p class="text-[11px] text-slate-500">Hora pico</p>
+                    <div class="flex items-end justify-between gap-3">
+                        <p id="kpiPeakHour" class="text-2xl font-bold text-slate-800 count">—</p>
+                        <span id="kpiPeakValue"
+                            class="text-xs px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">—</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">Maior volume no dia</p>
+                </div>
+
+                <div class="rounded-2xl border border-slate-200 p-4">
+                    <p class="text-[11px] text-slate-500">Tendência (últimas 2 horas com dado)</p>
+                    <div class="flex items-center justify-between gap-3">
+                        <p id="kpiTrend" class="text-2xl font-bold text-slate-800 count">—</p>
+                        <span id="kpiTrendBadge" class="text-xs px-2 py-1 rounded-full border">—</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">Comparação entre a última hora e a anterior</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chart -->
+        <section class="bg-white rounded-2xl shadow p-4 fade-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-700">Publicações por hora</h3>
+                    <p class="text-xs text-slate-500">Eixo X = hora • Eixo Y = total</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[11px] text-slate-500">Última atualização</p>
+                    <p id="lastUpdated" class="text-xs font-medium text-slate-700">—</p>
+                </div>
+            </div>
+
+            <div class="mt-4 h-48 relative">
+                <canvas id="barChart" class="absolute inset-0"></canvas>
+            </div>
+
+            <div id="errorBox"
+                class="mt-4 hidden rounded-xl border border-rose-200 bg-rose-50 text-rose-800 p-3 text-sm"></div>
+        </section>
+    </main>
+
+    <script>
+        // Endpoint público informado
+        // const endpoint = "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/vertis_laudos_hora";
+        const endpoint = "/api/laudos/hora";
+
+        let chart;
+
+        const refreshIndicator = document.getElementById('refreshIndicator');
+        const errorBox = document.getElementById('errorBox');
+
+        const pad2 = (n) => String(n).padStart(2, '0');
+        const nowBR = () => {
+            const d = new Date();
+            return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+        };
+
+        // Normaliza para 0..23 e preenche horas faltantes com total = 0
+        function normalizeHours(apiRows) {
+            const map = new Map();
+            (apiRows || []).forEach(r => {
+                const h = Number(r.hora);
+                if (!Number.isNaN(h) && h >= 0 && h <= 23) {
+                    map.set(h, Number(r.total || 0));
+                }
+            });
+
+            const labels = [];
+            const values = [];
+            for (let h = 0; h <= 23; h++) {
+                labels.push(`${pad2(h)}h`);
+                values.push(map.get(h) ?? 0);
+            }
+            return { labels, values, map };
+        }
+
+        function calcKPIs(values) {
+            const total = values.reduce((a, b) => a + (Number(b) || 0), 0);
+
+            let peakValue = -Infinity;
+            let peakHour = 0;
+            values.forEach((v, idx) => {
+                const n = Number(v) || 0;
+                if (n > peakValue) {
+                    peakValue = n;
+                    peakHour = idx;
+                }
+            });
+
+            // Tendência: pega as duas últimas horas com valor "observável".
+            // Aqui: considera "com dado" qualquer hora (mesmo 0). Se quiser ignorar 0, mude a regra.
+            const lastIdx = values.length - 1;
+            const prevIdx = values.length - 2;
+            const last = Number(values[lastIdx] || 0);
+            const prev = Number(values[prevIdx] || 0);
+            const diff = last - prev;
+
+            return { total, peakHour, peakValue, last, prev, diff };
+        }
+
+        function setTrendBadge(diff) {
+            const badge = document.getElementById('kpiTrendBadge');
+            badge.className = "text-xs px-2 py-1 rounded-full border";
+
+            if (diff > 0) {
+                badge.textContent = `↑ +${diff}`;
+                badge.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+            } else if (diff < 0) {
+                badge.textContent = `↓ ${diff}`;
+                badge.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
+            } else {
+                badge.textContent = `→ 0`;
+                badge.classList.add('bg-slate-100', 'text-slate-700', 'border-slate-200');
+            }
+        }
+
+        function renderKPIs(kpis) {
+            document.getElementById('kpiTotal').textContent = kpis.total.toLocaleString('pt-BR');
+            document.getElementById('kpiPeakHour').textContent = `${pad2(kpis.peakHour)}h`;
+            document.getElementById('kpiPeakValue').textContent = `${kpis.peakValue.toLocaleString('pt-BR')} publicações`;
+
+            // tendência
+            const trendTxt = kpis.diff > 0 ? "Subindo" : kpis.diff < 0 ? "Caindo" : "Estável";
+            document.getElementById('kpiTrend').textContent = trendTxt;
+            setTrendBadge(kpis.diff);
+        }
+
+        function buildChart(labels, values) {
+            const ctx = document.getElementById('barChart');
+            if (!ctx) return;
+
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Publicações',
+                        data: values,
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        // sem setar cor manualmente (deixa default do Chart.js)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` ${ctx.raw} publicações`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { maxRotation: 0, minRotation: 0 }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (v) => Number(v).toLocaleString('pt-BR')
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function showError(msg) {
+            errorBox.classList.remove('hidden');
+            errorBox.textContent = msg;
+        }
+
+        function clearError() {
+            errorBox.classList.add('hidden');
+            errorBox.textContent = '';
+        }
+
+        async function loadData() {
+            refreshIndicator.classList.remove('opacity-0');
+            clearError();
+
+            try {
+                const res = await fetch(endpoint, { method: 'GET' });
+                if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+
+                const data = await res.json();
+
+                const { labels, values } = normalizeHours(data);
+                const kpis = calcKPIs(values);
+
+                renderKPIs(kpis);
+                buildChart(labels, values);
+
+                document.getElementById('lastUpdated').textContent = nowBR();
+            } catch (err) {
+                showError(
+                    "Não foi possível carregar o endpoint. " +
+                    "Se estiver abrindo este HTML em file://, pode ser bloqueio de CORS do navegador. " +
+                    "Rode em um servidor local (ex: Live Server) ou atrás do seu backend/proxy. " +
+                    `Detalhe: ${err?.message || err}`
+                );
+            } finally {
+                setTimeout(() => refreshIndicator.classList.add('opacity-0'), 800);
+            }
+        }
+
+        document.getElementById('btnReload').addEventListener('click', loadData);
+
+        loadData();
+        setInterval(loadData, 300000); // 5 min
+    </script>
+
+    <!-- MENU (reaproveitado) -->
+    <script>
+        (function () {
+            const btn = document.getElementById('menuBtn');
+            const panel = document.getElementById('menuPanel');
+
+            if (!btn || !panel) return;
+
+            const openMenu = () => {
+                panel.classList.remove('hidden');
+                btn.setAttribute('aria-expanded', 'true');
+            };
+
+            const closeMenu = () => {
+                panel.classList.add('hidden');
+                btn.setAttribute('aria-expanded', 'false');
+            };
+
+            const toggleMenu = () => {
+                const isOpen = !panel.classList.contains('hidden');
+                isOpen ? closeMenu() : openMenu();
+            };
+
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleMenu();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!panel.contains(e.target) && e.target !== btn) closeMenu();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeMenu();
+            });
+
+            const getPanel = (key) => panel.querySelector(`[data-acc-panel="${key}"]`);
+
+            panel.querySelectorAll('[data-acc-btn]').forEach((accBtn) => {
+                accBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const key = accBtn.getAttribute('data-acc-btn');
+                    const accPanel = getPanel(key);
+                    if (!accPanel) return;
+
+                    accPanel.classList.toggle('hidden');
+
+                    if (key === 'dfe' && accPanel.classList.contains('hidden')) {
+                        const nfePanel = getPanel('nfe');
+                        const nfsePanel = getPanel('nfse');
+                        if (nfePanel) nfePanel.classList.add('hidden');
+                        if (nfsePanel) nfsePanel.classList.add('hidden');
+                    }
+                });
+            });
+        })();
+    </script>
+
+</body>
+
+</html>

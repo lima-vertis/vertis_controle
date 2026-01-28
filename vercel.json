@@ -15,6 +15,10 @@
         {
             "source": "/api/laudos/controle",
             "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_publicacao_controle"
+        },
+        {
+            "source": "/api/laudos/hora",
+            "destination": "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/vertis_laudos_hora"
         }
     ]
 }

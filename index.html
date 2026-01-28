@@ -70,6 +70,11 @@
 
                     <div class="py-2 text-sm">
 
+                        <!-- Início -->
+                        <a href="../NFE/index.html" class="block px-4 py-2 text-sm font-semibold hover:bg-slate-100">
+                            Início
+                        </a>
+
                         <!-- LAUDOS (nível 1) -->
                         <button type="button"
                             class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
@@ -346,26 +351,47 @@
 
             if (chart) chart.destroy();
 
+            const numeric = values.map(v => Number(v) || 0);
+            const avg = numeric.length
+                ? numeric.reduce((a, b) => a + b, 0) / numeric.length
+                : 0;
+
+            const avgLine = labels.map(() => avg);
+
             chart = new Chart(ctx, {
-                type: 'bar',
                 data: {
                     labels,
-                    datasets: [{
-                        label: 'Publicações',
-                        data: values,
-                        borderWidth: 1,
-                        borderRadius: 8,
-                        // sem setar cor manualmente (deixa default do Chart.js)
-                    }]
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Publicações',
+                            data: numeric,
+                            borderWidth: 1,
+                            borderRadius: 8
+                        },
+                        {
+                            type: 'line',
+                            label: 'Média',
+                            data: avgLine,
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            tension: 0,
+                            borderDash: [6, 6]
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, // importante se você estiver controlando altura do painel
                     plugins: {
-                        legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                label: (ctx) => ` ${ctx.raw} publicações`
+                                label: (ctx) => {
+                                    if (ctx.dataset.label === 'Média') {
+                                        return ` Média: ${Math.round(ctx.raw).toLocaleString('pt-BR')}`;
+                                    }
+                                    return ` ${ctx.raw.toLocaleString('pt-BR')} publicações`;
+                                }
                             }
                         }
                     },
@@ -384,6 +410,7 @@
                 }
             });
         }
+
 
         function showError(msg) {
             errorBox.classList.remove('hidden');

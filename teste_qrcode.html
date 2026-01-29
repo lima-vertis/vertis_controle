@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Pagamento via PIX • Vertis</title>
+    <style>
+        :root {
+            /* Vertis (white + preto + laranja) */
+            --bg: #f7f7f8;
+            --card: #ffffff;
+            --text: #0b0f19;
+            --muted: #5b6475;
+            --border: rgba(11, 15, 25, .12);
+            --shadow: 0 18px 45px rgba(11, 15, 25, .10);
+
+            --black: #0b0f19;
+            --orange: #ff6a00;
+            --orange2: #ff8a33;
+
+            --radius: 18px;
+            --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: var(--sans);
+            color: var(--text);
+            background:
+                radial-gradient(900px 520px at 15% 5%, rgba(255, 106, 0, .12), transparent 58%),
+                radial-gradient(900px 520px at 85% 20%, rgba(11, 15, 25, .08), transparent 60%),
+                linear-gradient(180deg, #ffffff, var(--bg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .wrap {
+            width: min(980px, 100%);
+            display: grid;
+            gap: 14px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 4px 2px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .logo {
+            height: 28px;
+            width: auto;
+            display: block;
+            filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .08));
+        }
+
+        .title {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            line-height: 1.1;
+            min-width: 0;
+        }
+
+        .title b {
+            font-size: 14px;
+            letter-spacing: .2px;
+        }
+
+        .title span {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, .65);
+            color: var(--muted);
+            font-size: 12px;
+            white-space: nowrap;
+            backdrop-filter: blur(6px);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--orange);
+            box-shadow: 0 0 0 4px rgba(255, 106, 0, .16);
+        }
+
+        .card {
+            border-radius: var(--radius);
+            background: var(--card);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 18px;
+            background: linear-gradient(90deg, rgba(11, 15, 25, .05), rgba(255, 106, 0, .07));
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 16px;
+            letter-spacing: .2px;
+        }
+
+        .topbar p {
+            margin: 2px 0 0 0;
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 106, 0, .25);
+            background: rgba(255, 106, 0, .08);
+            color: #7a2f00;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .badge b {
+            color: var(--black);
+            background: rgba(255, 106, 0, .18);
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 106, 0, .25);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr .8fr;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .left,
+        .right {
+            padding: 18px;
+        }
+
+        .right {
+            border-left: 1px solid var(--border);
+            background: linear-gradient(180deg, rgba(11, 15, 25, .02), rgba(255, 106, 0, .03));
+        }
+
+        @media (max-width: 900px) {
+            .right {
+                border-left: none;
+                border-top: 1px solid var(--border);
+            }
+        }
+
+        .fields {
+            display: grid;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .field {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 12px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .value {
+            font-size: 14px;
+            font-weight: 850;
+            color: var(--black);
+            word-break: break-word;
+        }
+
+        .amount {
+            font-size: 22px;
+            font-weight: 950;
+            letter-spacing: .2px;
+        }
+
+        .subnote {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+
+        .pixBox {
+            margin-top: 14px;
+            border-radius: 18px;
+            border: 1px dashed rgba(255, 106, 0, .35);
+            background: linear-gradient(180deg, rgba(255, 106, 0, .05), rgba(11, 15, 25, .02));
+            padding: 14px;
+        }
+
+        .pixHint {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pixHint b {
+            font-size: 12px;
+            color: #7a2f00;
+            background: rgba(255, 106, 0, .10);
+            border: 1px solid rgba(255, 106, 0, .22);
+            padding: 6px 10px;
+            border-radius: 999px;
+            letter-spacing: .2px;
+        }
+
+        .pixRow {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+
+        .pixKey {
+            flex: 1 1 430px;
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: 14px;
+            padding: 12px;
+            font-family: var(--mono);
+            font-size: 12.5px;
+            line-height: 1.5;
+            color: var(--black);
+            word-break: break-all;
+            user-select: text;
+        }
+
+        .btns {
+            flex: 0 0 230px;
+            min-width: 230px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            appearance: none;
+            border-radius: 16px;
+            padding: 12px 12px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--black);
+            font-weight: 900;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            border-color: rgba(11, 15, 25, .22);
+            box-shadow: 0 10px 24px rgba(11, 15, 25, .10);
+        }
+
+        .btn.primary {
+            border-color: rgba(255, 106, 0, .35);
+            background: linear-gradient(90deg, rgba(255, 106, 0, .95), rgba(255, 138, 51, .92));
+            color: #fff;
+            box-shadow: 0 14px 30px rgba(255, 106, 0, .25);
+        }
+
+        .btn.primary:hover {
+            box-shadow: 0 18px 38px rgba(255, 106, 0, .30);
+            border-color: rgba(255, 106, 0, .45);
+        }
+
+        .btn.ghost {
+            background: rgba(11, 15, 25, .02);
+        }
+
+        .sideTitle {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            font-weight: 950;
+            letter-spacing: .2px;
+        }
+
+        .steps {
+            display: grid;
+            gap: 10px;
+        }
+
+        .step {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: #fff;
+        }
+
+        .num {
+            width: 28px;
+            height: 28px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-weight: 950;
+            color: #fff;
+            background: var(--black);
+            box-shadow: 0 8px 18px rgba(11, 15, 25, .18);
+            flex: 0 0 auto;
+        }
+
+        .step b {
+            display: block;
+            font-size: 12.5px;
+            margin-bottom: 4px;
+        }
+
+        .step span {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            padding-top: 4px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, .92);
+            border: 1px solid rgba(11, 15, 25, .12);
+            padding: 10px 12px;
+            border-radius: 999px;
+            box-shadow: 0 16px 50px rgba(11, 15, 25, .16);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            max-width: calc(100% - 24px);
+            color: rgba(11, 15, 25, .92);
+            font-size: 12.5px;
+            backdrop-filter: blur(8px);
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        .toast .ok {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: var(--orange);
+            box-shadow: 0 0 0 4px rgba(255, 106, 0, .16);
+            flex: 0 0 auto;
+        }
+
+        .toast.err .ok {
+            background: #e11d48;
+            box-shadow: 0 0 0 4px rgba(225, 29, 72, .12);
+        }
+
+        .toast .msg {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div class="brand">
+                <img class="logo" src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png"
+                    alt="Vertis" />
+                <div class="title">
+                    <b>Pagamento via PIX</b>
+                    <span>White theme • Preto e laranja em destaque</span>
+                </div>
+            </div>
+
+            <div class="pill" title="Pagamento seguro">
+                <span class="dot"></span>
+                Cobrança • Vertis
+            </div>
+        </header>
+
+        <section class="card">
+            <div class="topbar">
+                <div>
+                    <h1>Detalhes do pagamento</h1>
+                    <p>Copie a chave PIX com 1 clique (ou toque e segure no celular).</p>
+                </div>
+                <div class="badge">
+                    Total <b id="amountTop">—</b>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="left">
+                    <div class="fields">
+                        <div class="field">
+                            <div class="meta">
+                                <div class="label">Cliente</div>
+                                <div id="clientName" class="value">—</div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="meta">
+                                <div class="label">Valor</div>
+                                <div id="amountBRL" class="value amount">—</div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="meta">
+                                <div class="label">Atendimento</div>
+                                <div id="ticket" class="value">—</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pixBox">
+                        <div class="pixHint">
+                            <b>⬇️ COPIE A CHAVE PIX ABAIXO ⬇️</b>
+                            <span style="font-size:12px;color:var(--muted);">PIX Copia e Cola</span>
+                        </div>
+
+                        <div class="pixRow">
+                            <div id="pixKey" class="pixKey">—</div>
+
+                            <div class="btns">
+                                <button class="btn primary" id="copyBtn" type="button">📋 Copiar chave</button>
+                                <a class="btn" id="waBtn" href="#" target="_blank" rel="noopener noreferrer">💬
+                                    WhatsApp</a>
+                                <button class="btn ghost" id="selectBtn" type="button">✨ Selecionar</button>
+                            </div>
+                        </div>
+
+                        <div class="subnote">
+                            Dica: no celular, você também pode <b>tocar e segurar</b> na chave para copiar.
+                            Para melhor resultado, a chave fica sozinha (sem texto depois).
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="right">
+                    <p class="sideTitle">Como pagar</p>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="num">1</div>
+                            <div>
+                                <b>Copie a chave</b>
+                                <span>Clique em <b>“Copiar chave”</b> (ou toque e segure na chave).</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="num">2</div>
+                            <div>
+                                <b>Abra o app do banco</b>
+                                <span>Vá em <b>PIX &gt; Copia e Cola</b> e cole a chave.</span>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="num">3</div>
+                            <div>
+                                <b>Confirme o pagamento</b>
+                                <span>Revise o valor e confirme ✅</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:16px;background:#fff;">
+                        <div class="label" style="margin-bottom:6px;">Parâmetros via URL</div>
+                        <div
+                            style="font-family:var(--mono);font-size:11.5px;color:var(--muted);word-break:break-all;line-height:1.5;">
+                            ?cliente=Maria%20Silva<br>
+                            &amp;valor=10.00<br>
+                            &amp;atendimento=1234<br>
+                            &amp;pix=000201010211...<br>
+                            &amp;phone=5511943774948
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <footer>© Vertis • Se tiver qualquer dúvida, responda a mensagem no WhatsApp.</footer>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite">
+        <span class="ok"></span>
+        <span class="msg" id="toastMsg">Copiado!</span>
+    </div>
+
+    <script>
+        // ✅ Querystring:
+        // /pix.html?cliente=Maria%20Silva&valor=10.00&atendimento=1234&pix=000201...&phone=5511943774948
+        const params = new URLSearchParams(window.location.search);
+
+        const data = {
+            clientName: params.get("cliente") || "—",
+            amountRaw: params.get("valor") || "",
+            ticket: params.get("atendimento") || "—",
+            pixKey: params.get("pix") || "—",
+            phone: params.get("phone") || "5511943774948"
+        };
+
+        function normalizeAmount(raw) {
+            if (!raw) return null;
+            const cleaned = String(raw).replace(/[^\d,.\-]/g, "").trim();
+            if (!cleaned) return null;
+            if (cleaned.includes(",") && cleaned.includes(".")) {
+                return Number(cleaned.replace(/\./g, "").replace(",", "."));
+            }
+            if (cleaned.includes(",") && !cleaned.includes(".")) {
+                return Number(cleaned.replace(",", "."));
+            }
+            return Number(cleaned);
+        }
+
+        function formatBRL(value) {
+            if (typeof value !== "number" || Number.isNaN(value)) return "—";
+            return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast");
+            const toastMsg = document.getElementById("toastMsg");
+            toastMsg.textContent = message;
+            toast.classList.toggle("err", !!isError);
+            toast.classList.add("show");
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(() => toast.classList.remove("show"), 2600);
+        }
+
+        function selectElementText(el) {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
+        async function copyText(text) {
+            if (!text || text === "—") throw new Error("empty");
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+                return;
+            }
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.setAttribute("readonly", "");
+            ta.style.position = "fixed";
+            ta.style.top = "-9999px";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            ta.setSelectionRange(0, ta.value.length);
+            const ok = document.execCommand("copy");
+            document.body.removeChild(ta);
+            if (!ok) throw new Error("copy failed");
+        }
+
+        function buildWhatsAppLink() {
+            const msg =
+                `💳 PIX — Vertis
+
+Atendimento nº ${data.ticket}
+
+⬇️ COPIE A CHAVE PIX ABAIXO ⬇️
+
+${data.pixKey}`;
+            return `https://wa.me/${data.phone}?text=${encodeURIComponent(msg)}`;
+        }
+
+        // Render
+        const amountNum = normalizeAmount(data.amountRaw);
+
+        document.getElementById("clientName").textContent = data.clientName;
+        document.getElementById("amountBRL").textContent = formatBRL(amountNum);
+        document.getElementById("amountTop").textContent = formatBRL(amountNum);
+        document.getElementById("ticket").textContent = data.ticket;
+        document.getElementById("pixKey").textContent = data.pixKey;
+        document.getElementById("waBtn").href = buildWhatsAppLink();
+
+        // Actions
+        document.getElementById("copyBtn").addEventListener("click", async () => {
+            try {
+                await copyText(data.pixKey);
+                showToast("Chave PIX copiada ✅");
+            } catch {
+                showToast("Não consegui copiar automaticamente. Use “Selecionar”.", true);
+            }
+        });
+
+        document.getElementById("selectBtn").addEventListener("click", () => {
+            selectElementText(document.getElementById("pixKey"));
+            showToast("Chave selecionada. Agora toque em Copiar.", false);
+        });
+
+        document.getElementById("pixKey").addEventListener("click", async () => {
+            try {
+                await copyText(data.pixKey);
+                showToast("Chave PIX copiada ✅");
+            } catch {
+                selectElementText(document.getElementById("pixKey"));
+                showToast("Chave selecionada. Agora toque em Copiar.", false);
+            }
+        });
+
+        if (data.pixKey === "—") showToast("Faltou o parâmetro 'pix' na URL.", true);
+        if (!amountNum && data.amountRaw) showToast("Não entendi o 'valor' informado.", true);
+    </script>
+</body>
+
+</html>

@@ -198,9 +198,17 @@
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-600">cidade</label>
+            <label class="text-xs font-medium text-slate-600">Cidade</label>
             <input id="pixCidade" type="text" placeholder="Ex.: SAO PAULO"
               class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+          </div>
+
+          <div class="space-y-1 md:col-span-2">
+            <label class="text-xs font-medium text-slate-600">TxId</label>
+            <input id="pixTxId" type="text" placeholder="Ex.: 012700400000151"
+              class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" />
+            <p class="text-xs text-slate-400">Identificador da transação (TxId). Recomendado até 25 caracteres, sem
+              acentos.</p>
           </div>
 
           <div class="space-y-1 md:col-span-2">
@@ -254,7 +262,7 @@
         </div>
 
         <div class="space-y-1">
-          <label class="text-xs font-medium text-slate-600">Chave PIX gerada (message)</label>
+          <label class="text-xs font-medium text-slate-600">Chave PIX gerada (chave_pix)</label>
           <textarea id="pixResultado" rows="5" readonly
             class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring bg-slate-50"></textarea>
         </div>
@@ -304,6 +312,7 @@
       mensagem: document.getElementById('pixMensagem'),
       cliente: document.getElementById('pixCliente'),
       cidade: document.getElementById('pixCidade'),
+      txtid: document.getElementById('pixTxId'),
       jsonPreview: document.getElementById('jsonPreview'),
       btnGerar: document.getElementById('btnGerar'),
       btnCopiar: document.getElementById('btnCopiar'),
@@ -327,7 +336,8 @@
         valor: isNaN(valorNum) ? 0 : valorNum,
         mensagem: (els.mensagem.value || '').trim(),
         cliente: (els.cliente.value || '').trim(),
-        cidade: (els.cidade.value || '').trim().toUpperCase()
+        cidade: (els.cidade.value || '').trim().toUpperCase(),
+        txtid: (els.txtid.value || '').trim()
       };
     }
 
@@ -375,7 +385,7 @@
     function validate(p) {
       if (!p.chave) return 'Informe a Chave PIX.';
       if (!p.valor || p.valor <= 0) return 'Informe um Valor maior que zero.';
-      if (!p.mensagem) return 'Informe a Mensagem.';
+      // mensagem agora é opcional
       if (!p.cliente) return 'Informe o Cliente.';
       if (!p.cidade) return 'Informe a Cidade.';
       return '';
@@ -406,18 +416,24 @@
           try { data = JSON.parse(txt); } catch { data = { message: txt }; }
         }
 
-        if (!res.ok) {
-          throw new Error((data && (data.error || data.message)) ? (data.error || data.message) : ('HTTP ' + res.status));
+        // Sucesso = HTTP 200. Qualquer outro status é erro.
+        if (res.status !== 200) {
+          const errMsg = (data && (data.mensagem || data.message || data.error))
+            ? String(data.mensagem || data.message || data.error)
+            : ('HTTP ' + res.status);
+          throw new Error(errMsg);
         }
 
-        const msg = (data && data.message) ? String(data.message) : '';
-        if (!msg) throw new Error('Resposta sem campo "message".');
+        const pix = (data && (data.chave_pix || data.chavePix)) ? String(data.chave_pix || data.chavePix) : '';
+        const retornoMsg = (data && (data.mensagem || data.message)) ? String(data.mensagem || data.message) : 'Sucesso';
 
-        els.resultado.value = msg;
+        if (!pix) throw new Error('Resposta sem "chave_pix".');
+
+        els.resultado.value = pix;
         els.btnCopiar.disabled = false;
         refreshActions();
-        renderQRCode(msg);
-        setStatus('Gerado', 'ok');
+        renderQRCode(pix);
+        setStatus(retornoMsg, 'ok');
       } catch (e) {
         setError('Falha ao gerar PIX: ' + (e && e.message ? e.message : e));
         setStatus('Erro', 'err');
@@ -498,6 +514,7 @@
       els.mensagem.value = '';
       els.cliente.value = 'Vertis';
       els.cidade.value = 'SAO PAULO';
+      els.txtid.value = '';
       els.resultado.value = '';
       els.btnCopiar.disabled = true;
       clearQRCode();
@@ -520,6 +537,7 @@
       els.mensagem.addEventListener(evt, refreshPreview);
       els.cliente.addEventListener(evt, refreshPreview);
       els.cidade.addEventListener(evt, refreshPreview);
+      els.txtid.addEventListener(evt, refreshPreview);
     });
 
     els.btnGerar.addEventListener('click', gerar);
@@ -529,6 +547,7 @@
     // defaults
     els.cliente.value = 'Vertis';
     els.cidade.value = 'SAO PAULO';
+    els.txtid.value = '';
     setStatus('Pronto', 'idle');
     refreshPreview();
   </script>

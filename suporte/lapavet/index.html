@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>LAPAVET | Visão Geral</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Favicons e Ícones -->
+  <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png" sizes="180x180">
+  <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32">
+
+  <style>
+    .chart-wrap {
+      height: 340px;
+    }
+
+    .chart-wrap-sm {
+      height: 300px;
+    }
+
+    @media (max-width: 768px) {
+      .chart-wrap {
+        height: 300px;
+      }
+
+      .chart-wrap-sm {
+        height: 280px;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header
+    class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
+    <div class="flex items-center gap-4">
+
+      <!-- MENU -->
+      <nav class="relative">
+        <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
+          aria-expanded="false" aria-controls="menuPanel">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <div id="menuPanel"
+          class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl hidden overflow-hidden">
+          <div class="px-4 py-3 border-b bg-slate-50">
+            <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
+          </div>
+
+          <div class="py-2 text-sm">
+            <a href="../nfe/index.html" class="block px-4 py-2 text-sm font-semibold hover:bg-slate-100">Início</a>
+
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="lol">
+              <span>Publicação de Laudos</span><span class="text-slate-400">›</span>
+            </button>
+            <div class="hidden" data-acc-panel="lol">
+              <a href="../laudos/index.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">Visão
+                Geral</a>
+            </div>
+
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="dfe">
+              <span>DFe (Documentos Fiscais)</span><span class="text-slate-400">›</span>
+            </button>
+
+            <div class="hidden" data-acc-panel="dfe">
+              <button type="button"
+                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                data-acc-btn="nfe">
+                <span>NFe</span><span class="text-slate-400">›</span>
+              </button>
+              <div class="hidden" data-acc-panel="nfe">
+                <a href="../nfe/index.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">Visão Geral</a>
+                <a href="../nfe/controle_nfe_logs.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">Erros</a>
+              </div>
+
+              <button type="button"
+                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                data-acc-btn="nfse">
+                <span>NFSe</span><span class="text-slate-400">›</span>
+              </button>
+              <div class="hidden" data-acc-panel="nfse">
+                <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">Visão Geral</a>
+                <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">Erros</a>
+              </div>
+            </div>
+
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="dev">
+              <span>Desenvolvimento</span><span class="text-slate-400">›</span>
+            </button>
+            <div class="hidden" data-acc-panel="dev">
+              <a href="../desenv/gerador_pix.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">Chave
+                PIX</a>
+              <a href="../desenv/leitor_pdf.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">Leitor
+                PDF (PDF.js)</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">Vertis • Dados Gerais</h1>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <span id="refreshIndicator" class="text-xs text-slate-300 opacity-0 transition-opacity">Atualizando...</span>
+      <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
+    </div>
+  </header>
+
+  <main class="p-6 flex-1 space-y-6">
+
+    <!-- ✅ PRIMEIRA LINHA: 2 WIDGETS (mais baixos) -->
+    <section class="grid grid-cols-1 xl:grid-cols-12 gap-4">
+      <!-- ✅ CLIENTE + VERSÃO (mais estreito) -->
+      <div class="bg-white rounded-2xl shadow p-4 xl:col-span-4 flex flex-col justify-center">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-600">Cliente</h2>
+
+            <p id="dg_cliente" class="mt-1 text-2xl md:text-4xl font-bold text-slate-800">
+              —
+            </p>
+
+            <!-- Versão (linha única, fonte maior) -->
+            <div class="mt-1 text-sm md:text-base text-slate-500">
+              Versão
+              <span id="dg_versao" class="ml-1 font-mono font-semibold text-slate-700">
+                —
+              </span>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-end gap-2">
+            <span id="dg_status"
+              class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold uppercase tracking-wide">
+              —
+            </span>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ✅ TAREFAS (Internet + Email na MESMA LINHA) -->
+      <div class="bg-white rounded-2xl shadow p-4 xl:col-span-8">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-600">Tarefas</h2>
+            <p class="text-[11px] text-slate-500 mt-1">Internet (LOL) • Email (LOE)</p>
+          </div>
+
+          <span
+            class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold uppercase tracking-wide">tarefa</span>
+        </div>
+
+        <!-- cards lado a lado -->
+        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+
+          <!-- INTERNET -->
+          <div class="rounded-xl border bg-gradient-to-br from-slate-50 to-white p-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="inline-flex h-2.5 w-2.5 rounded-full bg-sky-500"></span>
+                <div class="text-xs font-semibold text-slate-800">Internet</div>
+              </div>
+              <span
+                class="text-[10px] px-2 py-0.5 rounded-full bg-white border text-slate-600 font-semibold uppercase tracking-wide">LOL</span>
+            </div>
+
+            <div class="mt-3 grid grid-cols-4 gap-2">
+              <div class="rounded-lg bg-white border p-2">
+                <div class="text-[10px] text-slate-500">Total</div>
+                <div id="tar_lol_total" class="text-base font-bold text-slate-900 leading-tight">—</div>
+              </div>
+              <div class="rounded-lg bg-white border p-2">
+                <div class="text-[10px] text-slate-500">Fila</div>
+                <div id="tar_lol_fila" class="text-base font-bold text-slate-900 leading-tight">—</div>
+              </div>
+              <div class="rounded-lg bg-white border p-2">
+                <div class="text-[10px] text-slate-500">Erro</div>
+                <div id="tar_lol_erro" class="text-base font-bold text-slate-900 leading-tight">—</div>
+              </div>
+              <div class="rounded-lg bg-white border p-2">
+                <div class="text-[10px] text-slate-500">Sucesso</div>
+                <div id="tar_lol_sucesso" class="text-base font-bold text-slate-900 leading-tight">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EMAIL -->
+          <div class="rounded-xl border bg-gradient-to-br from-slate-50 to-white p-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="inline-flex h-2.5 w-2.5 rounded-full bg-violet-500"></span>
+                <div class="text-xs font-semibold text-slate-800">Email</div>
+              </div>
+              <span
+                class="text-[10px] px-2 py-0.5 rounded-full bg-white border text-slate-600 font-semibold uppercase tracking-wide">LOE</span>
+            </div>
+
+            <div class="mt-3 grid grid-cols-4 gap-2">
+              <div class="rounded-lg bg-white border p-2">
+                <div class="text-[10px] text-slate-500">Total</div>
+                <div id="tar_loe_total" class="text-base font-bold text-slate-900 leading-tight">—</div>
+              </div>
+              <div class="rounded-lg bg-white border p-2">
+                <div class="text-[10px] text-slate-500">Fila</div>
+                <div id="tar_loe_fila" class="text-base font-bold text-slate-900 leading-tight">—</div>
+              </div>
+              <div class="rounded-lg bg-white border p-2">
+                <div class="text-[10px] text-slate-500">Erro</div>
+                <div id="tar_loe_erro" class="text-base font-bold text-slate-900 leading-tight">—</div>
+              </div>
+              <div class="rounded-lg bg-white border p-2">
+                <div class="text-[10px] text-slate-500">Sucesso</div>
+                <div id="tar_loe_sucesso" class="text-base font-bold text-slate-900 leading-tight">—</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- GRÁFICO: PUBLICAÇÃO POR HORA -->
+    <section class="bg-white rounded-2xl shadow p-4">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h2 class="text-sm font-semibold text-slate-600">Publicação por hora</h2>
+          <p class="text-xs text-slate-500 mt-1">Barras: Laudos Assinados + Tarefas | Linhas: Internet + Email</p>
+        </div>
+        <span
+          class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold uppercase tracking-wide">laudos_hora</span>
+      </div>
+      <div class="mt-4 chart-wrap">
+        <canvas id="chartLaudosHora"></canvas>
+      </div>
+    </section>
+
+    <!-- PIZZAS: INTERNET x EMAIL -->
+    <section class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+      <div class="bg-white rounded-2xl shadow p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-600">Publicação • Internet</h2>
+            <p class="text-xs text-slate-500 mt-1">Distribuição por intervalo</p>
+          </div>
+          <span
+            class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold uppercase tracking-wide">grafico_internet</span>
+        </div>
+        <div class="mt-4 chart-wrap-sm">
+          <canvas id="chartInternet"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-600">Publicação • Email</h2>
+            <p class="text-xs text-slate-500 mt-1">Distribuição por intervalo</p>
+          </div>
+          <span
+            class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold uppercase tracking-wide">grafico_email</span>
+        </div>
+        <div class="mt-4 chart-wrap-sm">
+          <canvas id="chartEmail"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONEXÕES BD + TOP USERS -->
+    <section class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+      <!-- CONEXÕES BD -->
+      <div class="bg-white rounded-2xl shadow p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-600">Banco de Dados • Conexões</h2>
+            <p class="text-xs text-slate-500 mt-1">Status em tempo real</p>
+          </div>
+          <span
+            class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold uppercase tracking-wide">conexoes_bd</span>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-xl border bg-slate-50 p-3">
+            <div class="text-[11px] text-slate-500">Conexões atuais</div>
+            <div id="bd_atual" class="text-2xl font-bold text-slate-800 mt-1">—</div>
+          </div>
+
+          <div class="rounded-xl border bg-slate-50 p-3">
+            <div class="text-[11px] text-slate-500">Limite máximo</div>
+            <div id="bd_limite" class="text-2xl font-bold text-slate-800 mt-1">—</div>
+          </div>
+
+          <div class="rounded-xl border bg-slate-50 p-3">
+            <div class="text-[11px] text-slate-500">Conexões disponíveis</div>
+            <div id="bd_disp" class="text-2xl font-bold text-slate-800 mt-1">—</div>
+          </div>
+
+          <div class="rounded-xl border bg-slate-50 p-3">
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] text-slate-500">Percentual de uso</div>
+              <span id="bd_pct_badge"
+                class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold uppercase tracking-wide">—</span>
+            </div>
+
+            <div class="mt-2 h-2 rounded-full bg-slate-200 overflow-hidden">
+              <div id="bd_pct_bar" class="h-full w-0 bg-slate-700 transition-all duration-300"></div>
+            </div>
+
+            <div id="bd_pct_txt" class="mt-2 text-xs text-slate-500">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP USERS -->
+      <div class="bg-white rounded-2xl shadow p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-semibold text-slate-600">Top usuários • Conexões</h2>
+            <p class="text-xs text-slate-500 mt-1">Top 3 (clique para ver Top 10)</p>
+          </div>
+          <span
+            class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-semibold uppercase tracking-wide">users_bd</span>
+        </div>
+
+        <div class="mt-4 overflow-hidden rounded-xl border">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-100 text-slate-600">
+              <tr>
+                <th class="text-left px-3 py-2 font-semibold">Usuário</th>
+                <th class="text-right px-3 py-2 font-semibold">Conexões</th>
+              </tr>
+            </thead>
+            <tbody id="usersTopBody" class="divide-y bg-white">
+              <tr>
+                <td class="px-3 py-3 text-slate-500" colspan="2">Carregando...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-4 flex items-center justify-between">
+          <p class="text-xs text-slate-500">
+            Ordenado por <span class="font-mono">count</span> (desc).
+          </p>
+
+          <button id="btnTop10" type="button"
+            class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition">
+            Ver Top 10
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ✅ MODAL TOP 10 -->
+  <div id="top10Modal" class="fixed inset-0 z-[60] hidden">
+    <div id="top10Backdrop" class="absolute inset-0 bg-black/50"></div>
+
+    <div class="relative mx-auto mt-16 w-[92%] max-w-2xl">
+      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div class="px-5 py-4 border-b bg-slate-50 flex items-center justify-between">
+          <div>
+            <div class="text-sm font-semibold text-slate-800">Top 10 usuários • Conexões BD</div>
+            <div class="text-xs text-slate-500 mt-0.5">Baseado em <span class="font-mono">users_bd</span></div>
+          </div>
+
+          <button id="btnCloseTop10" class="p-2 rounded-lg hover:bg-slate-200 transition" aria-label="Fechar">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-700" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="p-5">
+          <div class="overflow-hidden rounded-xl border">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-100 text-slate-600">
+                <tr>
+                  <th class="text-left px-3 py-2 font-semibold">#</th>
+                  <th class="text-left px-3 py-2 font-semibold">Usuário</th>
+                  <th class="text-right px-3 py-2 font-semibold">Conexões</th>
+                </tr>
+              </thead>
+              <tbody id="usersTop10Body" class="divide-y bg-white">
+                <tr>
+                  <td class="px-3 py-3 text-slate-500" colspan="3">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 flex items-center justify-end gap-2">
+            <button id="btnCloseTop10_2" class="px-4 py-2 rounded-xl border text-sm hover:bg-slate-50 transition">
+              Fechar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    //const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/dados_gerais/91/1";
+    const endpoint = "/api/suporte/lapavet";
+
+    const CLIENTE_NOME = "LAPAVET";
+    const CLIENTE_COD_UNID_NEGOC = 91;
+    const CLIENTE_COD_UNID_OPER = 1;
+
+    let latestUsersBD = [];
+
+    function setDadosGeraisWidgets(payload) {
+      const elCliente = document.getElementById('dg_cliente');
+      const elClienteSub = document.getElementById('dg_cliente_sub');
+      const elVersao = document.getElementById('dg_versao');
+      const elStatus = document.getElementById('dg_status');
+
+      if (elCliente) elCliente.textContent = `${CLIENTE_NOME} (${CLIENTE_COD_UNID_NEGOC})`;
+      if (elClienteSub) elClienteSub.textContent = `Unid. Oper.: ${CLIENTE_COD_UNID_OPER}`;
+
+      const versao = payload?.versao_vertis ?? '—';
+      if (elVersao) elVersao.textContent = versao;
+
+      if (elStatus) {
+        elStatus.textContent = 'OK';
+        elStatus.className =
+          'text-[10px] px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold uppercase tracking-wide';
+      }
+    }
+
+    function setErroWidgets(msg) {
+      const elClienteSub = document.getElementById('dg_cliente_sub');
+      const elVersao = document.getElementById('dg_versao');
+      const elStatus = document.getElementById('dg_status');
+
+      if (elClienteSub) elClienteSub.textContent = msg;
+      if (elVersao) elVersao.textContent = '—';
+
+      if (elStatus) {
+        elStatus.textContent = 'Erro';
+        elStatus.className =
+          'text-[10px] px-2 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-semibold uppercase tracking-wide';
+      }
+    }
+
+    function setTarefas(payload) {
+      const row = Array.isArray(payload?.tarefa) ? payload.tarefa[0] : null;
+
+      const lol_total = Number(row?.qtd_lol ?? 0);
+      const lol_fila = Number(row?.qtd_lol_fila ?? 0);
+      const lol_erro = Number(row?.qtd_lol_erro ?? 0);
+      const lol_sucesso = Number(row?.qtd_lol_sucesso ?? 0);
+
+      const loe_total = Number(row?.qtd_loe ?? 0);
+      const loe_fila = Number(row?.qtd_loe_fila ?? 0);
+      const loe_erro = Number(row?.qtd_loe_erro ?? 0);
+      const loe_sucesso = Number(row?.qtd_loe_sucesso ?? 0);
+
+      const set = (id, v) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = Number.isFinite(v) ? v : '—';
+      };
+
+      set('tar_lol_total', lol_total);
+      set('tar_lol_fila', lol_fila);
+      set('tar_lol_erro', lol_erro);
+      set('tar_lol_sucesso', lol_sucesso);
+
+      set('tar_loe_total', loe_total);
+      set('tar_loe_fila', loe_fila);
+      set('tar_loe_erro', loe_erro);
+      set('tar_loe_sucesso', loe_sucesso);
+    }
+
+    /* ===== GRÁFICO: LAUDOS POR HORA ===== */
+    let chartLaudosHoraInstance = null;
+
+    const TIPOS = {
+      ASSINADOS: "Laudos Assinados",
+      TAREFAS: "Tarefas | Laudos",
+      INTERNET: "Laudos | Internet",
+      EMAIL: "Laudos | Email"
+    };
+
+    const pad2 = (n) => String(n).padStart(2, '0');
+    const hourLabel = (h) => `${pad2(h)}:00`;
+
+    function buildLaudosHoraSeries(rows) {
+      const bucket = new Map();
+
+      for (const r of (rows || [])) {
+        const tipo = r?.tipo_grafico;
+        const hourStr = String(r?.w_dth_cadastro ?? '').trim();
+        const hour = Number(hourStr);
+
+        if (!Number.isFinite(hour) || hour < 0 || hour > 23) continue;
+        const count = Number(r?.count || 0);
+
+        if (!bucket.has(hour)) bucket.set(hour, {});
+        const obj = bucket.get(hour);
+        obj[tipo] = (obj[tipo] || 0) + count;
+      }
+
+      const hoursSorted = [...bucket.keys()].sort((a, b) => a - b);
+      const labels = hoursSorted.map(h => hourLabel(h));
+      const series = (tipo) => hoursSorted.map(h => Number((bucket.get(h)?.[tipo]) || 0));
+
+      return {
+        labels,
+        assinados: series(TIPOS.ASSINADOS),
+        tarefas: series(TIPOS.TAREFAS),
+        internet: series(TIPOS.INTERNET),
+        email: series(TIPOS.EMAIL)
+      };
+    }
+
+    function renderLaudosHoraChart(rows) {
+      const el = document.getElementById('chartLaudosHora');
+      if (!el) return;
+
+      const s = buildLaudosHoraSeries(rows);
+
+      if (s.labels.length === 0) {
+        if (chartLaudosHoraInstance) { chartLaudosHoraInstance.destroy(); chartLaudosHoraInstance = null; }
+        return;
+      }
+
+      if (chartLaudosHoraInstance) chartLaudosHoraInstance.destroy();
+
+      chartLaudosHoraInstance = new Chart(el, {
+        type: 'bar',
+        data: {
+          labels: s.labels,
+          datasets: [
+            { type: 'bar', label: 'Laudos Assinados', data: s.assinados, borderWidth: 1 },
+            { type: 'bar', label: 'Tarefas | Laudos', data: s.tarefas, borderWidth: 1 },
+            { type: 'line', label: 'Laudos | Internet', data: s.internet, tension: 0.25, pointRadius: 2, borderWidth: 2 },
+            { type: 'line', label: 'Laudos | Email', data: s.email, tension: 0.25, pointRadius: 2, borderWidth: 2 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { position: 'top' }, tooltip: { enabled: true } },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true } },
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    /* ===== PIZZAS: INTERNET / EMAIL ===== */
+    let chartInternetInstance = null;
+    let chartEmailInstance = null;
+
+    function buildIntervaloSeries(rows) {
+      const labels = (rows || []).map(r => String(r?.intervalo ?? '—'));
+      const data = (rows || []).map(r => Number(r?.count || 0));
+      return { labels, data };
+    }
+
+    function renderPieChart(canvasId, rows, existingChart) {
+      const el = document.getElementById(canvasId);
+      if (!el) return null;
+
+      const s = buildIntervaloSeries(rows);
+
+      if (s.labels.length === 0) {
+        if (existingChart) existingChart.destroy();
+        return null;
+      }
+
+      if (existingChart) existingChart.destroy();
+
+      return new Chart(el, {
+        type: 'pie',
+        data: { labels: s.labels, datasets: [{ data: s.data, borderWidth: 1 }] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              enabled: true,
+              callbacks: {
+                label: (ctx) => {
+                  const label = ctx.label ?? '';
+                  const value = Number(ctx.raw || 0);
+                  const total = ctx.dataset.data.reduce((a, b) => a + Number(b || 0), 0) || 1;
+                  const pct = ((value / total) * 100).toFixed(1) + '%';
+                  return `${label}: ${value} (${pct})`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderInternetEmailCharts(payload) {
+      chartInternetInstance = renderPieChart("chartInternet", payload?.grafico_internet || [], chartInternetInstance);
+      chartEmailInstance = renderPieChart("chartEmail", payload?.grafico_email || [], chartEmailInstance);
+    }
+
+    /* ===== WIDGET: CONEXÕES BD ===== */
+    function setConexoesBD(payload) {
+      const row = Array.isArray(payload?.conexoes_bd) ? payload.conexoes_bd[0] : null;
+
+      const atual = Number(row?.conexoes_atuais ?? 0);
+      const limite = Number(row?.limite_maximo ?? 0);
+      const disp = Number(row?.conexoes_disponiveis ?? 0);
+
+      const elAtual = document.getElementById('bd_atual');
+      const elLimite = document.getElementById('bd_limite');
+      const elDisp = document.getElementById('bd_disp');
+      const elBadge = document.getElementById('bd_pct_badge');
+      const elBar = document.getElementById('bd_pct_bar');
+      const elTxt = document.getElementById('bd_pct_txt');
+
+      if (elAtual) elAtual.textContent = Number.isFinite(atual) ? atual : '—';
+      if (elLimite) elLimite.textContent = Number.isFinite(limite) ? limite : '—';
+      if (elDisp) elDisp.textContent = Number.isFinite(disp) ? disp : '—';
+
+      const pctUso = (limite > 0) ? (atual / limite) * 100 : 0;
+      const pctSobra = (limite > 0) ? (disp / limite) * 100 : 0;
+
+      const usoFmt = pctUso.toFixed(1) + '%';
+      const sobraFmt = pctSobra.toFixed(1) + '%';
+
+      const usoClamped = Math.max(0, Math.min(100, pctUso));
+      if (elBar) elBar.style.width = usoClamped + '%';
+
+      if (elBadge) elBadge.textContent = `Sobra ${sobraFmt}`;
+      if (elTxt) elTxt.textContent = `Uso: ${usoFmt} • Disponível: ${sobraFmt}`;
+
+      if (elBar) {
+        elBar.className = 'h-full transition-all duration-300 ' +
+          (pctUso >= 90 ? 'bg-rose-600' : pctUso >= 75 ? 'bg-amber-600' : 'bg-emerald-600');
+      }
+      if (elBadge) {
+        elBadge.className = 'text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide ' +
+          (pctUso >= 90 ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+            pctUso >= 75 ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+              'bg-emerald-50 text-emerald-700 border border-emerald-200');
+      }
+    }
+
+    function normalizeUsers(rows) {
+      return (rows || [])
+        .map(r => ({ usename: String(r?.usename ?? '').trim(), count: Number(r?.count ?? 0) }))
+        .filter(r => r.usename)
+        .sort((a, b) => (b.count - a.count) || a.usename.localeCompare(b.usename));
+    }
+
+    function setTopUsers(payload) {
+      const tbody = document.getElementById('usersTopBody');
+      if (!tbody) return;
+
+      latestUsersBD = Array.isArray(payload?.users_bd) ? payload.users_bd : [];
+      const sorted = normalizeUsers(latestUsersBD);
+      const top3 = sorted.slice(0, 3);
+
+      tbody.innerHTML = '';
+
+      if (top3.length === 0) {
+        tbody.innerHTML = `<tr><td class="px-3 py-3 text-slate-500" colspan="2">Sem dados.</td></tr>`;
+        return;
+      }
+
+      top3.forEach((r, idx) => {
+        const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="px-3 py-2">
+            <div class="flex items-center gap-2">
+              <span class="text-base">${medal}</span>
+              <span class="font-medium text-slate-800">${escapeHtml(r.usename)}</span>
+            </div>
+          </td>
+          <td class="px-3 py-2 text-right font-semibold text-slate-800">${Number.isFinite(r.count) ? r.count : 0}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderTop10Modal() {
+      const tbody = document.getElementById('usersTop10Body');
+      if (!tbody) return;
+
+      const top10 = normalizeUsers(latestUsersBD).slice(0, 10);
+      tbody.innerHTML = '';
+
+      if (top10.length === 0) {
+        tbody.innerHTML = `<tr><td class="px-3 py-3 text-slate-500" colspan="3">Sem dados.</td></tr>`;
+        return;
+      }
+
+      top10.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="px-3 py-2 text-slate-500">${idx + 1}</td>
+          <td class="px-3 py-2 font-medium text-slate-800">${escapeHtml(r.usename)}</td>
+          <td class="px-3 py-2 text-right font-semibold text-slate-800">${Number.isFinite(r.count) ? r.count : 0}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function openTop10() {
+      renderTop10Modal();
+      const modal = document.getElementById('top10Modal');
+      modal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeTop10() {
+      const modal = document.getElementById('top10Modal');
+      modal.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    function bindModalEvents() {
+      const btn = document.getElementById('btnTop10');
+      const btnClose = document.getElementById('btnCloseTop10');
+      const btnClose2 = document.getElementById('btnCloseTop10_2');
+      const backdrop = document.getElementById('top10Backdrop');
+
+      if (btn) btn.addEventListener('click', openTop10);
+      if (btnClose) btnClose.addEventListener('click', closeTop10);
+      if (btnClose2) btnClose2.addEventListener('click', closeTop10);
+      if (backdrop) backdrop.addEventListener('click', closeTop10);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeTop10();
+      });
+    }
+
+    async function loadData() {
+      document.getElementById('refreshIndicator').classList.remove('opacity-0');
+
+      try {
+        const r = await fetch(endpoint, { cache: 'no-store' });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+
+        const payload = await r.json();
+
+        setDadosGeraisWidgets(payload);
+        setTarefas(payload);
+
+        renderLaudosHoraChart(payload?.laudos_hora || []);
+        renderInternetEmailCharts(payload);
+
+        setConexoesBD(payload);
+        setTopUsers(payload);
+
+      } catch (err) {
+        console.error('Erro ao carregar dados gerais:', err);
+        setErroWidgets('Não foi possível carregar o endpoint. Verifique CORS / rede / URL.');
+
+        if (chartLaudosHoraInstance) { chartLaudosHoraInstance.destroy(); chartLaudosHoraInstance = null; }
+        if (chartInternetInstance) { chartInternetInstance.destroy(); chartInternetInstance = null; }
+        if (chartEmailInstance) { chartEmailInstance.destroy(); chartEmailInstance = null; }
+
+        latestUsersBD = [];
+        setConexoesBD({});
+        setTopUsers({});
+        setTarefas({});
+      } finally {
+        setTimeout(() => document.getElementById('refreshIndicator').classList.add('opacity-0'), 800);
+      }
+    }
+
+    bindModalEvents();
+    loadData();
+    setInterval(loadData, 300000);
+  </script>
+
+  <!-- MENU -->
+  <script>
+    (function () {
+      const btn = document.getElementById('menuBtn');
+      const panel = document.getElementById('menuPanel');
+      if (!btn || !panel) return;
+
+      const openMenu = () => { panel.classList.remove('hidden'); btn.setAttribute('aria-expanded', 'true'); };
+      const closeMenu = () => { panel.classList.add('hidden'); btn.setAttribute('aria-expanded', 'false'); };
+      const toggleMenu = () => { (!panel.classList.contains('hidden')) ? closeMenu() : openMenu(); };
+
+      btn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+
+      document.addEventListener('click', (e) => {
+        if (!panel.contains(e.target) && e.target !== btn) closeMenu();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMenu();
+      });
+
+      const getPanel = (key) => panel.querySelector(`[data-acc-panel="${key}"]`);
+
+      panel.querySelectorAll('[data-acc-btn]').forEach((accBtn) => {
+        accBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const key = accBtn.getAttribute('data-acc-btn');
+          const accPanel = getPanel(key);
+          if (!accPanel) return;
+
+          accPanel.classList.toggle('hidden');
+
+          if (key === 'dfe' && accPanel.classList.contains('hidden')) {
+            const nfePanel = getPanel('nfe');
+            const nfsePanel = getPanel('nfse');
+            if (nfePanel) nfePanel.classList.add('hidden');
+            if (nfsePanel) nfsePanel.classList.add('hidden');
+          }
+        });
+      });
+    })();
+  </script>
+
+</body>
+
+</html>

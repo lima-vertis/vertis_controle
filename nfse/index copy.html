@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>NFSe | Controle</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Favicons e Icones -->
+  <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png" sizes="180x180">
+  <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32">
+
+  <style>
+    .fade-in {
+      animation: fadeInUp 0.25s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .count {
+      transition: all .3s ease;
+    }
+
+    /* micro-interação de "pulse" quando atualiza */
+    .kpi-pulse {
+      animation: kpiPulse 450ms ease-out;
+    }
+
+    @keyframes kpiPulse {
+      0% {
+        transform: translateY(0);
+      }
+
+      40% {
+        transform: translateY(-1px);
+      }
+
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    .card-chip {
+      border: 1px solid rgb(226 232 240);
+      background: rgb(248 250 252);
+      border-radius: 0.85rem;
+      padding: 0.5rem 0.65rem;
+    }
+
+    .mini-bar {
+      height: 6px;
+      border-radius: 999px;
+      background: rgb(226 232 240);
+      overflow: hidden;
+    }
+
+    .mini-bar>div {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: width 700ms ease;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header
+    class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
+
+    <!-- ESQUERDA -->
+    <div class="flex items-center gap-4">
+
+      <!-- MENU SANDUÍCHE -->
+      <nav class="relative">
+        <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
+          aria-expanded="false" aria-controls="menuPanel">
+
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <!-- PAINEL -->
+        <div id="menuPanel" class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl
+           hidden overflow-hidden">
+
+          <!-- HEADER DO PAINEL (opcional) -->
+          <div class="px-4 py-3 border-b bg-slate-50">
+            <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
+          </div>
+
+          <div class="py-2 text-sm">
+
+            <!-- Início -->
+            <a href="../NFE/index.html" class="block px-4 py-2 text-sm font-semibold hover:bg-slate-100">
+              Início
+            </a>
+
+            <!-- LAUDOS (nível 1) -->
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="lol">
+              <span>Publicação de Laudos</span>
+              <span class="text-slate-400">›</span>
+            </button>
+
+            <!-- Conteúdo LAUDOS (nível 2) -->
+            <div class="hidden" data-acc-panel="lol">
+              <a href="../laudos/index.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                Visão Geral
+              </a>
+            </div>
+
+            <!-- DFe (nível 1) -->
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="dfe">
+              <span>DFe (Documentos Fiscais)</span>
+              <span class="text-slate-400">›</span>
+            </button>
+
+            <!-- Conteúdo DFe (nível 2) -->
+            <div class="hidden" data-acc-panel="dfe">
+
+              <!-- NFe -->
+              <button type="button"
+                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                data-acc-btn="nfe">
+                <span>NFe</span>
+                <span class="text-slate-400">›</span>
+              </button>
+
+              <div class="hidden" data-acc-panel="nfe">
+                <a href="../nfe/index.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Visão Geral
+                </a>
+                <a href="../nfe/controle_nfe_logs.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Erros
+                </a>
+              </div>
+
+              <!-- NFSe -->
+              <button type="button"
+                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                data-acc-btn="nfse">
+                <span>NFSe</span>
+                <span class="text-slate-400">›</span>
+              </button>
+
+              <div class="hidden" data-acc-panel="nfse">
+                <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Visão Geral
+                </a>
+                <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                  Erros
+                </a>
+              </div>
+
+            </div>
+
+            <!-- DESENVOLVIMENTO (nível 1) -->
+            <button type="button"
+              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+              data-acc-btn="dev">
+              <span>Desenvolvimento</span>
+              <span class="text-slate-400">›</span>
+            </button>
+
+            <!-- Conteúdo Desenvolvimento (nível 2) -->
+            <div class="hidden" data-acc-panel="dev">
+              <a href="../desenv/gerador_pix.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                Chave PIX
+              </a>
+              <a href="../desenv/leitor_pdf.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                Leitor PDF (PDF.js)
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </nav>
+
+
+      <!-- TEXTO -->
+      <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
+        Vertis • NFSe • Controle
+      </h1>
+    </div>
+
+    <!-- DIREITA -->
+    <div class="flex items-center gap-4">
+      <span id="refreshIndicator" class="text-xs text-slate-300 opacity-0 transition-opacity">
+        Atualizando...
+      </span>
+
+      <!-- Logs e Erros (no header) -->
+      <a href="controle_nfse_logs.html" title="Logs e Erros" class="group relative inline-flex items-center justify-center
+            h-10 w-10 rounded-xl
+            bg-white/10 border border-white/15
+            hover:bg-white/15 hover:border-white/25
+            transition-all duration-200
+            focus:outline-none focus:ring-2 focus:ring-white/30">
+
+        <!-- Ping discreto -->
+        <span class="absolute -top-1 -right-1 flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+        </span>
+
+        <!-- Ícone -->
+        <svg xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-white/90 group-hover:scale-110 transition-transform duration-200" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h2M7 7h10M7 11h10M7 15h4" />
+        </svg>
+
+        <!-- Tooltip -->
+        <span class="pointer-events-none absolute right-0 top-11
+                 opacity-0 translate-y-1
+                 group-hover:opacity-100 group-hover:translate-y-0
+                 transition-all duration-200
+                 text-[11px] px-2 py-1 rounded-lg
+                 bg-slate-900 text-white shadow-lg whitespace-nowrap">
+          Logs e Erros
+        </span>
+      </a>
+
+      <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
+    </div>
+
+  </header>
+
+  <main class="p-6 flex-1 space-y-6">
+
+    <!-- KPIs -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+
+      <!-- TOTAL -->
+      <div class="bg-white rounded-xl border border-slate-200 p-3 hover:shadow-sm transition">
+
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Total</h2>
+            <div class="text-[11px] text-slate-400 mt-0.5">Visão consolidada do período</div>
+          </div>
+
+          <span id="kpi_total_badge"
+            class="text-[11px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+            Mês Atual
+          </span>
+        </div>
+
+        <!-- Big number -->
+        <div class="mt-3 flex items-end justify-between gap-3">
+          <div>
+            <div class="text-[10px] uppercase tracking-wide text-slate-400">Total geral</div>
+            <div id="kpi_total_all" class="text-3xl font-semibold text-slate-900 leading-tight count">0</div>
+          </div>
+
+          <!-- micro status (opcional) -->
+          <div class="text-right">
+            <div class="text-[10px] uppercase tracking-wide text-slate-400">Taxa de erro</div>
+            <div id="kpi_total_err_pct_top" class="text-sm font-semibold text-slate-700">0%</div>
+          </div>
+        </div>
+
+        <!-- 4 metrics as modern chips -->
+        <div class="mt-3 grid grid-cols-2 gap-2">
+          <!-- Pendentes -->
+          <div class="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase tracking-wide text-slate-400">Pendentes</span>
+              <span id="kpi_total_pend" class="text-lg font-semibold text-slate-900 count">0</span>
+            </div>
+            <div class="mt-2 h-1.5 rounded-full bg-slate-200 overflow-hidden">
+              <div id="bar_pend" class="h-full rounded-full w-0 transition-all duration-700"></div>
+            </div>
+          </div>
+
+          <!-- Erros -->
+          <div class="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase tracking-wide text-slate-400">Erros</span>
+              <span id="kpi_total_err" class="text-lg font-semibold text-slate-900 count">0</span>
+            </div>
+            <div class="mt-2 h-1.5 rounded-full bg-slate-200 overflow-hidden">
+              <div id="bar_err" class="h-full rounded-full w-0 transition-all duration-700"></div>
+            </div>
+          </div>
+
+          <!-- Gerados -->
+          <div class="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase tracking-wide text-slate-400">Gerados</span>
+              <span id="kpi_total_ger" class="text-lg font-semibold text-slate-900 count">0</span>
+            </div>
+            <div class="mt-2 h-1.5 rounded-full bg-slate-200 overflow-hidden">
+              <div id="bar_ger" class="h-full rounded-full w-0 transition-all duration-700"></div>
+            </div>
+          </div>
+
+          <!-- Fila -->
+          <div class="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] uppercase tracking-wide text-slate-400">Fila</span>
+              <span id="kpi_total_fila" class="text-lg font-semibold text-slate-900 count">0</span>
+            </div>
+            <div class="mt-2 h-1.5 rounded-full bg-slate-200 overflow-hidden">
+              <div id="bar_fila" class="h-full rounded-full w-0 transition-all duration-700"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TOP 3 UNIDADES -->
+      <div class="bg-white rounded-xl border border-slate-200 p-3 hover:shadow-sm transition">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Top 3 Unidades</h2>
+          <span class="text-[11px] px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+            por Gerados
+          </span>
+        </div>
+
+        <ol id="kpi_top_unid" class="space-y-2"></ol>
+
+        <div class="mt-3 text-[11px] text-slate-500">
+          Base: <span class="font-medium text-slate-700" id="kpi_top_unid_base">Mês Atual</span>
+        </div>
+      </div>
+
+      <!-- TOP 3 UNID. NEGÓCIOS -->
+      <div class="bg-white rounded-xl border border-slate-200 p-3 hover:shadow-sm transition">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Unid. Negócios</h2>
+          <span class="text-[11px] px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+            por Gerados
+          </span>
+        </div>
+
+        <ol id="kpi_top_neg" class="space-y-2"></ol>
+
+        <div class="mt-3 text-[11px] text-slate-500">
+          Base: <span class="font-medium text-slate-700" id="kpi_top_neg_base">Mês Atual</span>
+        </div>
+      </div>
+
+      <!-- TOP 3 CIDADES -->
+      <div class="bg-white rounded-xl border border-slate-200 p-3 hover:shadow-sm transition">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Top 3 Cidades</h2>
+          <span class="text-[11px] px-2 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+            placeholder
+          </span>
+        </div>
+
+        <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4">
+          <div class="text-sm font-semibold text-slate-700">Aguardando campos no JSON</div>
+          <div class="text-xs text-slate-500 mt-1">
+            Quando tivermos <span class="font-medium">cidade/UF</span> no retorno, eu monto o ranking aqui (por Gerados
+            no modo selecionado).
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- FILTRO -->
+    <div class="bg-white rounded-2xl shadow p-4 flex flex-col md:flex-row md:items-center gap-4">
+      <input id="filterInput" type="text" placeholder="🔍 Filtrar por código ou nome da unidade..."
+        class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" oninput="applyFilter()" />
+
+      <div class="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
+        <!-- Toggle 3 opções -->
+        <div class="inline-flex rounded-2xl bg-slate-100 p-1 border border-slate-200 shadow-sm">
+          <button id="btnModeAtual" type="button" class="px-3 py-2 text-xs font-semibold rounded-xl transition-all">
+            Mês Atual
+          </button>
+          <button id="btnModeAnterior" type="button" class="px-3 py-2 text-xs font-semibold rounded-xl transition-all">
+            Mês Anterior
+          </button>
+          <button id="btnModeTotal" type="button" class="px-3 py-2 text-xs font-semibold rounded-xl transition-all">
+            60 dias
+          </button>
+        </div>
+
+        <span class="text-sm text-slate-500 whitespace-nowrap">Auto-refresh 5 min</span>
+      </div>
+    </div>
+
+    <!-- LISTA (CARDS) -->
+    <div class="bg-white rounded-2xl shadow p-3">
+      <!-- topo da lista -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+        <div class="text-sm font-semibold text-slate-800">Unidades</div>
+
+        <div class="flex items-center gap-2">
+          <label class="text-xs text-slate-500">Ordenar por</label>
+          <select id="sortSelect"
+            class="text-sm border border-slate-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring">
+            <option value="nom_unid_oper">Cliente</option>
+            <option value="cod_unid_negoc">Negócio</option>
+            <option value="cod_unid_oper">Oper</option>
+            <option value="pendentes">Pendentes (modo)</option>
+            <option value="erro">Erros (modo)</option>
+            <option value="gerados">Gerados (modo)</option>
+            <option value="fila">Fila (modo)</option>
+            <option value="dth_ultimo_rps_convertido">Dt Últ. Conv.</option>
+            <option value="dth_ult_atualizacao">Atualização</option>
+          </select>
+
+          <button id="sortDirBtn"
+            class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-sm">
+            ↑
+          </button>
+        </div>
+      </div>
+
+      <!-- grid de cards -->
+      <div id="cardsWrap" class="grid grid-cols-1 lg:grid-cols-2 gap-3"></div>
+
+      <!-- resumo totals (opcional) -->
+      <div id="cardsFooter" class="mt-3 pt-3 border-t text-xs text-slate-500"></div>
+    </div>
+
+    <!-- PAGINAÇÃO -->
+    <div class="flex items-center justify-between px-2 text-sm text-slate-600">
+      <span id="pageInfo"></span>
+      <div id="pagination" class="flex gap-1"></div>
+    </div>
+
+  </main>
+
+  <script>
+    const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfse_controle";
+    //const endpoint = "/api/nfse/controle";
+
+    const PAGE_SIZE = 10;
+    let currentPage = 1;
+
+    const columns = [
+      { key: 'cod_unid_negoc', label: 'Neg', sticky: true, width: 50 },
+      { key: 'cod_unid_oper', label: 'Oper', sticky: true, width: 50 },
+      { key: 'nom_unid_oper', label: 'Cliente', sticky: true, width: 250 },
+
+      // Campos dinâmicos por modo (Mês Atual / Mês Anterior / 60 dias)
+      { baseKey: 'pendentes', label: 'Pendentes', sum: true, numeric: true, dyn: true },
+      { baseKey: 'erro', label: 'Erros', sum: true, numeric: true, dyn: true },
+      { baseKey: 'gerados', label: 'Gerados', sum: true, numeric: true, dyn: true },
+      { baseKey: 'fila', label: 'Fila', sum: true, numeric: true, dyn: true },
+
+      { key: 'ultimo_rps_convertido', label: 'Últ. RPS Conv.', numeric: true },
+      { key: 'dth_ultimo_rps_convertido', label: 'Dt Últ. Conv.' },
+
+      { key: 'dth_ult_atualizacao', label: 'Atualização' }
+    ];
+
+    let originalData = [], filteredData = [], sortKey = null, sortAsc = true;
+
+    // ===== Toggle Mode (Mês Atual | Mês Anterior | 60 dias) =====
+    // ===== Toggle Mode (Mês Atual | Mês Anterior | 60 dias) =====
+    let viewMode = 'atual'; // default
+
+    const modeSuffix = () => {
+      if (viewMode === 'atual') return 'mes_atual';
+      if (viewMode === 'anterior') return 'mes_anterior';
+      return 'total'; // 60 dias
+    };
+
+    const modeLabel = () => {
+      if (viewMode === 'atual') return 'Mês Atual';
+      if (viewMode === 'anterior') return 'Mês Anterior';
+      return '60 dias';
+    };
+
+    const setMode = (mode) => {
+      viewMode = mode;
+      currentPage = 1;
+
+      const activeCls = 'bg-white text-slate-900 shadow';
+      const idleCls = 'bg-transparent text-slate-600 hover:text-slate-900';
+
+      const btnAtual = document.getElementById('btnModeAtual');
+      const btnAnterior = document.getElementById('btnModeAnterior');
+      const btnTotal = document.getElementById('btnModeTotal');
+
+      [btnAtual, btnAnterior, btnTotal].forEach(b => {
+        if (!b) return;
+        b.classList.remove(...activeCls.split(' '));
+        b.classList.add(...idleCls.split(' '));
+      });
+
+      const activeBtn =
+        mode === 'atual' ? btnAtual :
+          mode === 'anterior' ? btnAnterior :
+            btnTotal;
+
+      if (activeBtn) {
+        activeBtn.classList.remove(...idleCls.split(' '));
+        activeBtn.classList.add(...activeCls.split(' '));
+      }
+
+      // Atualiza badges dos KPIs
+      const badge = document.getElementById('kpi_total_badge');
+      const base1 = document.getElementById('kpi_top_unid_base');
+      const base2 = document.getElementById('kpi_top_neg_base');
+      if (badge) badge.textContent = modeLabel();
+      if (base1) base1.textContent = modeLabel();
+      if (base2) base2.textContent = modeLabel();
+
+      renderCards();
+    };
+
+    const getPagedData = () =>
+      filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+    const totalPages = () =>
+      Math.ceil(filteredData.length / PAGE_SIZE) || 1;
+
+    /* ===== KPIs ===== */
+    const pct = (valor, total) =>
+      total > 0 ? ((valor / total) * 100).toFixed(1) + '%' : '0%';
+
+    const setBar = (id, valor, total) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const pct = total > 0 ? Math.min((valor / total) * 100, 100) : 0;
+      el.style.width = pct + '%';
+    };
+
+    const parseBrDateTime = (s) => {
+      // "DD/MM/YYYY HH:MM:SS"
+      if (!s || typeof s !== 'string') return null;
+      const m = s.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?/);
+      if (!m) return null;
+      const [_, dd, mm, yyyy, HH, MI, SS] = m;
+      return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(HH), Number(MI), Number(SS || 0));
+    };
+
+    const parseIsoDateTime = (value) => {
+      if (!value) return null;
+      // Esperado: YYYY-MM-DD HH:mm:SS
+      const [datePart, timePart] = value.split(' ');
+      if (!datePart || !timePart) return null;
+
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute, second] = timePart.split(':').map(Number);
+
+      return new Date(year, month - 1, day, hour, minute, second);
+    };
+
+    const formatDateTimeBR = (date) => {
+      if (!(date instanceof Date) || isNaN(date)) return '';
+
+      const pad = (n) => String(n).padStart(2, '0');
+
+      const day = pad(date.getDate());
+      const month = pad(date.getMonth() + 1);
+      const year = date.getFullYear();
+
+      const hour = pad(date.getHours());
+      const minute = pad(date.getMinutes());
+      const second = pad(date.getSeconds());
+
+      return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
+    };
+
+    const minutesSince = (dt) => {
+      if (!dt) return null;
+      const diffMs = Date.now() - dt.getTime();
+      return Math.floor(diffMs / 60000);
+    };
+
+    const isFresh = (dt, maxMinutes = 30) => {
+      const mins = minutesSince(dt);
+      if (mins == null) return null;     // sem data
+      if (mins < 0) return true;         // data no "futuro" (relógio/servidor), considera OK
+      return mins <= maxMinutes;
+    };
+
+    const renderFreshIcon = (dt, maxMinutes = 30) => {
+      const ok = isFresh(dt, maxMinutes);
+      const dtBr = formatDateTimeBR(dt);
+
+      if (ok === null) {
+        return `<span class="inline-flex items-center gap-2 text-slate-400" title="Sem data">
+      <span class="h-2 w-2 rounded-full bg-slate-300"></span><span class="text-xs">—</span>
+    </span>`;
+      }
+
+      if (ok) {
+        return `<span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200"
+      title="${dtBr}">
+      ✓
+    </span>`;
+      }
+
+      const mins = minutesSince(dt);
+      return `<span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-rose-50 text-rose-700 border border-rose-200"
+    title="${dtBr}">
+    !
+  </span>`;
+    };
+
+    // ===== Count Up (sem libs) =====
+    const getNumericText = (el) => {
+      if (!el) return 0;
+      const raw = (el.textContent || '').toString().replace(/[^\d.-]/g, '');
+      const n = Number(raw);
+      return isNaN(n) ? 0 : n;
+    };
+
+    // easing suave (mais "premium" que linear)
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+    const fmtIntBR = (n) => Math.round(n).toLocaleString('pt-BR');
+
+    const animateCount = (el, toValue, opts = {}) => {
+      if (!el) return;
+
+      const {
+        duration = 450,          // ms
+        formatter = (n) => String(Math.round(n)),
+        minStep = 1              // evita micro-passos quando números grandes
+      } = opts;
+
+      const fromValue = getNumericText(el);
+      const end = Number(toValue) || 0;
+
+      // se não mudou, não anima
+      if (fromValue === end) return;
+
+      // cancela animação anterior do mesmo elemento
+      if (el._raf) cancelAnimationFrame(el._raf);
+
+      const start = performance.now();
+      const delta = end - fromValue;
+
+      const tick = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = easeOutCubic(t);
+        let current = fromValue + delta * eased;
+
+        // "quantização" pra ficar mais estável visualmente
+        if (Math.abs(delta) >= 1000) {
+          // números grandes: arredonda com passo mínimo
+          const sign = current < 0 ? -1 : 1;
+          current = sign * Math.round(Math.abs(current) / minStep) * minStep;
+        }
+
+        el.textContent = formatter(current);
+
+        // micro feedback visual
+        el.classList.add('kpi-pulse');
+
+        if (t < 1) {
+          el._raf = requestAnimationFrame(tick);
+        } else {
+          el.textContent = formatter(end);
+          // remove a classe depois (deixa pronto pra próxima)
+          setTimeout(() => el.classList.remove('kpi-pulse'), 200);
+          el._raf = null;
+        }
+      };
+
+      el._raf = requestAnimationFrame(tick);
+    };
+
+    function updateKPIs() {
+      const suffix = modeSuffix();
+      const keyOf = (base) => `${base}_${suffix}`;
+
+      const sum = (k) => filteredData.reduce((t, r) => t + Number(r[k] || 0), 0);
+
+      const totalPend = sum(keyOf('pendentes'));
+      const totalErr = sum(keyOf('erro'));
+      const totalGer = sum(keyOf('gerados'));
+      const totalFila = sum(keyOf('fila'));
+
+      // --- TOTAL ---
+      const elPend = document.getElementById('kpi_total_pend');
+      const elErr = document.getElementById('kpi_total_err');
+      const elGer = document.getElementById('kpi_total_ger');
+      const elFila = document.getElementById('kpi_total_fila');
+
+      animateCount(elPend, totalPend);
+      animateCount(elGer, totalGer);
+      animateCount(elFila, totalFila);
+
+      if (elErr) {
+        elErr.textContent = totalErr;
+        // Erros em vermelho quando > 0
+        elErr.classList.toggle('text-rose-600', totalErr > 0);
+        elErr.classList.toggle('text-slate-800', !(totalErr > 0));
+      }
+
+      const base = totalPend + totalErr + totalGer + totalFila;
+      const pct2 = (v, t) => (t > 0 ? ((v / t) * 100).toFixed(1) + '%' : '0%');
+
+      const elErrPct = document.getElementById('kpi_total_err_pct');
+      const elPendPct = document.getElementById('kpi_total_pend_pct');
+      const elFilaPct = document.getElementById('kpi_total_fila_pct');
+
+      if (elErrPct) elErrPct.textContent = pct2(totalErr, base);
+      if (elPendPct) elPendPct.textContent = pct2(totalPend, base);
+      if (elFilaPct) elFilaPct.textContent = pct2(totalFila, base);
+
+      // Total geral (novo)
+      const totalAll = totalPend + totalErr + totalGer + totalFila;
+      const elAll = document.getElementById('kpi_total_all');
+      animateCount(elAll, totalAll, { duration: 550, formatter: fmtIntBR });
+
+      // Mostra taxa de erro também no topo (novo)
+      const elErrTop = document.getElementById('kpi_total_err_pct_top');
+      if (elErrTop) elErrTop.textContent = pct2(totalErr, totalAll);
+
+      // Helpers p/ barras
+      const setBarWidth = (id, value, total) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const p = total > 0 ? Math.min((value / total) * 100, 100) : 0;
+        el.style.width = p + '%';
+      };
+
+      const setPctBarWidth = (id, pctStr) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const p = Math.max(0, Math.min(parseFloat(String(pctStr).replace('%', '')) || 0, 100));
+        el.style.width = p + '%';
+      };
+
+      // Cores (sem depender de config do Tailwind)
+      const colorize = () => {
+        const bar = (id, color) => {
+          const el = document.getElementById(id);
+          if (el) el.style.background = color;
+        };
+        // métricas
+        bar('bar_pend', '#64748b'); // slate
+        bar('bar_ger', '#10b981'); // emerald
+        bar('bar_fila', '#6366f1'); // indigo
+        bar('bar_err', '#f43f5e'); // rose
+        // percentuais
+        bar('bar_pend_pct', '#64748b');
+        bar('bar_fila_pct', '#6366f1');
+        bar('bar_err_pct', '#f43f5e');
+      };
+      colorize();
+
+      // Preenche barras (animadas via transition)
+      setBarWidth('bar_pend', totalPend, totalAll);
+      setBarWidth('bar_err', totalErr, totalAll);
+      setBarWidth('bar_ger', totalGer, totalAll);
+      setBarWidth('bar_fila', totalFila, totalAll);
+
+      // percentuais (já calculados mais abaixo no seu código)
+      setPctBarWidth('bar_err_pct', document.getElementById('kpi_total_err_pct')?.textContent);
+      setPctBarWidth('bar_pend_pct', document.getElementById('kpi_total_pend_pct')?.textContent);
+      setPctBarWidth('bar_fila_pct', document.getElementById('kpi_total_fila_pct')?.textContent);
+
+      // Pulse leve no card quando atualizar
+      const totalCard = document.getElementById('kpi_total_all')?.closest('.bg-white');
+      if (totalCard) {
+        totalCard.classList.remove('kpi-pulse');
+        // força reflow pra reiniciar animação
+        void totalCard.offsetWidth;
+        totalCard.classList.add('kpi-pulse');
+      }
+
+      // --- TOP 3 UNIDADES (por Gerados) ---
+      const topUnid = [...filteredData]
+        .map(r => ({
+          cod_unid_oper: r.cod_unid_oper,
+          nom_unid_oper: r.nom_unid_oper,
+          gerados: Number(r[keyOf('gerados')] || 0),
+          erros: Number(r[keyOf('erro')] || 0)
+        }))
+        .sort((a, b) => b.gerados - a.gerados)
+        .slice(0, 3);
+
+      const listUnid = document.getElementById('kpi_top_unid');
+      if (listUnid) {
+        listUnid.innerHTML = topUnid.length
+          ? topUnid.map((u, idx) => {
+            const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉';
+            const errCls = u.erros > 0
+              ? 'text-rose-700 bg-rose-50 border-rose-100'
+              : 'text-slate-600 bg-slate-50 border-slate-100';
+
+            return `
+          <li class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-sm font-semibold text-slate-800 truncate">${medal} ${u.nom_unid_oper ?? '—'}</div>
+              <div class="text-xs text-slate-500">Oper: <span class="font-medium text-slate-700">${u.cod_unid_oper ?? '—'}</span></div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="text-lg font-semibold text-slate-900">${u.gerados}</div>
+              <div class="mt-1 inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border ${errCls}">
+                Erros: <span class="font-semibold">${u.erros}</span>
+              </div>
+            </div>
+          </li>
+        `;
+          }).join('')
+          : `<li class="text-sm text-slate-500">Sem dados.</li>`;
+      }
+
+      // --- TOP 3 UNID. NEGÓCIOS (por Gerados agrupado) ---
+      const byNeg = new Map();
+      for (const r of filteredData) {
+        const neg = String(r.cod_unid_negoc ?? '');
+        if (!neg) continue;
+
+        const cur = byNeg.get(neg) || { cod_unid_negoc: neg, gerados: 0, erros: 0 };
+        cur.gerados += Number(r[keyOf('gerados')] || 0);
+        cur.erros += Number(r[keyOf('erro')] || 0);
+        byNeg.set(neg, cur);
+      }
+
+      const topNeg = [...byNeg.values()]
+        .sort((a, b) => b.gerados - a.gerados)
+        .slice(0, 3);
+
+      const listNeg = document.getElementById('kpi_top_neg');
+      if (listNeg) {
+        listNeg.innerHTML = topNeg.length
+          ? topNeg.map((n, idx) => {
+            const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉';
+            const errCls = n.erros > 0
+              ? 'text-rose-700 bg-rose-50 border-rose-100'
+              : 'text-slate-600 bg-slate-50 border-slate-100';
+
+            return `
+          <li class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-sm font-semibold text-slate-800 truncate">${medal} Negócio ${n.cod_unid_negoc}</div>
+              <div class="text-xs text-slate-500">Agrupado por <span class="font-medium text-slate-700">cod_unid_negoc</span></div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="text-lg font-semibold text-slate-900">${n.gerados}</div>
+              <div class="mt-1 inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border ${errCls}">
+                Erros: <span class="font-semibold">${n.erros}</span>
+              </div>
+            </div>
+          </li>
+        `;
+          }).join('')
+          : `<li class="text-sm text-slate-500">Sem dados.</li>`;
+      }
+    }
+
+    /* ===== TABLE ===== */
+    function createHeader() {
+      const tr = document.getElementById('table-head');
+      tr.innerHTML = '';
+      let left = 0;
+
+      columns.forEach(col => {
+        const th = document.createElement('th');
+        let cls = 'px-3 py-2 whitespace-nowrap cursor-pointer';
+        if (col.numeric || col.sum) cls += ' text-center';
+
+        if (col.sticky) {
+          cls += ' sticky bg-slate-200 z-50';
+          th.style.left = left + 'px';
+          th.style.width = col.width + 'px';
+          left += col.width;
+        }
+
+        th.className = cls;
+        if (col.dyn) {
+          th.textContent = `${col.label} • ${modeLabel()}`;
+        } else {
+          /* th.textContent = col.label; */
+          th.textContent = col.dyn ? `${col.label} • ${modeLabel()}` : col.label;
+        }
+        th.onclick = () => sortBy(col);
+        tr.appendChild(th);
+      });
+    }
+
+    function renderCards() {
+      const wrap = document.getElementById('cardsWrap');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+
+      const suffix = modeSuffix();
+      const keyDyn = (base) => `${base}_${suffix}`;
+
+      const fmtInt = (n) => Number(n || 0).toLocaleString('pt-BR');
+
+      const rows = getPagedData();
+
+      rows.forEach((row, i) => {
+        const pend = Number(row[keyDyn('pendentes')] || 0);
+        const err = Number(row[keyDyn('erro')] || 0);
+        const ger = Number(row[keyDyn('gerados')] || 0);
+        const fila = Number(row[keyDyn('fila')] || 0);
+
+        const total = pend + err + ger + fila;
+        const pct = (v) => total > 0 ? Math.min((v / total) * 100, 100) : 0;
+
+        const dtConv = parseIsoDateTime(row.dth_ultimo_rps_convertido);
+        const dtUp = parseIsoDateTime(row.dth_ult_atualizacao);
+
+        const freshIcon = renderFreshIcon(dtUp, 30);
+
+        const errBadge =
+          err > 0
+            ? 'bg-rose-50 text-rose-700 border-rose-200'
+            : 'bg-slate-50 text-slate-600 border-slate-200';
+
+        const card = document.createElement('div');
+        card.className = `rounded-2xl border border-slate-200 bg-white p-4 hover:shadow-sm transition fade-in`;
+
+        card.innerHTML = `
+      <!-- header -->
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <div class="text-sm font-semibold text-slate-900 truncate">
+            ${row.nom_unid_oper ?? '—'}
+          </div>
+          <div class="mt-1 text-xs text-slate-500 flex flex-wrap gap-x-3 gap-y-1">
+            <span>Neg: <span class="font-medium text-slate-700">${row.cod_unid_negoc ?? '—'}</span></span>
+            <span>Oper: <span class="font-medium text-slate-700">${row.cod_unid_oper ?? '—'}</span></span>
+          </div>
+        </div>
+
+        <div class="shrink-0 flex items-center gap-2">
+          <span class="text-[10px] px-2 py-1 rounded-full border ${errBadge}">
+            Erros: <span class="font-semibold">${fmtInt(err)}</span>
+          </span>
+          <div class="flex items-center justify-center">
+            ${freshIcon}
+          </div>
+        </div>
+      </div>
+
+      <!-- métricas -->
+      <div class="mt-4 grid grid-cols-2 gap-2">
+        <div class="card-chip">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase tracking-wide text-slate-400">Pendentes</span>
+            <span class="text-sm font-semibold text-slate-900">${fmtInt(pend)}</span>
+          </div>
+          <div class="mt-2 mini-bar"><div style="width:${pct(pend)}%; background:#64748b;"></div></div>
+        </div>
+
+        <div class="card-chip">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase tracking-wide text-slate-400">Gerados</span>
+            <span class="text-sm font-semibold text-slate-900">${fmtInt(ger)}</span>
+          </div>
+          <div class="mt-2 mini-bar"><div style="width:${pct(ger)}%; background:#10b981;"></div></div>
+        </div>
+
+        <div class="card-chip">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase tracking-wide text-slate-400">Fila</span>
+            <span class="text-sm font-semibold text-slate-900">${fmtInt(fila)}</span>
+          </div>
+          <div class="mt-2 mini-bar"><div style="width:${pct(fila)}%; background:#6366f1;"></div></div>
+        </div>
+
+        <div class="card-chip">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase tracking-wide text-slate-400">Total (modo)</span>
+            <span class="text-sm font-semibold text-slate-900">${fmtInt(total)}</span>
+          </div>
+          <div class="mt-2 mini-bar"><div style="width:100%; background:#0f172a;"></div></div>
+        </div>
+      </div>
+
+      <!-- footer -->
+      <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-500">
+        <div>
+          Últ. RPS Conv.: <span class="font-medium text-slate-700">
+            ${dtConv ? formatDateTimeBR(dtConv) : (row.dth_ultimo_rps_convertido ?? '—')}
+          </span>
+        </div>
+        <div class="text-[11px] px-2 py-1 rounded-full bg-slate-50 border border-slate-200 w-fit">
+          ${modeLabel()}
+        </div>
+      </div>
+    `;
+
+        wrap.appendChild(card);
+      });
+
+      // Footer (totais do filtro, não só da página)
+      const footer = document.getElementById('cardsFooter');
+      if (footer) {
+        const sum = (k) => filteredData.reduce((t, r) => t + Number(r[k] || 0), 0);
+        const tp = sum(keyDyn('pendentes'));
+        const te = sum(keyDyn('erro'));
+        const tg = sum(keyDyn('gerados'));
+        const tf = sum(keyDyn('fila'));
+        footer.innerHTML = `
+      <div class="flex flex-wrap items-center gap-3">
+        <span><span class="text-slate-400">Totais no filtro:</span> <span class="font-semibold text-slate-700">${modeLabel()}</span></span>
+        <span class="px-2 py-1 rounded-full bg-slate-50 border border-slate-200">Pend: <b>${fmtInt(tp)}</b></span>
+        <span class="px-2 py-1 rounded-full bg-slate-50 border border-slate-200">Erros: <b>${fmtInt(te)}</b></span>
+        <span class="px-2 py-1 rounded-full bg-slate-50 border border-slate-200">Ger: <b>${fmtInt(tg)}</b></span>
+        <span class="px-2 py-1 rounded-full bg-slate-50 border border-slate-200">Fila: <b>${fmtInt(tf)}</b></span>
+      </div>
+    `;
+      }
+
+      updateKPIs();
+      renderPagination();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+
+      getPagedData().forEach((row, i) => {
+        const tr = document.createElement('tr');
+        tr.className = `${i % 2 ? 'bg-slate-50' : 'bg-white'} hover:bg-slate-100 fade-in`;
+        let left = 0;
+
+        columns.forEach(col => {
+          const td = document.createElement('td');
+          let cls = 'px-3 py-2 whitespace-nowrap';
+
+          if (col.numeric || col.sum) cls += ' text-center font-medium';
+
+          if (col.sticky) {
+            cls += ' sticky z-40 ' + (i % 2 ? 'bg-slate-50' : 'bg-white');
+            td.style.left = left + 'px';
+            td.style.width = col.width + 'px';
+            left += col.width;
+          }
+
+          td.className = cls;
+          if (col.key === 'dth_ult_atualizacao') {
+            const dt = parseIsoDateTime(row[col.key]);
+            td.innerHTML = `<div class="flex items-center justify-center">
+            ${renderFreshIcon(dt, 30)}
+            </div>`;
+            td.classList.add('text-center');
+          } else if (col.key === 'dth_ultimo_rps_convertido') {
+            const dt = parseIsoDateTime(row[col.key]);
+            td.textContent = dt ? formatDateTimeBR(dt) : (row[col.key] ?? '');
+          } else {
+            if (col.dyn) {
+              const key = `${col.baseKey}_${modeSuffix()}`;
+              const val = Number(row[key] ?? 0);
+              td.textContent = isNaN(val) ? (row[key] ?? 0) : val;
+
+              // Highlight de erros
+              if (col.baseKey === 'erro' && val > 0) {
+                td.classList.add('text-rose-600', 'font-semibold');
+              }
+            } else {
+              td.textContent = row[col.key] ?? '';
+            }
+          }
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      renderFooter();
+      updateKPIs();
+      renderPagination();
+    }
+
+    function renderFooter() {
+      const tr = document.getElementById('table-footer');
+      tr.innerHTML = '';
+      let left = 0;
+
+      columns.forEach((col, i) => {
+        const td = document.createElement('td');
+        let cls = 'px-3 py-2';
+        if (col.numeric || col.sum) cls += ' text-center';
+
+        if (col.sticky) {
+          cls += ' sticky bg-slate-100 z-40';
+          td.style.left = left + 'px';
+          td.style.width = col.width + 'px';
+          left += col.width;
+        }
+
+        td.className = cls;
+        td.textContent = i === 0
+          ? 'Totais'
+          : col.sum
+            ? (() => {
+              const total = filteredData.reduce((t, r) => {
+                const key = col.dyn ? `${col.baseKey}_${modeSuffix()}` : col.key;
+                return t + Number(r[key] || 0);
+              }, 0);
+
+              // Highlight total de erros
+              if (col.dyn && col.baseKey === 'erro' && total > 0) {
+                td.classList.add('text-rose-600');
+              }
+              return total;
+            })()
+            : '';
+        tr.appendChild(td);
+      });
+    }
+
+    function renderPagination() {
+      const total = totalPages();
+      const delta = 1; // quantas páginas antes/depois da atual
+      const pages = [];
+      const range = [];
+
+      pageInfo.textContent =
+        `Página ${currentPage} de ${total} • ${filteredData.length} registros`;
+
+      // Sempre inclui primeira e última
+      range.push(1);
+      if (total > 1) range.push(total);
+
+      // Páginas ao redor da atual
+      for (let i = currentPage - delta; i <= currentPage + delta; i++) {
+        if (i > 1 && i < total) range.push(i);
+      }
+
+      // Ordena e remove duplicados
+      [...new Set(range)].sort((a, b) => a - b).forEach(p => pages.push(p));
+
+      pagination.innerHTML = '';
+
+      let last = 0;
+      pages.forEach(p => {
+        if (p - last > 1) {
+          const dots = document.createElement('span');
+          dots.textContent = '…';
+          dots.className = 'px-2 text-slate-400';
+          pagination.appendChild(dots);
+        }
+
+        const btn = document.createElement('button');
+        btn.textContent = p;
+        btn.className =
+          `px-2 py-1 rounded ${p === currentPage
+            ? 'bg-slate-700 text-white'
+            : 'bg-slate-200 hover:bg-slate-300'
+          }`;
+
+        btn.onclick = () => {
+          currentPage = p;
+          renderTable();
+        };
+
+        pagination.appendChild(btn);
+        last = p;
+      });
+    }
+
+    function sortBy(col) {
+      const key = col.dyn ? `${col.baseKey}_${modeSuffix()}` : col.key;
+
+      sortAsc = sortKey === key ? !sortAsc : true;
+      sortKey = key;
+      currentPage = 1;
+
+      filteredData.sort((a, b) => {
+        const n1 = Number(a[key]), n2 = Number(b[key]);
+        if (!isNaN(n1) && !isNaN(n2)) return sortAsc ? n1 - n2 : n2 - n1;
+        return sortAsc
+          ? String(a[key] ?? '').localeCompare(String(b[key] ?? ''))
+          : String(b[key] ?? '').localeCompare(String(a[key] ?? ''));
+      });
+
+      renderTable();
+    }
+
+    function applyFilter() {
+      const v = filterInput.value.toLowerCase();
+      filteredData = originalData.filter(r =>
+        String(r.cod_unid_negoc).includes(v) ||
+        String(r.cod_unid_oper).includes(v) ||
+        String(r.nom_unid_oper).toLowerCase().includes(v)
+      );
+      currentPage = 1;
+      renderTable();
+    }
+
+    async function loadData() {
+      refreshIndicator.classList.remove('opacity-0');
+      const r = await fetch(endpoint);
+      originalData = await r.json();
+      filteredData = [...originalData];
+      renderCards();
+      // garante estilo default do toggle após carregar
+      if (!document.getElementById('btnModeAtual')?.dataset?.init) {
+        document.getElementById('btnModeAtual').dataset.init = '1';
+        document.getElementById('btnModeAtual').addEventListener('click', () => setMode('atual'));
+        document.getElementById('btnModeAnterior').addEventListener('click', () => setMode('anterior'));
+        document.getElementById('btnModeTotal').addEventListener('click', () => setMode('total'));
+
+        setMode('atual'); // default
+      }
+      setTimeout(() => refreshIndicator.classList.add('opacity-0'), 800);
+    }
+
+    loadData();
+    setInterval(loadData, 300000);
+  </script>
+
+  <!-- MENU -->
+  <script>
+    (function () {
+      const btn = document.getElementById('menuBtn');
+      const panel = document.getElementById('menuPanel');
+
+      if (!btn || !panel) return;
+
+      const openMenu = () => {
+        panel.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+      };
+
+      const closeMenu = () => {
+        panel.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+      };
+
+      const toggleMenu = () => {
+        const isOpen = !panel.classList.contains('hidden');
+        isOpen ? closeMenu() : openMenu();
+      };
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      // Fecha clicando fora
+      document.addEventListener('click', (e) => {
+        if (!panel.contains(e.target) && e.target !== btn) closeMenu();
+      });
+
+      // Fecha no ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMenu();
+      });
+
+      // Accordion
+      const getPanel = (key) => panel.querySelector(`[data-acc-panel="${key}"]`);
+      const getBtn = (key) => panel.querySelector(`[data-acc-btn="${key}"]`);
+
+      panel.querySelectorAll('[data-acc-btn]').forEach((accBtn) => {
+        accBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          const key = accBtn.getAttribute('data-acc-btn');
+          const accPanel = getPanel(key);
+          if (!accPanel) return;
+
+          // Toggle do próprio painel
+          accPanel.classList.toggle('hidden');
+
+          // (Opcional) se fechar DFe, fecha filhos também
+          if (key === 'dfe' && accPanel.classList.contains('hidden')) {
+            const nfePanel = getPanel('nfe');
+            const nfsePanel = getPanel('nfse');
+            if (nfePanel) nfePanel.classList.add('hidden');
+            if (nfsePanel) nfsePanel.classList.add('hidden');
+          }
+        });
+      });
+
+    })();
+  </script>
+
+</body>
+
+</html>

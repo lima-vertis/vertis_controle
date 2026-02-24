@@ -1,6 +1,10 @@
 {
     "rewrites": [
         {
+            "source": "/api/nfse/controle",
+            "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfse_controle"
+        },
+        {
             "source": "/api/nfce/controle",
             "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle"
         },

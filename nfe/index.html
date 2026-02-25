@@ -165,6 +165,38 @@
         Atualizando...
       </span>
 
+      <!-- Logs e Erros (no header) -->
+      <a href="controle_nfe_logs.html" title="Logs e Erros" class="group relative inline-flex items-center justify-center
+            h-10 w-10 rounded-xl
+            bg-white/10 border border-white/15
+            hover:bg-white/15 hover:border-white/25
+            transition-all duration-200
+            focus:outline-none focus:ring-2 focus:ring-white/30">
+
+        <!-- Ping discreto -->
+        <span class="absolute -top-1 -right-1 flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+        </span>
+
+        <!-- Ícone -->
+        <svg xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-white/90 group-hover:scale-110 transition-transform duration-200" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h2M7 7h10M7 11h10M7 15h4" />
+        </svg>
+
+        <!-- Tooltip -->
+        <span class="pointer-events-none absolute right-0 top-11
+                 opacity-0 translate-y-1
+                 group-hover:opacity-100 group-hover:translate-y-0
+                 transition-all duration-200
+                 text-[11px] px-2 py-1 rounded-lg
+                 bg-slate-900 text-white shadow-lg whitespace-nowrap">
+          Logs e Erros
+        </span>
+      </a>
+
       <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
     </div>
 
@@ -306,7 +338,6 @@
   </main>
 
   <script>
-    // const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle";
     const endpoint = "/api/nfce/controle";
 
     const PAGE_SIZE = 10;
@@ -729,18 +760,6 @@
 
     })();
   </script>
-
-  <!-- TROCA DE PÁGINA -->
-  <a href="controle_nfe_logs.html" title="Logs e Erros" class="fixed bottom-6 right-6 z-50
-       bg-slate-900 text-white
-       p-4 rounded-full shadow-xl
-       hover:bg-slate-800 transition">
-
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-      stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h2M7 7h10M7 11h10M7 15h4" />
-    </svg>
-  </a>
 
 </body>
 

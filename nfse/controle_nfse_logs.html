@@ -2,439 +2,569 @@
 <html lang="pt-BR">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>NFS-e | Logs</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Favicons e Icones -->
-  <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png" sizes="180x180">
-  <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32">
+    <meta charset="UTF-8" />
+    <title>NFS-e | Logs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Favicons e Icones -->
+    <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png"
+        sizes="180x180">
+    <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32">
 
-  <style>
-    .fade-in {
-      animation: fadeInUp 0.25s ease-out;
-    }
+    <style>
+        .fade-in {
+            animation: fadeInUp 0.25s ease-out;
+        }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(4px);
-      }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .count {
-      transition: all .3s ease;
-    }
+        .count {
+            transition: all .3s ease;
+        }
 
-    .rotate-180 {
-      transform: rotate(180deg);
-    }
-  </style>
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+
+        /* Donut (sem libs) — versão premium */
+        .donut {
+            --p: 0;
+            --f: 0;
+            width: 92px;
+            height: 92px;
+            border-radius: 999px;
+            background:
+                conic-gradient(#f43f5e calc(var(--p) * 1%),
+                    #a855f7 0 calc((var(--p) + var(--f)) * 1%),
+                    #e2e8f0 0);
+            position: relative;
+            box-shadow:
+                0 10px 25px rgba(15, 23, 42, 0.08),
+                inset 0 0 0 1px rgba(15, 23, 42, 0.06);
+        }
+
+        .donut--lg {
+            width: 112px;
+            height: 112px;
+        }
+
+        /* “miolo” com efeito mais elegante */
+        .donut::after {
+            content: "";
+            position: absolute;
+            inset: 14px;
+            /* espessura do anel */
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 999px;
+            box-shadow:
+                inset 0 0 0 1px rgba(15, 23, 42, 0.06),
+                0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .donut-center {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            z-index: 1;
+            text-align: center;
+            line-height: 1.1;
+        }
+    </style>
 </head>
 
 <body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen flex flex-col">
 
-  <!-- HEADER -->
-  <header
-    class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
+    <!-- HEADER -->
+    <header
+        class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
 
-    <!-- ESQUERDA -->
-    <div class="flex items-center gap-4">
+        <!-- ESQUERDA -->
+        <div class="flex items-center gap-4">
 
-      <!-- MENU SANDUÍCHE -->
-      <nav class="relative">
-        <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
-          aria-expanded="false" aria-controls="menuPanel">
+            <!-- MENU SANDUÍCHE -->
+            <nav class="relative">
+                <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
+                    aria-expanded="false" aria-controls="menuPanel">
 
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
 
-        <!-- PAINEL -->
-        <div id="menuPanel" class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl
+                <!-- PAINEL -->
+                <div id="menuPanel" class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl
            hidden overflow-hidden">
 
-          <!-- HEADER DO PAINEL (opcional) -->
-          <div class="px-4 py-3 border-b bg-slate-50">
-            <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
-          </div>
+                    <!-- HEADER DO PAINEL (opcional) -->
+                    <div class="px-4 py-3 border-b bg-slate-50">
+                        <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
+                    </div>
 
-          <div class="py-2 text-sm">
+                    <div class="py-2 text-sm">
 
-            <!-- Início -->
-            <a href="../NFE/index.html" class="block px-4 py-2 text-sm font-semibold hover:bg-slate-100">
-              Início
-            </a>
+                        <!-- Início -->
+                        <a href="../NFE/index.html" class="block px-4 py-2 text-sm font-semibold hover:bg-slate-100">
+                            Início
+                        </a>
 
-            <!-- LAUDOS (nível 1) -->
-            <button type="button"
-              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
-              data-acc-btn="lol">
-              <span>Publicação de Laudos</span>
-              <span class="text-slate-400">›</span>
-            </button>
+                        <!-- LAUDOS (nível 1) -->
+                        <button type="button"
+                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                            data-acc-btn="lol">
+                            <span>Publicação de Laudos</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
 
-            <!-- Conteúdo LAUDOS (nível 2) -->
-            <div class="hidden" data-acc-panel="lol">
-              <a href="../laudos/index.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
-                Visão Geral
-              </a>
-            </div>
+                        <!-- Conteúdo LAUDOS (nível 2) -->
+                        <div class="hidden" data-acc-panel="lol">
+                            <a href="../laudos/index.html"
+                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                                Visão Geral
+                            </a>
+                        </div>
 
-            <!-- DFe (nível 1) -->
-            <button type="button"
-              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
-              data-acc-btn="dfe">
-              <span>DFe (Documentos Fiscais)</span>
-              <span class="text-slate-400">›</span>
-            </button>
+                        <!-- DFe (nível 1) -->
+                        <button type="button"
+                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                            data-acc-btn="dfe">
+                            <span>DFe (Documentos Fiscais)</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
 
-            <!-- Conteúdo DFe (nível 2) -->
-            <div class="hidden" data-acc-panel="dfe">
+                        <!-- Conteúdo DFe (nível 2) -->
+                        <div class="hidden" data-acc-panel="dfe">
 
-              <!-- NFe -->
-              <button type="button"
-                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
-                data-acc-btn="nfe">
-                <span>NFe</span>
-                <span class="text-slate-400">›</span>
-              </button>
+                            <!-- NFe -->
+                            <button type="button"
+                                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                                data-acc-btn="nfe">
+                                <span>NFe</span>
+                                <span class="text-slate-400">›</span>
+                            </button>
 
-              <div class="hidden" data-acc-panel="nfe">
-                <a href="../nfe/index.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                  Visão Geral
-                </a>
-                <a href="../nfe/controle_nfe_logs.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                  Erros
-                </a>
-              </div>
+                            <div class="hidden" data-acc-panel="nfe">
+                                <a href="../nfe/index.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Visão Geral
+                                </a>
+                                <a href="../nfe/controle_nfe_logs.html"
+                                    class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Erros
+                                </a>
+                            </div>
 
-              <!-- NFSe -->
-              <button type="button"
-                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
-                data-acc-btn="nfse">
-                <span>NFSe</span>
-                <span class="text-slate-400">›</span>
-              </button>
+                            <!-- NFSe -->
+                            <button type="button"
+                                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
+                                data-acc-btn="nfse">
+                                <span>NFSe</span>
+                                <span class="text-slate-400">›</span>
+                            </button>
 
-              <div class="hidden" data-acc-panel="nfse">
-                <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                  Visão Geral
-                </a>
-                <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                  Erros
-                </a>
-              </div>
+                            <div class="hidden" data-acc-panel="nfse">
+                                <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Visão Geral
+                                </a>
+                                <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
+                                    Erros
+                                </a>
+                            </div>
 
-            </div>
+                        </div>
 
-            <!-- DESENVOLVIMENTO (nível 1) -->
-            <button type="button"
-              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
-              data-acc-btn="dev">
-              <span>Desenvolvimento</span>
-              <span class="text-slate-400">›</span>
-            </button>
+                        <!-- DESENVOLVIMENTO (nível 1) -->
+                        <button type="button"
+                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
+                            data-acc-btn="dev">
+                            <span>Desenvolvimento</span>
+                            <span class="text-slate-400">›</span>
+                        </button>
 
-            <!-- Conteúdo Desenvolvimento (nível 2) -->
-            <div class="hidden" data-acc-panel="dev">
-              <a href="../desenv/gerador_pix.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
-                Chave PIX
-              </a>
-              <a href="../desenv/leitor_pdf.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
-                Leitor PDF (PDF.js)
-              </a>
-            </div>
+                        <!-- Conteúdo Desenvolvimento (nível 2) -->
+                        <div class="hidden" data-acc-panel="dev">
+                            <a href="../desenv/gerador_pix.html"
+                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                                Chave PIX
+                            </a>
+                            <a href="../desenv/leitor_pdf.html"
+                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
+                                Leitor PDF (PDF.js)
+                            </a>
+                        </div>
 
-          </div>
+                    </div>
+                </div>
+            </nav>
+
+
+            <!-- TEXTO -->
+            <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
+                Vertis • NFSe • Logs
+            </h1>
         </div>
-      </nav>
 
+        <!-- DIREITA -->
+        <div class="flex items-center gap-4">
+            <span id="refreshIndicator" class="text-xs text-slate-300 opacity-0 transition-opacity">
+                Atualizando...
+            </span>
 
-      <!-- TEXTO -->
-      <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
-        Vertis • Laudos • Publicação
-      </h1>
-    </div>
-
-    <!-- DIREITA -->
-    <div class="flex items-center gap-4">
-      <span id="refreshIndicator" class="text-xs text-slate-300 opacity-0 transition-opacity">
-        Atualizando...
-      </span>
-
-      <!-- Logs e Erros (no header) -->
-      <a href="index.html" title="Logs e Erros" class="group relative inline-flex items-center justify-center
+            <!-- Logs e Erros (no header) -->
+            <a href="/nfse/index.html" title="Logs e Erros" class="group relative inline-flex items-center justify-center
             h-10 w-10 rounded-xl
             bg-white/10 border border-white/15
             hover:bg-white/15 hover:border-white/25
             transition-all duration-200
             focus:outline-none focus:ring-2 focus:ring-white/30">
 
-        <!-- Ping discreto -->
-        <span class="absolute -top-1 -right-1 flex h-3 w-3">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
-        </span>
+                <!-- Ping discreto -->
+                <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                </span>
 
-        <!-- Ícone -->
-        <button id="toggleViewBtn" class="group relative inline-flex items-center justify-center
+                <!-- Ícone -->
+                <button id="toggleViewBtn" class="group relative inline-flex items-center justify-center
          h-10 w-10 rounded-xl
          bg-white/10 border border-white/15
          hover:bg-white/15 hover:border-white/25
          transition-all duration-200
          focus:outline-none focus:ring-2 focus:ring-white/30" title="Alternar visão">
 
-          <svg id="toggleViewIcon" xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 text-white/90 transition-transform duration-300 ease-in-out" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
+                    <svg id="toggleViewIcon" xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5 text-white/90 transition-transform duration-300 ease-in-out" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
 
-        </button>
+                </button>
 
-        <!-- Tooltip -->
-        <span class="pointer-events-none absolute right-0 top-11
+                <!-- Tooltip -->
+                <span class="pointer-events-none absolute right-0 top-11
                  opacity-0 translate-y-1
                  group-hover:opacity-100 group-hover:translate-y-0
                  transition-all duration-200
                  text-[11px] px-2 py-1 rounded-lg
                  bg-slate-900 text-white shadow-lg whitespace-nowrap">
-          Logs e Erros
-        </span>
-      </a>
+                    Logs e Erros
+                </span>
+            </a>
 
-      <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
-    </div>
-
-  </header>
-
-
-  <main class="p-6 flex-1 space-y-6">
-
-    <!-- KPIs -->
-    <!-- KPIs -->
-    <section class="grid grid-cols-1 xl:grid-cols-4 gap-4">
-
-      <!-- TIPO DOCUMENTO -->
-      <div class="bg-white rounded-2xl shadow p-4">
-        <h2 class="text-sm font-semibold text-slate-600 mb-3">Tipo de Documento</h2>
-
-        <div class="space-y-2">
-          <div class="flex justify-between text-sm">
-            <span>NFC-e</span>
-            <span id="kpi_nfce" class="font-bold text-emerald-600">0%</span>
-          </div>
-          <div class="w-full bg-slate-200 rounded-full h-2">
-            <div id="bar_nfce" class="bg-emerald-500 h-2 rounded-full"></div>
-          </div>
-
-          <div class="flex justify-between text-sm mt-2">
-            <span>NF-e</span>
-            <span id="kpi_nfe" class="font-bold text-indigo-600">0%</span>
-          </div>
-          <div class="w-full bg-slate-200 rounded-full h-2">
-            <div id="bar_nfe" class="bg-indigo-500 h-2 rounded-full"></div>
-          </div>
+            <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
         </div>
-      </div>
 
-      <!-- TOP 3 ERROS -->
-      <div class="bg-white rounded-2xl shadow p-4 relative">
-        <h2 class="text-sm font-semibold text-slate-600 mb-3">Top 3 Erros</h2>
+    </header>
 
-        <!-- ÍCONE TOP 10 -->
-        <button onclick="openTop10ErrosModal()" title="Ver Top 10 Erros" class="absolute top-3 right-3
+
+    <main class="p-6 flex-1 space-y-6">
+
+        <!-- KPIs -->
+        <section class="grid grid-cols-1 xl:grid-cols-4 gap-4">
+
+            <!-- STATUS (P x F) — versão mais moderna -->
+            <div class="bg-white/80 backdrop-blur rounded-3xl shadow-sm ring-1 ring-slate-200 p-5">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <h2 class="text-sm font-semibold text-slate-800">Status (Situação)</h2>
+                        <p class="text-xs text-slate-500">Distribuição por ind_situacao</p>
+                    </div>
+
+                    <!-- opcional: badge de “live” -->
+                    <span
+                        class="inline-flex items-center gap-2 text-[11px] px-2.5 py-1 rounded-full bg-slate-900 text-white">
+                        <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Atualizado
+                    </span>
+                </div>
+
+                <div class="mt-4 flex items-center gap-5">
+                    <!-- Donut -->
+                    <div class="relative shrink-0">
+                        <div id="donutStatus" class="donut donut--lg" aria-label="Distribuição por situação"></div>
+
+                        <div class="donut-center">
+                            <div class="text-[11px] text-slate-500">Total</div>
+                            <div id="kpi_total_status" class="text-xl font-extrabold text-slate-900">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Legenda “cards” -->
+                    <div class="flex-1 grid grid-cols-1 gap-3">
+                        <!-- P -->
+                        <button type="button"
+                            class="group text-left rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition p-3"
+                            title="Pendente/Erro (P)">
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="h-2.5 w-2.5 rounded-full" style="background:#f43f5e"></span>
+                                    <span class="font-semibold text-slate-800 truncate">Pendente/Erro</span>
+                                    <span
+                                        class="text-[11px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-100">P</span>
+                                </div>
+
+                                <div class="text-right">
+                                    <div id="kpi_p_qtd" class="text-lg font-bold text-slate-900 leading-none">0</div>
+                                    <div
+                                        class="mt-1 inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                        <span id="kpi_p_pct">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- F -->
+                        <button type="button"
+                            class="group text-left rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition p-3"
+                            title="Fila (F)">
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="h-2.5 w-2.5 rounded-full" style="background:#a855f7"></span>
+                                    <span class="font-semibold text-slate-800 truncate">Fila</span>
+                                    <span
+                                        class="text-[11px] px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-100">F</span>
+                                </div>
+
+                                <div class="text-right">
+                                    <div id="kpi_f_qtd" class="text-lg font-bold text-slate-900 leading-none">0</div>
+                                    <div
+                                        class="mt-1 inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                        <span id="kpi_f_pct">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOP 3 ERROS -->
+            <div class="bg-white rounded-2xl shadow p-4 relative">
+                <h2 class="text-sm font-semibold text-slate-600 mb-3">Top 3 Erros</h2>
+
+                <!-- ÍCONE TOP 10 -->
+                <button onclick="openTop10ErrosModal()" title="Ver Top 10 Erros" class="absolute top-3 right-3
                  w-5 h-5 flex items-center justify-center
                  rounded-full border border-slate-300
                  text-[11px] font-bold text-slate-500
                  hover:bg-slate-100 hover:text-slate-700
                  transition">
-          !
-        </button>
+                    !
+                </button>
 
-        <ul id="kpi_top_erros" class="space-y-1 text-sm"></ul>
-      </div>
+                <ul id="kpi_top_erros" class="space-y-1 text-sm"></ul>
+            </div>
 
-      <!-- TOP UNIDADES -->
-      <div class="bg-white rounded-2xl shadow p-4 relative">
-        <h2 class="text-sm font-semibold text-slate-600 mb-3">Unidades com mais erros</h2>
+            <!-- TOP UNIDADES -->
+            <div class="bg-white rounded-2xl shadow p-4 relative">
+                <h2 class="text-sm font-semibold text-slate-600 mb-3">Unidades com mais erros</h2>
 
-        <!-- ÍCONE TOP 10 CLIENTES -->
-        <button onclick="openTop10UnidadesModal()" title="Ver Top 10 Unidades" class="absolute top-3 right-3
+                <!-- ÍCONE TOP 10 CLIENTES -->
+                <button onclick="openTop10UnidadesModal()" title="Ver Top 10 Unidades" class="absolute top-3 right-3
            w-5 h-5 flex items-center justify-center
            rounded-full border border-slate-300
            text-[11px] font-bold text-slate-500
            hover:bg-slate-100 hover:text-slate-700
            transition">
-          !
-        </button>
+                    !
+                </button>
 
-        <ul id="kpi_top_unidades" class="space-y-1 text-sm"></ul>
-      </div>
+                <ul id="kpi_top_unidades" class="space-y-1 text-sm"></ul>
+            </div>
 
-      <!-- TOTAL REGISTROS -->
-      <!-- REGISTROS HOJE x TOTAL -->
-      <div class="bg-white rounded-2xl shadow p-4">
-        <h2 class="text-sm font-semibold text-slate-600 mb-3">Registros</h2>
+            <!-- TOTAL REGISTROS -->
+            <!-- REGISTROS HOJE x TOTAL -->
+            <div class="bg-white rounded-2xl shadow p-4">
+                <h2 class="text-sm font-semibold text-slate-600 mb-3">Registros</h2>
 
-        <div class="flex justify-between items-end">
-          <div>
-            <p id="kpi_registros_hoje" class="text-2xl font-bold text-indigo-600 leading-none">
-              0
-            </p>
-            <span class="text-xs text-slate-500">hoje</span>
-          </div>
+                <div class="flex justify-between items-end">
+                    <div>
+                        <p id="kpi_registros_hoje" class="text-2xl font-bold text-indigo-600 leading-none">
+                            0
+                        </p>
+                        <span class="text-xs text-slate-500">hoje</span>
+                    </div>
 
-          <div class="text-right">
-            <p id="kpi_registros_total" class="text-xl font-semibold text-slate-700 leading-none">
-              0
-            </p>
-            <span class="text-xs text-slate-500">total</span>
-          </div>
+                    <div class="text-right">
+                        <p id="kpi_registros_total" class="text-xl font-semibold text-slate-700 leading-none">
+                            0
+                        </p>
+                        <span class="text-xs text-slate-500">total</span>
+                    </div>
+                </div>
+            </div>
+
+
+        </section>
+
+        <!-- FILTRO -->
+        <div class="bg-white rounded-2xl shadow p-4 flex items-center gap-3">
+            <input id="filterInput" type="text" placeholder="🔍 Filtrar por código, unidade ou erro..."
+                class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" oninput="applyFilter()" />
+
+            <button id="btnClearFilter" onclick="clearFilters()"
+                class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-sm whitespace-nowrap">
+                Limpar filtros
+            </button>
+
+            <span class="text-sm text-slate-500 whitespace-nowrap">Auto-refresh 5 min</span>
         </div>
-      </div>
 
 
-    </section>
+        <!-- TABELA -->
+        <div class="bg-white rounded-2xl shadow overflow-x-auto max-h-[70vh]">
+            <table class="min-w-full text-sm border-collapse">
+                <thead class="bg-slate-200 sticky top-0 z-40">
+                    <tr id="table-head"></tr>
+                </thead>
+                <tbody id="table-body" class="divide-y"></tbody>
+                <tfoot class="bg-slate-100 sticky bottom-0 font-semibold">
+                    <tr id="table-footer"></tr>
+                </tfoot>
+            </table>
+        </div>
 
-    <!-- FILTRO -->
-    <div class="bg-white rounded-2xl shadow p-4 flex items-center gap-3">
-      <input id="filterInput" type="text" placeholder="🔍 Filtrar por código, unidade ou erro..."
-        class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" oninput="applyFilter()" />
+        <!-- PAGINAÇÃO -->
+        <div class="flex items-center justify-between px-2 text-sm text-slate-600">
+            <span id="pageInfo"></span>
+            <div id="pagination" class="flex gap-1"></div>
+        </div>
 
-      <button id="btnClearFilter" onclick="clearFilters()"
-        class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-sm whitespace-nowrap">
-        Limpar filtros
-      </button>
+    </main>
 
-      <span class="text-sm text-slate-500 whitespace-nowrap">Auto-refresh 5 min</span>
-    </div>
+    <script>
+        const endpoint = "/api/nfce/logs";
+        //const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfse_controle_logs";
 
+        const PAGE_SIZE = 10;
+        let currentPage = 1;
 
-    <!-- TABELA -->
-    <div class="bg-white rounded-2xl shadow overflow-x-auto max-h-[70vh]">
-      <table class="min-w-full text-sm border-collapse">
-        <thead class="bg-slate-200 sticky top-0 z-40">
-          <tr id="table-head"></tr>
-        </thead>
-        <tbody id="table-body" class="divide-y"></tbody>
-        <tfoot class="bg-slate-100 sticky bottom-0 font-semibold">
-          <tr id="table-footer"></tr>
-        </tfoot>
-      </table>
-    </div>
+        const columns = [
+            { key: 'cod_unid_negoc', label: 'Neg', sticky: true, width: 50 },
+            { key: 'cod_unid_oper', label: 'Oper', sticky: true, width: 50 },
+            { key: 'nom_unid_oper', label: 'Cliente', sticky: true, width: 250 },
 
-    <!-- PAGINAÇÃO -->
-    <div class="flex items-center justify-between px-2 text-sm text-slate-600">
-      <span id="pageInfo"></span>
-      <div id="pagination" class="flex gap-1"></div>
-    </div>
+            { key: 'dth_emissao', label: 'Emissão' },
+            { key: 'num_rps', label: 'RPS' },
+            { key: 'ind_situacao', label: 'Sit' },
+            { key: 'desc_log', label: 'Log' },
+            { key: '__actions', label: '', width: 110 }
 
-  </main>
+        ];
 
-  <script>
-    // const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfce_controle_logs";
-    const endpoint = "/api/nfce/logs";
+        let originalData = [], filteredData = [], sortKey = null, sortAsc = true;
 
-    const PAGE_SIZE = 10;
-    let currentPage = 1;
+        const getPagedData = () =>
+            filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-    const columns = [
-      { key: 'cod_unid_negoc', label: 'Neg', sticky: true, width: 50 },
-      { key: 'cod_unid_oper', label: 'Oper', sticky: true, width: 50 },
-      { key: 'nom_unid_oper', label: 'Cliente', sticky: true, width: 250 },
-      { key: 'id_ctrl_pgto', label: 'Ctrl Pgto' },
-      { key: 'num_doc_fiscal', label: 'Nro Doc' },
-      { key: 'tipo_doc_fiscal', label: 'Tipo' },
-      { key: 'dth_emissao', label: 'Emissão' },
-      { key: 'vlr_doc_fiscal', label: 'Valor R$', sum: true },
-      { key: 'desc_log', label: 'Ocorrência' }
-    ];
+        const totalPages = () =>
+            Math.ceil(filteredData.length / PAGE_SIZE) || 1;
 
-    let originalData = [], filteredData = [], sortKey = null, sortAsc = true;
+        // ===== Helpers de Log (somente para exibição na tabela) =====
+        const LOG_PREFIXES_TO_REMOVE = [
+            'A Solicitação para emissão da NFSe foi rejeitada',
+            'Retorno da Prefeitura',
+        ];
 
-    const getPagedData = () =>
-      filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+        function stripLogPrefixForTable(text) {
+            const raw = String(text ?? '');
+            for (const p of LOG_PREFIXES_TO_REMOVE) {
+                if (raw.startsWith(p)) return raw.slice(p.length).trim();
+            }
+            return raw.trim();
+        }
 
-    const totalPages = () =>
-      Math.ceil(filteredData.length / PAGE_SIZE) || 1;
+        function truncateText(text, maxLen = 50) {
+            const t = String(text ?? '');
+            if (t.length <= maxLen) return t;
+            return t.slice(0, maxLen) + '…';
+        }
 
-    /* ===== Função Formatar Monetário ===== */
-    function formatCurrency(value) {
-      const num = Number(value);
-      if (isNaN(num)) return '-';
+        /* ===== Função Formatar Monetário ===== */
+        function formatCurrency(value) {
+            const num = Number(value);
+            if (isNaN(num)) return '-';
 
-      return num.toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      });
-    }
-
-
-    /* ===== Função Limpa Filtros ===== */
-    function clearFilters() {
-      filterInput.value = '';
-      filteredData = [...originalData];
-      currentPage = 1;
-      renderTable();
-      btnClearFilter.disabled = true;
-      btnClearFilter.classList.add('opacity-50', 'cursor-not-allowed');
-    }
-
-    /* ===== KPIs ===== */
-    function updateKPIs() {
-      const total = filteredData.length;
-
-      /* === Tipo Documento === */
-      const countNFCE = filteredData.filter(
-        r => String(r.tipo_doc_fiscal).toLowerCase() === 'nfce'
-      ).length;
-
-      const countNFE = filteredData.filter(
-        r => String(r.tipo_doc_fiscal).toLowerCase() === 'nfe'
-      ).length;
-
-      const pctNFCE = total ? Math.round((countNFCE / total) * 100) : 0;
-      const pctNFE = total ? Math.round((countNFE / total) * 100) : 0;
-
-      kpi_nfce.textContent = `${pctNFCE}%`;
-      kpi_nfe.textContent = `${pctNFE}%`;
-      bar_nfce.style.width = `${pctNFCE}%`;
-      bar_nfe.style.width = `${pctNFE}%`;
-
-      /* === Top 3 Erros === */
-      const erros = {};
-      filteredData.forEach(r => {
-        const key = r.desc_log || 'Erro não informado';
-        erros[key] = (erros[key] || 0) + 1;
-      });
-
-      // 🔥 Top 10 (para o modal)
-      const topErros10 = Object.entries(erros)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .map(([desc, qtd]) => ({ desc, qtd }));
-
-      top10ErrosCache = topErros10;
+            return num.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+        }
 
 
-      const topErros = Object.entries(erros)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3);
+        /* ===== Função Limpa Filtros ===== */
+        function clearFilters() {
+            filterInput.value = '';
+            filteredData = [...originalData];
+            currentPage = 1;
+            renderTable();
+            btnClearFilter.disabled = true;
+            btnClearFilter.classList.add('opacity-50', 'cursor-not-allowed');
+        }
 
-      kpi_top_erros.innerHTML = '';
-      topErros.forEach(([desc, qtd]) => {
-        const li = document.createElement('li');
+        /* ===== KPIs ===== */
+        /* ===== KPIs ===== */
+        function updateKPIs() {
+            const total = filteredData.length;
 
-        li.innerHTML = `
+            /* === Status: P (Pendente/Erro) x F (Fila) === */
+            const norm = (v) => String(v ?? '').trim().toUpperCase();
+
+            const qtdP = filteredData.filter(r => norm(r.ind_situacao) === 'P').length;
+            const qtdF = filteredData.filter(r => norm(r.ind_situacao) === 'E').length;
+
+            const pctP = total ? Math.round((qtdP / total) * 100) : 0;
+            const pctF = total ? Math.round((qtdF / total) * 100) : 0;
+
+            // Donut
+            const donut = document.getElementById('donutStatus');
+            donut?.style.setProperty('--p', pctP);
+            donut?.style.setProperty('--f', pctF);
+
+            // Números
+            kpi_total_status.textContent = total;
+            kpi_p_qtd.textContent = qtdP;
+            kpi_f_qtd.textContent = qtdF;
+            kpi_p_pct.textContent = `${pctP}%`;
+            kpi_f_pct.textContent = `${pctF}%`;
+
+            /* === Top 3 Erros === */
+            const erros = {};
+            filteredData.forEach(r => {
+                const key = r.desc_log || 'Erro não informado';
+                erros[key] = (erros[key] || 0) + 1;
+            });
+
+            // 🔥 Top 10 (para o modal)
+            const topErros10 = Object.entries(erros)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10)
+                .map(([desc, qtd]) => ({ desc, qtd }));
+
+            top10ErrosCache = topErros10;
+
+
+            const topErros = Object.entries(erros)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            kpi_top_erros.innerHTML = '';
+            topErros.forEach(([desc, qtd]) => {
+                const li = document.createElement('li');
+
+                li.innerHTML = `
     <div class="group flex justify-between gap-2 cursor-pointer relative
       ${filterInput.value === desc ? 'bg-slate-100 rounded px-1' : ''}">
 
@@ -461,44 +591,44 @@
     </div>
   `;
 
-        // 👉 Clique no TEXTO => filtra (toggle)
-        li.onclick = () => {
-          if (filterInput.value === desc) {
-            filterInput.value = '';
-          } else {
-            filterInput.value = desc;
-          }
-          applyFilter();
-        };
+                // 👉 Clique no TEXTO => filtra (toggle)
+                li.onclick = () => {
+                    if (filterInput.value === desc) {
+                        filterInput.value = '';
+                    } else {
+                        filterInput.value = desc;
+                    }
+                    applyFilter();
+                };
 
-        kpi_top_erros.appendChild(li);
-      });
-
-
-      /* === Top Unidades === */
-      const unidades = {};
-      filteredData.forEach(r => {
-        const key = r.nom_unid_oper || 'Não informado';
-        unidades[key] = (unidades[key] || 0) + 1;
-      });
-
-      // 🔥 Top 10 Unidades (para o modal)
-      top10UnidadesCache = Object.entries(unidades)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .map(([nome, qtd]) => ({ nome, qtd }));
+                kpi_top_erros.appendChild(li);
+            });
 
 
-      const topUnidades = Object.entries(unidades)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3);
+            /* === Top Unidades === */
+            const unidades = {};
+            filteredData.forEach(r => {
+                const key = r.nom_unid_oper || 'Não informado';
+                unidades[key] = (unidades[key] || 0) + 1;
+            });
 
-      /* === Teste Filtro Top 3 === */
-      kpi_top_unidades.innerHTML = '';
-      topUnidades.forEach(([nome, qtd]) => {
-        const li = document.createElement('li');
+            // 🔥 Top 10 Unidades (para o modal)
+            top10UnidadesCache = Object.entries(unidades)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10)
+                .map(([nome, qtd]) => ({ nome, qtd }));
 
-        li.innerHTML = `
+
+            const topUnidades = Object.entries(unidades)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            /* === Teste Filtro Top 3 === */
+            kpi_top_unidades.innerHTML = '';
+            topUnidades.forEach(([nome, qtd]) => {
+                const li = document.createElement('li');
+
+                li.innerHTML = `
     <div class="group flex justify-between gap-2 cursor-pointer relative
       ${filterInput.value === nome ? 'bg-slate-100 rounded px-1' : ''}">
 
@@ -521,403 +651,434 @@
     </div>
   `;
 
-        // 👉 Clique filtra a tabela pela UNIDADE
-        li.onclick = () => {
-          if (filterInput.value === nome) {
-            // toggle OFF
-            filterInput.value = '';
-          } else {
-            // toggle ON
-            filterInput.value = nome;
-          }
-          applyFilter();
-        };
+                // 👉 Clique filtra a tabela pela UNIDADE
+                li.onclick = () => {
+                    if (filterInput.value === nome) {
+                        // toggle OFF
+                        filterInput.value = '';
+                    } else {
+                        // toggle ON
+                        filterInput.value = nome;
+                    }
+                    applyFilter();
+                };
 
-        kpi_top_unidades.appendChild(li);
-      });
-
-
-      /* === Total Registros === */
-      /* === Registros Hoje x Total === */
-      const hoje = new Date().toLocaleDateString('sv-SE');
+                kpi_top_unidades.appendChild(li);
+            });
 
 
-      const registrosHoje = filteredData.filter(r =>
-        String(r.dth_emissao || '').slice(0, 10) === hoje
-      ).length;
-
-      kpi_registros_hoje.textContent = registrosHoje;
-      kpi_registros_total.textContent = total;
+            /* === Registros Hoje x Total === */
+            const hoje = new Date().toLocaleDateString('sv-SE');
 
 
-    }
+            const registrosHoje = filteredData.filter(r =>
+                String(r.dth_emissao || '').slice(0, 10) === hoje
+            ).length;
+
+            kpi_registros_hoje.textContent = registrosHoje;
+            kpi_registros_total.textContent = total;
 
 
-
-    /* ===== TABLE ===== */
-    function createHeader() {
-      const tr = document.getElementById('table-head');
-      tr.innerHTML = '';
-      let left = 0;
-
-      columns.forEach(col => {
-        const th = document.createElement('th');
-        let cls = 'px-3 py-2 whitespace-nowrap cursor-pointer';
-        if (col.key.startsWith('qtd_')) cls += ' text-center';
-
-        if (col.sticky) {
-          cls += ' sticky bg-slate-200 z-50';
-          th.style.left = left + 'px';
-          th.style.width = col.width + 'px';
-          left += col.width;
         }
 
-        th.className = cls;
-        th.textContent = col.label;
-        th.onclick = () => sortBy(col.key);
-        tr.appendChild(th);
-      });
-    }
+        /* ===== TABLE ===== */
+        function createHeader() {
+            const tr = document.getElementById('table-head');
+            tr.innerHTML = '';
+            let left = 0;
 
-    function renderTable() {
-      const tbody = document.getElementById('table-body');
-      tbody.innerHTML = '';
+            columns.forEach(col => {
+                const th = document.createElement('th');
+                let cls = 'px-3 py-2 whitespace-nowrap cursor-pointer';
+                if (col.key.startsWith('qtd_')) cls += ' text-center';
 
-      getPagedData().forEach((row, i) => {
-        const tr = document.createElement('tr');
-        tr.className = `${i % 2 ? 'bg-slate-50' : 'bg-white'} hover:bg-slate-100 fade-in`;
-        let left = 0;
+                if (col.sticky) {
+                    cls += ' sticky bg-slate-200 z-50';
+                    th.style.left = left + 'px';
+                    th.style.width = col.width + 'px';
+                    left += col.width;
+                }
 
-        columns.forEach(col => {
-          const td = document.createElement('td');
-          let cls = 'px-3 py-2 whitespace-nowrap';
-
-          if (col.key.startsWith('qtd_')) cls += ' text-center font-medium';
-
-
-
-          if (col.sticky) {
-            cls += ' sticky z-40 ' + (i % 2 ? 'bg-slate-50' : 'bg-white');
-            td.style.left = left + 'px';
-            td.style.width = col.width + 'px';
-            left += col.width;
-          }
-
-          td.className = cls;
-          let value = row[col.key] ?? '';
-
-          if (col.key === 'vlr_doc_fiscal') {
-            value = formatCurrency(value);
-          }
-
-          td.textContent = value;
-
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-
-      renderFooter();
-      updateKPIs();
-      renderPagination();
-    }
-
-    function renderFooter() {
-      const tr = document.getElementById('table-footer');
-      tr.innerHTML = '';
-      let left = 0;
-
-      columns.forEach((col, i) => {
-        const td = document.createElement('td');
-        let cls = 'px-3 py-2';
-
-        if (col.key.startsWith('qtd_')) cls += ' text-center';
-
-        if (col.sticky) {
-          cls += ' sticky bg-slate-100 z-40';
-          td.style.left = left + 'px';
-          td.style.width = col.width + 'px';
-          left += col.width;
+                th.className = cls;
+                th.textContent = col.label;
+                if (col.key !== '__actions') {
+                    th.onclick = () => sortBy(col.key);
+                } else {
+                    th.classList.remove('cursor-pointer');
+                    th.classList.add('cursor-default');
+                }
+                tr.appendChild(th);
+            });
         }
 
-        td.className = cls;
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
 
-        // 👉 Primeira coluna
-        if (i === 0) {
-          td.textContent = 'Totais';
+            getPagedData().forEach((row, i) => {
+                const tr = document.createElement('tr');
+                tr.className = `${i % 2 ? 'bg-slate-50' : 'bg-white'} hover:bg-slate-100 fade-in`;
+                let left = 0;
+
+                columns.forEach(col => {
+                    const td = document.createElement('td');
+                    let cls = 'px-3 py-2 whitespace-nowrap';
+
+                    if (col.key.startsWith('qtd_')) cls += ' text-center font-medium';
+
+
+
+                    if (col.sticky) {
+                        cls += ' sticky z-40 ' + (i % 2 ? 'bg-slate-50' : 'bg-white');
+                        td.style.left = left + 'px';
+                        td.style.width = col.width + 'px';
+                        left += col.width;
+                    }
+
+                    td.className = cls;
+
+                    // Ações (Ver Mais)
+                    if (col.key === '__actions') {
+                        td.classList.remove('whitespace-nowrap');
+                        td.classList.add('text-right');
+
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition shadow-sm';
+                        btn.title = 'Ver Mais';
+
+                        btn.innerHTML = `
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          <span>Ver Mais</span>
+                        `;
+
+                        btn.addEventListener('click', () => openRowDetailsModal(row));
+                        td.appendChild(btn);
+                        tr.appendChild(td);
+                        return;
+                    }
+
+                    let value = row[col.key] ?? '';
+
+                    if (col.key === 'dth_emissao' && value) {
+                        // se vier ISO "2026-02-27T..." ou "2026-02-27 10:30:00"
+                        value = String(value).replace('T', ' ').slice(0, 19);
+                    }
+
+                    if (col.key === 'ind_situacao' && value) {
+                        const map = { P: 'Pendente', F: 'Fila', E: 'Fila', G: 'Gerado', C: 'Cancelado' };
+                        value = map[String(value).trim()] || value;
+                    }
+
+                    if (col.key === 'desc_log') {
+                        // Remove um prefixo grande somente na TABELA e mostra só os 50 primeiros caracteres
+                        const cleaned = stripLogPrefixForTable(value);
+                        td.title = cleaned; // hover mostra o texto completo (sem prefixo)
+                        value = truncateText(cleaned, 100);
+                        td.classList.remove('whitespace-nowrap');
+                        td.classList.add('max-w-[520px]', 'truncate');
+                    }
+
+                    td.textContent = value;
+
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+
+            renderFooter();
+            updateKPIs();
+            renderPagination();
         }
-        // 👉 Colunas somáveis
-        else if (col.sum) {
-          const total = filteredData.reduce(
-            (t, r) => t + Number(r[col.key] || 0),
-            0
-          );
 
-          // 💰 Formatação monetária SOMENTE para valor fiscal
-          if (col.key === 'vlr_doc_fiscal') {
-            td.textContent = formatCurrency(total);
-            td.classList.add('text-right', 'font-semibold');
-          } else {
-            td.textContent = total;
-          }
-        }
-        // 👉 Demais colunas
-        else {
-          td.textContent = '';
-        }
+        function renderFooter() {
+            const tr = document.getElementById('table-footer');
+            tr.innerHTML = '';
+            let left = 0;
 
-        tr.appendChild(td);
-      });
-    }
+            columns.forEach((col, i) => {
+                const td = document.createElement('td');
+                let cls = 'px-3 py-2';
 
+                if (col.key.startsWith('qtd_')) cls += ' text-center';
 
-    function renderPagination() {
-      const total = totalPages();
-      const delta = 1; // quantas páginas antes/depois da atual
-      const pages = [];
-      const range = [];
+                if (col.sticky) {
+                    cls += ' sticky bg-slate-100 z-40';
+                    td.style.left = left + 'px';
+                    td.style.width = col.width + 'px';
+                    left += col.width;
+                }
 
-      pageInfo.textContent =
-        `Página ${currentPage} de ${total} • ${filteredData.length} registros`;
+                td.className = cls;
 
-      // Sempre inclui primeira e última
-      range.push(1);
-      if (total > 1) range.push(total);
+                // 👉 Primeira coluna
+                if (i === 0) {
+                    td.textContent = 'Totais';
+                }
+                // 👉 Colunas somáveis
+                else if (col.sum) {
+                    const total = filteredData.reduce(
+                        (t, r) => t + Number(r[col.key] || 0),
+                        0
+                    );
 
-      // Páginas ao redor da atual
-      for (let i = currentPage - delta; i <= currentPage + delta; i++) {
-        if (i > 1 && i < total) range.push(i);
-      }
+                    // 💰 Formatação monetária SOMENTE para valor fiscal
+                    if (col.key === 'vlr_doc_fiscal') {
+                        td.textContent = formatCurrency(total);
+                        td.classList.add('text-right', 'font-semibold');
+                    } else {
+                        td.textContent = total;
+                    }
+                }
+                // 👉 Demais colunas
+                else {
+                    td.textContent = '';
+                }
 
-      // Ordena e remove duplicados
-      [...new Set(range)].sort((a, b) => a - b).forEach(p => pages.push(p));
-
-      pagination.innerHTML = '';
-
-      let last = 0;
-      pages.forEach(p => {
-        if (p - last > 1) {
-          const dots = document.createElement('span');
-          dots.textContent = '…';
-          dots.className = 'px-2 text-slate-400';
-          pagination.appendChild(dots);
+                tr.appendChild(td);
+            });
         }
 
-        const btn = document.createElement('button');
-        btn.textContent = p;
-        btn.className =
-          `px-2 py-1 rounded ${p === currentPage
-            ? 'bg-slate-700 text-white'
-            : 'bg-slate-200 hover:bg-slate-300'
-          }`;
 
-        btn.onclick = () => {
-          currentPage = p;
-          renderTable();
-        };
+        function renderPagination() {
+            const total = totalPages();
+            const delta = 1; // quantas páginas antes/depois da atual
+            const pages = [];
+            const range = [];
 
-        pagination.appendChild(btn);
-        last = p;
-      });
-    }
+            pageInfo.textContent =
+                `Página ${currentPage} de ${total} • ${filteredData.length} registros`;
+
+            // Sempre inclui primeira e última
+            range.push(1);
+            if (total > 1) range.push(total);
+
+            // Páginas ao redor da atual
+            for (let i = currentPage - delta; i <= currentPage + delta; i++) {
+                if (i > 1 && i < total) range.push(i);
+            }
+
+            // Ordena e remove duplicados
+            [...new Set(range)].sort((a, b) => a - b).forEach(p => pages.push(p));
+
+            pagination.innerHTML = '';
+
+            let last = 0;
+            pages.forEach(p => {
+                if (p - last > 1) {
+                    const dots = document.createElement('span');
+                    dots.textContent = '…';
+                    dots.className = 'px-2 text-slate-400';
+                    pagination.appendChild(dots);
+                }
+
+                const btn = document.createElement('button');
+                btn.textContent = p;
+                btn.className =
+                    `px-2 py-1 rounded ${p === currentPage
+                        ? 'bg-slate-700 text-white'
+                        : 'bg-slate-200 hover:bg-slate-300'
+                    }`;
+
+                btn.onclick = () => {
+                    currentPage = p;
+                    renderTable();
+                };
+
+                pagination.appendChild(btn);
+                last = p;
+            });
+        }
 
 
-    function sortBy(key) {
-      sortAsc = sortKey === key ? !sortAsc : true;
-      sortKey = key;
-      currentPage = 1;
+        function sortBy(key) {
+            sortAsc = sortKey === key ? !sortAsc : true;
+            sortKey = key;
+            currentPage = 1;
 
-      filteredData.sort((a, b) => {
-        const n1 = Number(a[key]), n2 = Number(b[key]);
-        if (!isNaN(n1) && !isNaN(n2)) return sortAsc ? n1 - n2 : n2 - n1;
-        return sortAsc
-          ? String(a[key]).localeCompare(String(b[key]))
-          : String(b[key]).localeCompare(String(a[key]));
-      });
+            filteredData.sort((a, b) => {
+                const n1 = Number(a[key]), n2 = Number(b[key]);
+                if (!isNaN(n1) && !isNaN(n2)) return sortAsc ? n1 - n2 : n2 - n1;
+                return sortAsc
+                    ? String(a[key]).localeCompare(String(b[key]))
+                    : String(b[key]).localeCompare(String(a[key]));
+            });
 
-      renderTable();
-    }
+            renderTable();
+        }
 
-    function applyFilter() {
-      const v = filterInput.value.toLowerCase();
-      filteredData = originalData.filter(r =>
-        String(r.cod_unid_negoc).includes(v) ||
-        String(r.cod_unid_oper).includes(v) ||
-        String(r.nom_unid_oper).toLowerCase().includes(v) ||
-        String(r.desc_log).toLowerCase().includes(v)
-      );
-      currentPage = 1;
-      renderTable();
-      btnClearFilter.disabled = !filterInput.value;
-      btnClearFilter.classList.toggle('opacity-50', btnClearFilter.disabled);
-      btnClearFilter.classList.toggle('cursor-not-allowed', btnClearFilter.disabled);
+        function applyFilter() {
+            const v = filterInput.value.toLowerCase();
+            filteredData = originalData.filter(r =>
+                String(r.cod_unid_negoc).includes(v) ||
+                String(r.cod_unid_oper).includes(v) ||
+                String(r.nom_unid_oper).toLowerCase().includes(v) ||
+                String(r.desc_log).toLowerCase().includes(v)
+            );
+            currentPage = 1;
+            renderTable();
+            btnClearFilter.disabled = !filterInput.value;
+            btnClearFilter.classList.toggle('opacity-50', btnClearFilter.disabled);
+            btnClearFilter.classList.toggle('cursor-not-allowed', btnClearFilter.disabled);
 
-    }
+        }
 
-    async function loadData() {
-      refreshIndicator.classList.remove('opacity-0');
-      const r = await fetch(endpoint);
-      originalData = await r.json();
-      filteredData = [...originalData];
-      createHeader();
-      renderTable();
-      setTimeout(() => refreshIndicator.classList.add('opacity-0'), 800);
-    }
+        async function loadData() {
+            refreshIndicator.classList.remove('opacity-0');
+            const r = await fetch(endpoint);
+            originalData = await r.json();
+            filteredData = [...originalData];
+            createHeader();
+            renderTable();
+            setTimeout(() => refreshIndicator.classList.add('opacity-0'), 800);
+        }
 
-    loadData();
-    setInterval(loadData, 300000);
-  </script>
+        loadData();
+        setInterval(loadData, 300000);
+    </script>
 
-  <!-- MENU -->
-  <script>
-    (function () {
-      const btn = document.getElementById('menuBtn');
-      const panel = document.getElementById('menuPanel');
+    <!-- MENU -->
+    <script>
+        (function () {
+            const btn = document.getElementById('menuBtn');
+            const panel = document.getElementById('menuPanel');
 
-      if (!btn || !panel) return;
+            if (!btn || !panel) return;
 
-      const openMenu = () => {
-        panel.classList.remove('hidden');
-        btn.setAttribute('aria-expanded', 'true');
-      };
+            const openMenu = () => {
+                panel.classList.remove('hidden');
+                btn.setAttribute('aria-expanded', 'true');
+            };
 
-      const closeMenu = () => {
-        panel.classList.add('hidden');
-        btn.setAttribute('aria-expanded', 'false');
-      };
+            const closeMenu = () => {
+                panel.classList.add('hidden');
+                btn.setAttribute('aria-expanded', 'false');
+            };
 
-      const toggleMenu = () => {
-        const isOpen = !panel.classList.contains('hidden');
-        isOpen ? closeMenu() : openMenu();
-      };
+            const toggleMenu = () => {
+                const isOpen = !panel.classList.contains('hidden');
+                isOpen ? closeMenu() : openMenu();
+            };
 
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu();
-      });
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleMenu();
+            });
 
-      // Fecha clicando fora
-      document.addEventListener('click', (e) => {
-        if (!panel.contains(e.target) && e.target !== btn) closeMenu();
-      });
+            // Fecha clicando fora
+            document.addEventListener('click', (e) => {
+                if (!panel.contains(e.target) && e.target !== btn) closeMenu();
+            });
 
-      // Fecha no ESC
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeMenu();
-      });
+            // Fecha no ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeMenu();
+            });
 
-      // Accordion
-      const getPanel = (key) => panel.querySelector(`[data-acc-panel="${key}"]`);
-      const getBtn = (key) => panel.querySelector(`[data-acc-btn="${key}"]`);
+            // Accordion
+            const getPanel = (key) => panel.querySelector(`[data-acc-panel="${key}"]`);
+            const getBtn = (key) => panel.querySelector(`[data-acc-btn="${key}"]`);
 
-      panel.querySelectorAll('[data-acc-btn]').forEach((accBtn) => {
-        accBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
+            panel.querySelectorAll('[data-acc-btn]').forEach((accBtn) => {
+                accBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
 
-          const key = accBtn.getAttribute('data-acc-btn');
-          const accPanel = getPanel(key);
-          if (!accPanel) return;
+                    const key = accBtn.getAttribute('data-acc-btn');
+                    const accPanel = getPanel(key);
+                    if (!accPanel) return;
 
-          // Toggle do próprio painel
-          accPanel.classList.toggle('hidden');
+                    // Toggle do próprio painel
+                    accPanel.classList.toggle('hidden');
 
-          // (Opcional) se fechar DFe, fecha filhos também
-          if (key === 'dfe' && accPanel.classList.contains('hidden')) {
-            const nfePanel = getPanel('nfe');
-            const nfsePanel = getPanel('nfse');
-            if (nfePanel) nfePanel.classList.add('hidden');
-            if (nfsePanel) nfsePanel.classList.add('hidden');
-          }
-        });
-      });
+                    // (Opcional) se fechar DFe, fecha filhos também
+                    if (key === 'dfe' && accPanel.classList.contains('hidden')) {
+                        const nfePanel = getPanel('nfe');
+                        const nfsePanel = getPanel('nfse');
+                        if (nfePanel) nfePanel.classList.add('hidden');
+                        if (nfsePanel) nfsePanel.classList.add('hidden');
+                    }
+                });
+            });
 
-    })();
-  </script>
+        })();
+    </script>
 
-  <!-- TROCA DE PÁGINA -->
-  <a href="index.html" title="Visão Geral" class="fixed bottom-6 right-6 z-50
-       bg-slate-900 text-white
-       p-4 rounded-full shadow-xl
-       hover:bg-slate-800 transition">
+    <!-- MODAL: TOP 10 ERROS -->
+    <div id="modalTop10Erros" class="fixed inset-0 z-[999] hidden">
+        <!-- backdrop -->
+        <div id="modalTop10Backdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-      stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h2M7 7h10M7 11h10M7 15h4" />
-    </svg>
-  </a>
+        <!-- dialog -->
+        <div class="relative mx-auto mt-24 w-[92%] max-w-3xl">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <!-- header -->
+                <div class="flex items-center justify-between px-5 py-4 border-b bg-slate-50">
+                    <div>
+                        <h3 class="text-base font-semibold text-slate-800">Top 10 Erros</h3>
+                        <p class="text-xs text-slate-500">Clique em um erro para filtrar a tabela</p>
+                    </div>
 
-  <!-- MODAL: TOP 10 ERROS -->
-  <div id="modalTop10Erros" class="fixed inset-0 z-[999] hidden">
-    <!-- backdrop -->
-    <div id="modalTop10Backdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                    <button id="btnCloseTop10" class="p-2 rounded-lg hover:bg-slate-200 transition"
+                        aria-label="Fechar modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
 
-    <!-- dialog -->
-    <div class="relative mx-auto mt-24 w-[92%] max-w-3xl">
-      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
-        <!-- header -->
-        <div class="flex items-center justify-between px-5 py-4 border-b bg-slate-50">
-          <div>
-            <h3 class="text-base font-semibold text-slate-800">Top 10 Erros</h3>
-            <p class="text-xs text-slate-500">Clique em um erro para filtrar a tabela</p>
-          </div>
+                <!-- body -->
+                <div class="max-h-[70vh] overflow-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="sticky top-0 bg-white">
+                            <tr class="text-left border-b">
+                                <th class="px-5 py-3 w-16 text-slate-500 font-semibold">#</th>
+                                <th class="px-5 py-3 text-slate-500 font-semibold">Erro</th>
+                                <th class="px-5 py-3 w-24 text-right text-slate-500 font-semibold">Qtd</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top10ErrosBody" class="divide-y"></tbody>
+                    </table>
+                </div>
 
-          <button id="btnCloseTop10" class="p-2 rounded-lg hover:bg-slate-200 transition" aria-label="Fechar modal">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+                <!-- footer -->
+                <div class="px-5 py-4 border-t bg-white flex justify-end gap-2">
+                    <button id="btnLimparFiltroTop10"
+                        class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm transition">
+                        Limpar filtro
+                    </button>
+                    <button id="btnFecharTop10"
+                        class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm transition">
+                        Fechar
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <!-- body -->
-        <div class="max-h-[70vh] overflow-auto">
-          <table class="min-w-full text-sm">
-            <thead class="sticky top-0 bg-white">
-              <tr class="text-left border-b">
-                <th class="px-5 py-3 w-16 text-slate-500 font-semibold">#</th>
-                <th class="px-5 py-3 text-slate-500 font-semibold">Erro</th>
-                <th class="px-5 py-3 w-24 text-right text-slate-500 font-semibold">Qtd</th>
-              </tr>
-            </thead>
-            <tbody id="top10ErrosBody" class="divide-y"></tbody>
-          </table>
-        </div>
-
-        <!-- footer -->
-        <div class="px-5 py-4 border-t bg-white flex justify-end gap-2">
-          <button id="btnLimparFiltroTop10"
-            class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm transition">
-            Limpar filtro
-          </button>
-          <button id="btnFecharTop10"
-            class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm transition">
-            Fechar
-          </button>
-        </div>
-      </div>
     </div>
-  </div>
 
 
-  <script>
-    // Cache do Top 10 (atualizado a cada updateKPIs)
-    let top10ErrosCache = [];
+    <script>
+        // Cache do Top 10 (atualizado a cada updateKPIs)
+        let top10ErrosCache = [];
 
-    function openTop10ErrosModal() {
-      const modal = document.getElementById('modalTop10Erros');
-      const tbody = document.getElementById('top10ErrosBody');
-      if (!modal || !tbody) return;
+        function openTop10ErrosModal() {
+            const modal = document.getElementById('modalTop10Erros');
+            const tbody = document.getElementById('top10ErrosBody');
+            if (!modal || !tbody) return;
 
-      tbody.innerHTML = '';
+            tbody.innerHTML = '';
 
-      top10ErrosCache.forEach((item, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50 cursor-pointer';
+            top10ErrosCache.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 cursor-pointer';
 
-        const desc = item.desc;
-        const qtd = item.qtd;
+                const desc = item.desc;
+                const qtd = item.qtd;
 
-        tr.innerHTML = `
+                tr.innerHTML = `
           <td class="px-5 py-3 font-semibold text-slate-600">${idx + 1}</td>
           <td class="px-5 py-3">
             <div class="text-slate-800">${desc}</div>
@@ -925,116 +1086,116 @@
           <td class="px-5 py-3 text-right font-semibold text-slate-700">${qtd}</td>
         `;
 
-        // Clique no erro => filtra a tabela e fecha o modal
-        tr.addEventListener('click', () => {
-          filterInput.value = desc;
-          applyFilter();
-          closeTop10ErrosModal();
-        });
+                // Clique no erro => filtra a tabela e fecha o modal
+                tr.addEventListener('click', () => {
+                    filterInput.value = desc;
+                    applyFilter();
+                    closeTop10ErrosModal();
+                });
 
-        tbody.appendChild(tr);
-      });
+                tbody.appendChild(tr);
+            });
 
-      modal.classList.remove('hidden');
-    }
-
-    function closeTop10ErrosModal() {
-      const modal = document.getElementById('modalTop10Erros');
-      if (!modal) return;
-      modal.classList.add('hidden');
-    }
-
-    // binds
-    (function bindTop10Modal() {
-      const modal = document.getElementById('modalTop10Erros');
-      const backdrop = document.getElementById('modalTop10Backdrop');
-      const btnClose = document.getElementById('btnCloseTop10');
-      const btnFechar = document.getElementById('btnFecharTop10');
-      const btnLimpar = document.getElementById('btnLimparFiltroTop10');
-
-      if (!modal) return;
-
-      backdrop?.addEventListener('click', closeTop10ErrosModal);
-      btnClose?.addEventListener('click', closeTop10ErrosModal);
-      btnFechar?.addEventListener('click', closeTop10ErrosModal);
-
-      btnLimpar?.addEventListener('click', () => {
-        filterInput.value = '';
-        applyFilter();
-        closeTop10ErrosModal();
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-          closeTop10ErrosModal();
+            modal.classList.remove('hidden');
         }
-      });
-    })();
-  </script>
 
-  <!-- MODAL: TOP 10 UNIDADES -->
-  <div id="modalTop10Unidades" class="fixed inset-0 z-[999] hidden">
-    <div id="modalTop10UnidadesBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        function closeTop10ErrosModal() {
+            const modal = document.getElementById('modalTop10Erros');
+            if (!modal) return;
+            modal.classList.add('hidden');
+        }
 
-    <div class="relative mx-auto mt-24 w-[92%] max-w-3xl">
-      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-4 border-b bg-slate-50">
-          <div>
-            <h3 class="text-base font-semibold text-slate-800">Top 10 Unidades</h3>
-            <p class="text-xs text-slate-500">Clique em uma unidade para filtrar a tabela</p>
-          </div>
+        // binds
+        (function bindTop10Modal() {
+            const modal = document.getElementById('modalTop10Erros');
+            const backdrop = document.getElementById('modalTop10Backdrop');
+            const btnClose = document.getElementById('btnCloseTop10');
+            const btnFechar = document.getElementById('btnFecharTop10');
+            const btnLimpar = document.getElementById('btnLimparFiltroTop10');
 
-          <button id="btnCloseTop10Unidades" class="p-2 rounded-lg hover:bg-slate-200 transition"
-            aria-label="Fechar modal">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+            if (!modal) return;
+
+            backdrop?.addEventListener('click', closeTop10ErrosModal);
+            btnClose?.addEventListener('click', closeTop10ErrosModal);
+            btnFechar?.addEventListener('click', closeTop10ErrosModal);
+
+            btnLimpar?.addEventListener('click', () => {
+                filterInput.value = '';
+                applyFilter();
+                closeTop10ErrosModal();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeTop10ErrosModal();
+                }
+            });
+        })();
+    </script>
+
+    <!-- MODAL: TOP 10 UNIDADES -->
+    <div id="modalTop10Unidades" class="fixed inset-0 z-[999] hidden">
+        <div id="modalTop10UnidadesBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+        <div class="relative mx-auto mt-24 w-[92%] max-w-3xl">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <div class="flex items-center justify-between px-5 py-4 border-b bg-slate-50">
+                    <div>
+                        <h3 class="text-base font-semibold text-slate-800">Top 10 Unidades</h3>
+                        <p class="text-xs text-slate-500">Clique em uma unidade para filtrar a tabela</p>
+                    </div>
+
+                    <button id="btnCloseTop10Unidades" class="p-2 rounded-lg hover:bg-slate-200 transition"
+                        aria-label="Fechar modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="max-h-[70vh] overflow-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="sticky top-0 bg-white">
+                            <tr class="text-left border-b">
+                                <th class="px-5 py-3 w-16 text-slate-500 font-semibold">#</th>
+                                <th class="px-5 py-3 text-slate-500 font-semibold">Unidade / Cliente</th>
+                                <th class="px-5 py-3 w-24 text-right text-slate-500 font-semibold">Qtd</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top10UnidadesBody" class="divide-y"></tbody>
+                    </table>
+                </div>
+
+                <div class="px-5 py-4 border-t bg-white flex justify-end gap-2">
+                    <button id="btnLimparFiltroTop10Unidades"
+                        class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm transition">
+                        Limpar filtro
+                    </button>
+                    <button id="btnFecharTop10Unidades"
+                        class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm transition">
+                        Fechar
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <div class="max-h-[70vh] overflow-auto">
-          <table class="min-w-full text-sm">
-            <thead class="sticky top-0 bg-white">
-              <tr class="text-left border-b">
-                <th class="px-5 py-3 w-16 text-slate-500 font-semibold">#</th>
-                <th class="px-5 py-3 text-slate-500 font-semibold">Unidade / Cliente</th>
-                <th class="px-5 py-3 w-24 text-right text-slate-500 font-semibold">Qtd</th>
-              </tr>
-            </thead>
-            <tbody id="top10UnidadesBody" class="divide-y"></tbody>
-          </table>
-        </div>
-
-        <div class="px-5 py-4 border-t bg-white flex justify-end gap-2">
-          <button id="btnLimparFiltroTop10Unidades"
-            class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm transition">
-            Limpar filtro
-          </button>
-          <button id="btnFecharTop10Unidades"
-            class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm transition">
-            Fechar
-          </button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <script>
-    let top10UnidadesCache = [];
+    <script>
+        let top10UnidadesCache = [];
 
-    function openTop10UnidadesModal() {
-      const modal = document.getElementById('modalTop10Unidades');
-      const tbody = document.getElementById('top10UnidadesBody');
-      if (!modal || !tbody) return;
+        function openTop10UnidadesModal() {
+            const modal = document.getElementById('modalTop10Unidades');
+            const tbody = document.getElementById('top10UnidadesBody');
+            if (!modal || !tbody) return;
 
-      tbody.innerHTML = '';
+            tbody.innerHTML = '';
 
-      top10UnidadesCache.forEach((item, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50 cursor-pointer';
+            top10UnidadesCache.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 cursor-pointer';
 
-        tr.innerHTML = `
+                tr.innerHTML = `
           <td class="px-5 py-3 font-semibold text-slate-600">${idx + 1}</td>
           <td class="px-5 py-3">
             <div class="text-slate-800">${item.nome}</div>
@@ -1042,53 +1203,201 @@
           <td class="px-5 py-3 text-right font-semibold text-slate-700">${item.qtd}</td>
         `;
 
-        tr.addEventListener('click', () => {
-          filterInput.value = item.nome;
-          applyFilter();
-          closeTop10UnidadesModal();
-        });
+                tr.addEventListener('click', () => {
+                    filterInput.value = item.nome;
+                    applyFilter();
+                    closeTop10UnidadesModal();
+                });
 
-        tbody.appendChild(tr);
-      });
+                tbody.appendChild(tr);
+            });
 
-      modal.classList.remove('hidden');
-    }
-
-    function closeTop10UnidadesModal() {
-      const modal = document.getElementById('modalTop10Unidades');
-      if (!modal) return;
-      modal.classList.add('hidden');
-    }
-
-    (function bindTop10UnidadesModal() {
-      const modal = document.getElementById('modalTop10Unidades');
-      const backdrop = document.getElementById('modalTop10UnidadesBackdrop');
-      const btnClose = document.getElementById('btnCloseTop10Unidades');
-      const btnFechar = document.getElementById('btnFecharTop10Unidades');
-      const btnLimpar = document.getElementById('btnLimparFiltroTop10Unidades');
-
-      if (!modal) return;
-
-      backdrop?.addEventListener('click', closeTop10UnidadesModal);
-      btnClose?.addEventListener('click', closeTop10UnidadesModal);
-      btnFechar?.addEventListener('click', closeTop10UnidadesModal);
-
-      btnLimpar?.addEventListener('click', () => {
-        filterInput.value = '';
-        applyFilter();
-        closeTop10UnidadesModal();
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-          closeTop10UnidadesModal();
+            modal.classList.remove('hidden');
         }
-      });
-    })();
-  </script>
+
+        function closeTop10UnidadesModal() {
+            const modal = document.getElementById('modalTop10Unidades');
+            if (!modal) return;
+            modal.classList.add('hidden');
+        }
+
+        (function bindTop10UnidadesModal() {
+            const modal = document.getElementById('modalTop10Unidades');
+            const backdrop = document.getElementById('modalTop10UnidadesBackdrop');
+            const btnClose = document.getElementById('btnCloseTop10Unidades');
+            const btnFechar = document.getElementById('btnFecharTop10Unidades');
+            const btnLimpar = document.getElementById('btnLimparFiltroTop10Unidades');
+
+            if (!modal) return;
+
+            backdrop?.addEventListener('click', closeTop10UnidadesModal);
+            btnClose?.addEventListener('click', closeTop10UnidadesModal);
+            btnFechar?.addEventListener('click', closeTop10UnidadesModal);
+
+            btnLimpar?.addEventListener('click', () => {
+                filterInput.value = '';
+                applyFilter();
+                closeTop10UnidadesModal();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeTop10UnidadesModal();
+                }
+            });
+        })();
+    </script>
 
 
 
+
+
+    <!-- MODAL: VER MAIS (DETALHES DA LINHA) -->
+    <div id="modalRowDetails" class="fixed inset-0 z-[999] hidden">
+        <!-- backdrop -->
+        <div id="modalRowDetailsBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+        <!-- dialog -->
+        <div class="relative mx-auto mt-16 w-[94%] max-w-4xl">
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden ring-1 ring-slate-200">
+                <!-- header -->
+                <div class="flex items-start justify-between gap-4 px-6 py-5 border-b bg-slate-50">
+                    <div class="min-w-0">
+                        <h3 class="text-base font-semibold text-slate-900">Detalhes do Registro</h3>
+                        <p id="rowDetailsSubtitle" class="text-xs text-slate-500 truncate"></p>
+                    </div>
+
+                    <button id="btnCloseRowDetails" class="p-2 rounded-xl hover:bg-slate-200 transition"
+                        aria-label="Fechar modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- body -->
+                <div class="max-h-[72vh] overflow-auto">
+                    <div class="p-6 space-y-5">
+                        <!-- grid de campos -->
+                        <div id="rowDetailsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+
+                        <!-- log completo -->
+                        <div class="rounded-2xl border border-slate-200 overflow-hidden">
+                            <div class="px-4 py-3 bg-slate-50 border-b flex items-center justify-between">
+                                <div class="text-sm font-semibold text-slate-800">Log completo</div>
+                                <button id="btnCopyFullLog"
+                                    class="text-xs px-3 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
+                                    Copiar
+                                </button>
+                            </div>
+                            <pre id="rowDetailsFullLog"
+                                class="px-4 py-3 text-sm text-slate-800 whitespace-pre-wrap break-words"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- footer -->
+                <div class="px-6 py-4 border-t bg-white flex justify-end gap-2">
+                    <button id="btnFecharRowDetails"
+                        class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm transition">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function openRowDetailsModal(row) {
+            const modal = document.getElementById('modalRowDetails');
+            const grid = document.getElementById('rowDetailsGrid');
+            const pre = document.getElementById('rowDetailsFullLog');
+            const subtitle = document.getElementById('rowDetailsSubtitle');
+
+            if (!modal || !grid || !pre) return;
+
+            // Subtítulo “bonito”
+            const cliente = row?.nom_unid_oper ?? '';
+            const neg = row?.cod_unid_negoc ?? '';
+            const oper = row?.cod_unid_oper ?? '';
+            const rps = row?.num_rps ?? '';
+            subtitle.textContent = `${cliente} • Neg ${neg} • Oper ${oper} • RPS ${rps}`;
+
+            // Grid de campos (exceto desc_log, que vai em destaque)
+            grid.innerHTML = '';
+            const entries = Object.entries(row || {}).filter(([k]) => k !== 'desc_log');
+
+            for (const [key, val] of entries) {
+                const card = document.createElement('div');
+                card.className = 'rounded-2xl border border-slate-200 bg-white p-4';
+
+                const prettyKey = key
+                    .replaceAll('_', ' ')
+                    .replace(/\w/g, (m) => m.toUpperCase());
+
+                const valueStr = (val === null || val === undefined) ? '-' : String(val);
+
+                card.innerHTML = `
+                    <div class="text-[11px] uppercase tracking-wide text-slate-500">${escapeHtml(prettyKey)}</div>
+                    <div class="mt-1 text-sm font-semibold text-slate-900 break-words">${escapeHtml(valueStr)}</div>
+                `;
+
+                grid.appendChild(card);
+            }
+
+            // Log completo (SEM remover prefixo aqui, como você pediu)
+            pre.textContent = String(row?.desc_log ?? '');
+
+            // Abrir
+            modal.classList.remove('hidden');
+        }
+
+        function closeRowDetailsModal() {
+            const modal = document.getElementById('modalRowDetails');
+            modal?.classList.add('hidden');
+        }
+
+        (function bindRowDetailsModal() {
+            const modal = document.getElementById('modalRowDetails');
+            const backdrop = document.getElementById('modalRowDetailsBackdrop');
+            const btnClose = document.getElementById('btnCloseRowDetails');
+            const btnFechar = document.getElementById('btnFecharRowDetails');
+            const btnCopy = document.getElementById('btnCopyFullLog');
+            const pre = document.getElementById('rowDetailsFullLog');
+
+            backdrop?.addEventListener('click', closeRowDetailsModal);
+            btnClose?.addEventListener('click', closeRowDetailsModal);
+            btnFechar?.addEventListener('click', closeRowDetailsModal);
+
+            btnCopy?.addEventListener('click', async () => {
+                try {
+                    const text = pre?.textContent ?? '';
+                    await navigator.clipboard.writeText(text);
+                    btnCopy.textContent = 'Copiado!';
+                    setTimeout(() => btnCopy.textContent = 'Copiar', 1200);
+                } catch (e) {
+                    btnCopy.textContent = 'Falhou';
+                    setTimeout(() => btnCopy.textContent = 'Copiar', 1200);
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+                    closeRowDetailsModal();
+                }
+            });
+        })();
+    </script>
 
 </body>
 

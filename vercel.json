@@ -35,6 +35,22 @@
         {
             "source": "/api/suporte/lapavet",
             "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/dados_gerais/91/1"
+        },
+        {
+            "source": "/api/status/constellation",
+            "destination": "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/status"
+        },
+        {
+            "source": "/api/status/lol",
+            "destination": "http://177.11.209.38/lol/IISLaudosONLineAPI.dll/lol-api/V1.1/status"
+        },
+        {
+            "source": "/api/status/vertis",
+            "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/status"
+        },
+        {
+            "source": "/api/status/nfse",
+            "destination": "http://177.11.209.38:8080/api/status"
         }
     ]
 }

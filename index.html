@@ -4,9 +4,29 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vertis • Laudos • Publicação por Hora</title>
+    <title>Vertis <span class="text-vertis-orange">•</span> Controle</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vertis: {
+                            orange: '#F97316',
+                            dark: '#0B1220'
+                        }
+                    },
+                    boxShadow: {
+                        soft: '0 10px 30px rgba(2, 6, 23, 0.10)',
+                        card: '0 8px 20px rgba(2, 6, 23, 0.08)'
+                    }
+                }
+            }
+        }
+    </script>
+
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -36,14 +56,87 @@
         .count {
             transition: all .3s ease;
         }
+
+        /* --- extra polish --- */
+        .lift {
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+
+        .lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(2, 6, 23, .10);
+        }
+
+        .glass {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .shimmer {
+            background: linear-gradient(110deg, rgba(148, 163, 184, .15) 8%, rgba(148, 163, 184, .35) 18%, rgba(148, 163, 184, .15) 33%);
+            background-size: 200% 100%;
+            animation: shimmer 1.1s linear infinite;
+        }
+
+        @keyframes shimmer {
+            to {
+                background-position-x: -200%;
+            }
+        }
+
+        .dot-glow {
+            box-shadow: 0 0 0 6px rgba(16, 185, 129, .12);
+        }
+
+        .dot-glow-err {
+            box-shadow: 0 0 0 6px rgba(244, 63, 94, .12);
+        }
+
+        .dot-glow-warn {
+            box-shadow: 0 0 0 6px rgba(245, 158, 11, .12);
+        }
+
+        /* Menu moderno (sem @apply) — compatível com Tailwind via CDN */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .625rem 1.25rem;
+            /* px-5 py-2.5 */
+            color: rgb(51 65 85);
+            /* slate-700 */
+            text-decoration: none;
+            position: relative;
+            transition: background-color .2s ease, color .2s ease, transform .2s ease;
+        }
+
+        .menu-item:hover {
+            background: rgb(241 245 249);
+            /* slate-100 */
+            color: rgb(2 6 23);
+            /* near black */
+            transform: translateX(4px);
+        }
+
+        .menu-icon {
+            width: 18px;
+            height: 18px;
+            opacity: .8;
+            transition: transform .2s ease, opacity .2s ease;
+        }
+
+        .menu-item:hover .menu-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen flex flex-col">
+<body class="bg-gradient-to-br from-slate-100 via-slate-100 to-slate-200 min-h-screen flex flex-col">
 
     <!-- HEADER -->
     <header
-        class="sticky top-0 z-50 backdrop-blur bg-slate-900/90 text-white px-6 py-4 flex justify-between items-center shadow">
+        class="sticky top-0 z-50 glass bg-slate-900/85 text-white px-6 py-4 flex justify-between items-center shadow border-b border-white/10">
 
         <!-- ESQUERDA -->
         <div class="flex items-center gap-4">
@@ -60,113 +153,94 @@
                 </button>
 
                 <!-- PAINEL -->
-                <div id="menuPanel" class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl
-         hidden overflow-hidden">
+                <!-- PAINEL MODERNO -->
+                <div id="menuPanel" class="absolute left-0 mt-3 w-80 rounded-2xl bg-white text-slate-800 shadow-2xl
+       hidden overflow-hidden border border-slate-200 backdrop-blur-xl
+       origin-top-left transform transition-all duration-200">
 
-                    <!-- HEADER DO PAINEL (opcional) -->
-                    <div class="px-4 py-3 border-b bg-slate-50">
-                        <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
+                    <!-- HEADER -->
+                    <div class="px-5 py-4 border-b bg-gradient-to-r from-slate-50 to-white">
+                        <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold">
+                            Navegação
+                        </div>
                     </div>
 
-                    <div class="py-2 text-sm">
+                    <div class="py-3 text-sm">
 
-                        <!-- Início -->
-                        <a href="../NFE/index.html" class="block px-4 py-2 text-sm font-semibold hover:bg-slate-100">
+                        <!-- INÍCIO -->
+                        <a href="../index.html" class="menu-item">
+                            <!-- Ícone Home -->
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 10.75L12 4l9 6.75M5 10v9h14v-9" />
+                            </svg>
                             Início
                         </a>
 
-                        <!-- LAUDOS (nível 1) -->
-                        <button type="button"
-                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
-                            data-acc-btn="lol">
-                            <span>Publicação de Laudos</span>
-                            <span class="text-slate-400">›</span>
-                        </button>
+                        <!-- PUBLICAÇÃO DE LAUDOS -->
+                        <a href="../laudos/index.html" class="menu-item">
+                            <!-- Ícone Chart -->
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l6-6 4 4 8-8" />
+                            </svg>
+                            Publicação de Laudos
+                        </a>
 
-                        <!-- Conteúdo LAUDOS (nível 2) -->
-                        <div class="hidden" data-acc-panel="lol">
-                            <a href="../laudos/index.html"
-                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
-                                Visão Geral
-                            </a>
+                        <!-- NFSe -->
+                        <a href="../nfse/index.html" class="menu-item">
+                            <!-- Ícone Documento -->
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13H7z" />
+                            </svg>
+                            NFSe
+                        </a>
+
+                        <!-- NFCe / NFe -->
+                        <a href="../nfe/index.html" class="menu-item">
+                            <!-- Ícone Nota Fiscal -->
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 14h6M9 10h6M7 3h10v18l-5-3-5 3z" />
+                            </svg>
+                            NFCe / NFe
+                        </a>
+
+                        <!-- DESENVOLVIMENTO -->
+                        <div class="mt-4 px-5 text-xs uppercase tracking-wider text-slate-400 font-semibold">
+                            Desenvolvimento
                         </div>
 
-                        <!-- DFe (nível 1) -->
-                        <button type="button"
-                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
-                            data-acc-btn="dfe">
-                            <span>DFe (Documentos Fiscais)</span>
-                            <span class="text-slate-400">›</span>
-                        </button>
+                        <a href="../desenv/gerador_pix.html" class="menu-item">
+                            <!-- Ícone PIX -->
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l6 6-6 6-6-6 6-6z" />
+                            </svg>
+                            Chave PIX
+                        </a>
 
-                        <!-- Conteúdo DFe (nível 2) -->
-                        <div class="hidden" data-acc-panel="dfe">
-
-                            <!-- NFe -->
-                            <button type="button"
-                                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
-                                data-acc-btn="nfe">
-                                <span>NFe</span>
-                                <span class="text-slate-400">›</span>
-                            </button>
-
-                            <div class="hidden" data-acc-panel="nfe">
-                                <a href="../nfe/index.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                                    Visão Geral
-                                </a>
-                                <a href="../nfe/controle_nfe_logs.html"
-                                    class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                                    Erros
-                                </a>
-                            </div>
-
-                            <!-- NFSe -->
-                            <button type="button"
-                                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
-                                data-acc-btn="nfse">
-                                <span>NFSe</span>
-                                <span class="text-slate-400">›</span>
-                            </button>
-
-                            <div class="hidden" data-acc-panel="nfse">
-                                <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                                    Visão Geral
-                                </a>
-                                <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                                    Erros
-                                </a>
-                            </div>
-
-                        </div>
-
-                        <!-- DESENVOLVIMENTO (nível 1) -->
-                        <button type="button"
-                            class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
-                            data-acc-btn="dev">
-                            <span>Desenvolvimento</span>
-                            <span class="text-slate-400">›</span>
-                        </button>
-
-                        <!-- Conteúdo Desenvolvimento (nível 2) -->
-                        <div class="hidden" data-acc-panel="dev">
-                            <a href="../desenv/gerador_pix.html"
-                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
-                                Chave PIX
-                            </a>
-                            <a href="../desenv/leitor_pdf.html"
-                                class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
-                                Leitor PDF (PDF.js)
-                            </a>
-                        </div>
+                        <a href="../desenv/leitor_pdf.html" class="menu-item">
+                            <!-- Ícone PDF -->
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13H7zM12 12h.01" />
+                            </svg>
+                            Leitor PDF (PDF.js)
+                        </a>
 
                     </div>
                 </div>
+
             </nav>
 
 
             <!-- TEXTO -->
             <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
-                Vertis • Laudos • Publicação
+                Vertis <span class="text-vertis-orange">•</span> Controle
             </h1>
         </div>
 
@@ -181,10 +255,231 @@
 
     </header>
 
-    <main class="p-6 flex-1 space-y-6">
+    <main class="p-6 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+
+
+        <!-- Status das APIs -->
+        <section class="bg-white/90 rounded-2xl shadow-card border border-white/60 p-4">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                <div>
+                    <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                        <span
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-slate-900 text-white shadow">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </span>
+                        Status das APIs
+                    </h2>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span
+                        class="inline-flex items-center gap-2 text-[11px] px-2 py-1 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200">
+                        <span class="h-2 w-2 rounded-full bg-emerald-500"></span> OK
+                    </span>
+                    <span
+                        class="inline-flex items-center gap-2 text-[11px] px-2 py-1 rounded-full border bg-rose-50 text-rose-700 border-rose-200">
+                        <span class="h-2 w-2 rounded-full bg-rose-500"></span> Erro
+                    </span>
+                    <span
+                        class="inline-flex items-center gap-2 text-[11px] px-2 py-1 rounded-full border bg-amber-50 text-amber-800 border-amber-200">
+                        <span class="h-2 w-2 rounded-full bg-amber-500"></span> CORS/Timeout
+                    </span>
+                    <span class="mx-1 h-5 w-px bg-slate-200"></span>
+                    <p class="text-[11px] text-slate-500">Última checagem</p>
+                    <span id="apisLastChecked"
+                        class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">—</span>
+
+                    <button id="btnCheckApis" type="button"
+                        class="ml-2 text-xs px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition shadow flex items-center gap-2">
+                        <span class="text-vertis-orange">⚡</span> Checar agora
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <!-- Constellation -->
+                <div class="rounded-2xl border border-slate-200/80 bg-white/70 p-4 lift">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 border border-slate-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-700" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M3 15a4 4 0 004 4h10a4 4 0 000-8 5 5 0 00-9.9 1A4 4 0 003 15z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <p class="text-[11px] uppercase tracking-wide text-slate-500">Constellation</p>
+                                    <p class="text-[11px] text-slate-400 -mt-0.5">GET /status</p>
+                                </div>
+                            </div>
+                            <div class="mt-1 flex items-center gap-2">
+                                <span id="api-constellation-pill"
+                                    class="inline-flex items-center gap-2 text-xs px-2 py-1 rounded-full border bg-slate-100 text-slate-700 border-slate-200">
+                                    <span id="api-constellation-dot"
+                                        class="h-2.5 w-2.5 rounded-full bg-slate-400"></span>
+                                    <span id="api-constellation-status">—</span>
+                                </span>
+                                <span id="api-constellation-ms"
+                                    class="text-[11px] px-2 py-1 rounded-full bg-slate-50 text-slate-600 border border-slate-200">—</span>
+                            </div>
+                        </div>
+
+                        <button type="button" data-api-check="constellation"
+                            class="text-xs px-2.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition"
+                            title="Checar agora">
+                            ↻
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Laudos Online -->
+                <div class="rounded-2xl border border-slate-200/80 bg-white/70 p-4 lift">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 border border-slate-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-700" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 12h6m-6 4h6m-7 4h8a2 2 0 002-2V7l-5-5H7a2 2 0 00-2 2v16a2 2 0 002 2z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <p class="text-[11px] uppercase tracking-wide text-slate-500">Laudos Online</p>
+                                    <p class="text-[11px] text-slate-400 -mt-0.5">GET /status</p>
+                                </div>
+                            </div>
+                            <div class="mt-1 flex items-center gap-2">
+                                <span id="api-lol-pill"
+                                    class="inline-flex items-center gap-2 text-xs px-2 py-1 rounded-full border bg-slate-100 text-slate-700 border-slate-200">
+                                    <span id="api-lol-dot" class="h-2.5 w-2.5 rounded-full bg-slate-400"></span>
+                                    <span id="api-lol-status">—</span>
+                                </span>
+                                <span id="api-lol-ms"
+                                    class="text-[11px] px-2 py-1 rounded-full bg-slate-50 text-slate-600 border border-slate-200">—</span>
+                            </div>
+                        </div>
+
+                        <button type="button" data-api-check="lol"
+                            class="text-xs px-2.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition"
+                            title="Checar agora">
+                            ↻
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Vertis API -->
+                <div class="rounded-2xl border border-slate-200/80 bg-white/70 p-4 lift">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 border border-slate-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-700" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.828 10.172a4 4 0 010 5.656l-1.414 1.414a4 4 0 01-5.656 0 4 4 0 010-5.656l1.06-1.06m7.364 1.06l1.06-1.06a4 4 0 015.656 5.656l-1.414 1.414a4 4 0 01-5.656 0" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <p class="text-[11px] uppercase tracking-wide text-slate-500">Vertis API</p>
+                                    <p class="text-[11px] text-slate-400 -mt-0.5">GET /status</p>
+                                </div>
+                            </div>
+                            <div class="mt-1 flex items-center gap-2">
+                                <span id="api-vertis-pill"
+                                    class="inline-flex items-center gap-2 text-xs px-2 py-1 rounded-full border bg-slate-100 text-slate-700 border-slate-200">
+                                    <span id="api-vertis-dot" class="h-2.5 w-2.5 rounded-full bg-slate-400"></span>
+                                    <span id="api-vertis-status">—</span>
+                                </span>
+                                <span id="api-vertis-ms"
+                                    class="text-[11px] px-2 py-1 rounded-full bg-slate-50 text-slate-600 border border-slate-200">—</span>
+                            </div>
+                        </div>
+
+                        <button type="button" data-api-check="vertis"
+                            class="text-xs px-2.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition"
+                            title="Checar agora">
+                            ↻
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- NFSe -->
+                <div class="rounded-2xl border border-slate-200/80 bg-white/70 p-4 lift">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 border border-slate-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-700" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 14h6m-6-4h6m-8 12l-2 1V3l2 1 2-1 2 1 2-1 2 1 2-1v20l-2-1-2 1-2-1-2 1-2-1z" />
+                                    </svg>
+                                </span>
+                                <div>
+                                    <p class="text-[11px] uppercase tracking-wide text-slate-500">NFSe</p>
+                                    <p class="text-[11px] text-slate-400 -mt-0.5">GET /status</p>
+                                </div>
+                            </div>
+                            <div class="mt-1 flex items-center gap-2">
+                                <span id="api-nfse-pill"
+                                    class="inline-flex items-center gap-2 text-xs px-2 py-1 rounded-full border bg-slate-100 text-slate-700 border-slate-200">
+                                    <span id="api-nfse-dot" class="h-2.5 w-2.5 rounded-full bg-slate-400"></span>
+                                    <span id="api-nfse-status">—</span>
+                                </span>
+                                <span id="api-nfse-ms"
+                                    class="text-[11px] px-2 py-1 rounded-full bg-slate-50 text-slate-600 border border-slate-200">—</span>
+                            </div>
+                        </div>
+
+                        <button type="button" data-api-check="nfse"
+                            class="text-xs px-2.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition"
+                            title="Checar agora">
+                            ↻
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Chart -->
+        <section class="bg-white/90 rounded-2xl shadow-card border border-white/60 p-4 fade-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-700">Publicações por hora</h3>
+                    <p class="text-xs text-slate-500">Eixo X = hora • Eixo Y = total</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[11px] text-slate-500">Última atualização</p>
+                    <p id="lastUpdated" class="text-xs font-medium text-slate-700">—</p>
+                </div>
+            </div>
+
+            <div class="mt-4 h-52 relative">
+                <canvas id="barChart" class="absolute inset-0"></canvas>
+            </div>
+
+            <div id="errorBox"
+                class="mt-4 hidden rounded-xl border border-rose-200 bg-rose-50 text-rose-800 p-3 text-sm"></div>
+        </section>
+
 
         <!-- Topbar / controles -->
-        <section class="bg-white rounded-2xl shadow p-4">
+        <section class="bg-white/90 rounded-2xl shadow-card border border-white/60 p-4">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                 <div>
                     <h2 class="text-sm font-semibold text-slate-700">Distribuição de Publicações (0–23h)</h2>
@@ -202,21 +497,21 @@
                     </div>
 
                     <button id="btnReload" type="button"
-                        class="text-xs px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition shadow">
-                        ↻ Atualizar agora
+                        class="text-xs px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition shadow flex items-center gap-2">
+                        <span class="text-vertis-orange">↻</span> Atualizar agora
                     </button>
                 </div>
             </div>
 
             <!-- KPIs -->
             <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="rounded-2xl border border-slate-200/80 bg-white/70 p-4 lift">
                     <p class="text-[11px] text-slate-500">Total no período</p>
                     <p id="kpiTotal" class="text-2xl font-bold text-slate-800 count">—</p>
                     <p id="kpiMeta" class="text-xs text-slate-500 mt-1">Soma dos totais por hora</p>
                 </div>
 
-                <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="rounded-2xl border border-slate-200/80 bg-white/70 p-4 lift">
                     <p class="text-[11px] text-slate-500">Hora pico</p>
                     <div class="flex items-end justify-between gap-3">
                         <p id="kpiPeakHour" class="text-2xl font-bold text-slate-800 count">—</p>
@@ -226,7 +521,7 @@
                     <p class="text-xs text-slate-500 mt-1">Maior volume no dia</p>
                 </div>
 
-                <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="rounded-2xl border border-slate-200/80 bg-white/70 p-4 lift">
                     <p class="text-[11px] text-slate-500">Tendência (últimas 2 horas com dado)</p>
                     <div class="flex items-center justify-between gap-3">
                         <p id="kpiTrend" class="text-2xl font-bold text-slate-800 count">—</p>
@@ -237,34 +532,143 @@
             </div>
         </section>
 
-        <!-- Chart -->
-        <section class="bg-white rounded-2xl shadow p-4 fade-in">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-sm font-semibold text-slate-700">Publicações por hora</h3>
-                    <p class="text-xs text-slate-500">Eixo X = hora • Eixo Y = total</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-[11px] text-slate-500">Última atualização</p>
-                    <p id="lastUpdated" class="text-xs font-medium text-slate-700">—</p>
-                </div>
-            </div>
-
-            <div class="mt-4 h-48 relative">
-                <canvas id="barChart" class="absolute inset-0"></canvas>
-            </div>
-
-            <div id="errorBox"
-                class="mt-4 hidden rounded-xl border border-rose-200 bg-rose-50 text-rose-800 p-3 text-sm"></div>
-        </section>
     </main>
 
     <script>
-        // Endpoint público informado
-        // const endpoint = "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/vertis_laudos_hora";
+
+        //const endpoint = "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/vertis_laudos_hora";
         const endpoint = "/api/laudos/hora";
 
         let chart;
+
+        // --- API STATUS (widgets) ---
+        const apiStatusEndpoints = {
+            constellation: "/api/status/constellation",
+            lol: "/api/status/lol",
+            vertis: "/api/status/vertis",
+            nfse: "/api/status/nfse"
+        };
+
+        function setApiUrlLabels() {
+            const map = [
+                ["api-constellation-url", apiStatusEndpoints.constellation],
+                ["api-lol-url", apiStatusEndpoints.lol],
+                ["api-vertis-url", apiStatusEndpoints.vertis],
+                ["api-nfse-url", apiStatusEndpoints.nfse],
+            ];
+            map.forEach(([id, url]) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = url;
+            });
+        }
+
+        function paintApiState(key, state) {
+            const pill = document.getElementById(`api-${key}-pill`);
+            const dot = document.getElementById(`api-${key}-dot`);
+            const status = document.getElementById(`api-${key}-status`);
+            const ms = document.getElementById(`api-${key}-ms`);
+            const bar = document.getElementById(`api-${key}-bar`);
+
+            if (!pill || !dot || !status || !ms) return;
+
+            // reset base classes
+            pill.className = "inline-flex items-center gap-2 text-xs px-2 py-1 rounded-full border bg-slate-100 text-slate-700 border-slate-200";
+            ms.className = "text-[11px] px-2 py-1 rounded-full bg-slate-50 text-slate-600 border border-slate-200";
+            dot.className = "h-2.5 w-2.5 rounded-full bg-slate-400";
+            pill.classList.remove("shimmer");
+            ms.classList.remove("shimmer");
+
+            if (bar) {
+                bar.className = "h-full w-0 rounded-full bg-slate-300 transition-[width] duration-300";
+                bar.style.width = "0%";
+            }
+
+            // Loading state (transitório)
+            if (state.kind === "loading") {
+                status.textContent = "checando...";
+                pill.classList.add("shimmer");
+                ms.textContent = "—";
+                ms.classList.add("shimmer");
+                return;
+            }
+
+            const msValue = (typeof state.ms === "number" && !Number.isNaN(state.ms)) ? state.ms : null;
+
+            // Latency bar: 0..2000ms -> 0..100%
+            const pct = msValue == null ? 0 : Math.max(0, Math.min(100, Math.round((msValue / 2000) * 100)));
+
+            if (state.kind === "ok") {
+                status.textContent = "OK";
+                dot.classList.remove('bg-slate-400');
+                dot.classList.add('bg-emerald-500', 'dot-glow');
+                pill.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+                ms.textContent = msValue != null ? `${msValue} ms` : "—";
+
+                if (bar) {
+                    bar.classList.add("bg-emerald-400");
+                    bar.style.width = `${pct}%`;
+                }
+            } else if (state.kind === "down") {
+                status.textContent = `ERRO (${state.code || "—"})`;
+                dot.classList.remove('bg-slate-400');
+                dot.classList.add('bg-rose-500', 'dot-glow-err');
+                pill.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
+                ms.textContent = msValue != null ? `${msValue} ms` : "—";
+
+                if (bar) {
+                    bar.classList.add("bg-rose-400");
+                    bar.style.width = `${pct}%`;
+                }
+            } else {
+                // "warn" (ex: CORS / timeout / network)
+                status.textContent = state.label || "Indisponível";
+                dot.classList.remove('bg-slate-400');
+                dot.classList.add('bg-amber-500', 'dot-glow-warn');
+                pill.classList.add('bg-amber-50', 'text-amber-800', 'border-amber-200');
+                ms.textContent = msValue != null ? `${msValue} ms` : "—";
+
+                if (bar) {
+                    bar.classList.add("bg-amber-400");
+                    bar.style.width = `${pct}%`;
+                }
+            }
+        }
+
+        async function checkApi(key, url) {
+            paintApiState(key, { kind: 'loading' });
+            const start = performance.now();
+            try {
+                // NOTE: fetch pode falhar por CORS dependendo do servidor e de como a página está sendo servida.
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 6000);
+
+                const res = await fetch(url, { method: "GET", signal: controller.signal, cache: "no-store" });
+                clearTimeout(timeout);
+
+                const elapsed = Math.round(performance.now() - start);
+
+                if (res.ok) {
+                    paintApiState(key, { kind: "ok", ms: elapsed });
+                } else {
+                    paintApiState(key, { kind: "down", code: res.status, ms: elapsed });
+                }
+            } catch (e) {
+                const elapsed = Math.round(performance.now() - start);
+                const msg = (e && (e.name === "AbortError")) ? "Timeout" : "Bloqueado/CORS";
+                paintApiState(key, { kind: "warn", label: msg, ms: elapsed });
+            }
+        }
+
+        async function checkAllApis() {
+            const last = document.getElementById("apisLastChecked");
+            if (last) last.textContent = "checando...";
+
+            const entries = Object.entries(apiStatusEndpoints);
+            await Promise.all(entries.map(([k, u]) => checkApi(k, u)));
+
+            if (last) last.textContent = nowBR();
+        }
+
 
         const refreshIndicator = document.getElementById('refreshIndicator');
         const errorBox = document.getElementById('errorBox');
@@ -453,8 +857,22 @@
 
         document.getElementById('btnReload').addEventListener('click', loadData);
 
+        // API status widgets
+        setApiUrlLabels();
+        document.getElementById('btnCheckApis')?.addEventListener('click', checkAllApis);
+        document.querySelectorAll('[data-api-check]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.getAttribute('data-api-check');
+                const url = apiStatusEndpoints[key];
+                if (key && url) checkApi(key, url);
+            });
+        });
+
+
         loadData();
+        checkAllApis();
         setInterval(loadData, 300000); // 5 min
+        setInterval(checkAllApis, 60000);
     </script>
 
     <!-- MENU (reaproveitado) -->
@@ -462,17 +880,22 @@
         (function () {
             const btn = document.getElementById('menuBtn');
             const panel = document.getElementById('menuPanel');
+            if (panel) panel.classList.add('opacity-0', 'scale-95');
 
             if (!btn || !panel) return;
 
             const openMenu = () => {
                 panel.classList.remove('hidden');
+                panel.classList.remove('opacity-0', 'scale-95');
+                panel.classList.add('opacity-100', 'scale-100');
                 btn.setAttribute('aria-expanded', 'true');
             };
 
             const closeMenu = () => {
-                panel.classList.add('hidden');
+                panel.classList.add('opacity-0', 'scale-95');
+                panel.classList.remove('opacity-100', 'scale-100');
                 btn.setAttribute('aria-expanded', 'false');
+                setTimeout(() => panel.classList.add('hidden'), 180);
             };
 
             const toggleMenu = () => {

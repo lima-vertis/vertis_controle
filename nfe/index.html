@@ -33,6 +33,40 @@
     .rotate-180 {
       transform: rotate(180deg);
     }
+
+    /* Menu moderno (sem @apply) — compatível com Tailwind via CDN */
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .625rem 1.25rem;
+      /* px-5 py-2.5 */
+      color: rgb(51 65 85);
+      /* slate-700 */
+      text-decoration: none;
+      position: relative;
+      transition: background-color .2s ease, color .2s ease, transform .2s ease;
+    }
+
+    .menu-item:hover {
+      background: rgb(241 245 249);
+      /* slate-100 */
+      color: rgb(2 6 23);
+      /* near black */
+      transform: translateX(4px);
+    }
+
+    .menu-icon {
+      width: 18px;
+      height: 18px;
+      opacity: .8;
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    .menu-item:hover .menu-icon {
+      opacity: 1;
+      transform: scale(1.1);
+    }
   </style>
 </head>
 
@@ -57,100 +91,75 @@
         </button>
 
         <!-- PAINEL -->
-        <div id="menuPanel" class="absolute left-0 mt-3 w-72 rounded-xl bg-white text-slate-800 shadow-xl
-           hidden overflow-hidden">
+        <div id="menuPanel" class="absolute left-0 mt-3 w-80 rounded-2xl bg-white text-slate-800 shadow-2xl
+       hidden overflow-hidden border border-slate-200 backdrop-blur-xl
+       origin-top-left transform transition-all duration-200">
 
-          <!-- HEADER DO PAINEL (opcional) -->
-          <div class="px-4 py-3 border-b bg-slate-50">
-            <div class="text-xs uppercase tracking-wide text-slate-500">Navegação</div>
+          <!-- HEADER -->
+          <div class="px-5 py-4 border-b bg-gradient-to-r from-slate-50 to-white">
+            <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold">
+              Navegação
+            </div>
           </div>
 
-          <div class="py-2 text-sm">
+          <div class="py-3 text-sm">
 
-            <!-- Início -->
-            <a href="../NFE/index.html" class="block px-4 py-2 text-sm font-semibold hover:bg-slate-100">
+            <!-- INÍCIO -->
+            <a href="../index.html" class="menu-item">
+              <!-- Ícone Home -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.75L12 4l9 6.75M5 10v9h14v-9" />
+              </svg>
               Início
             </a>
 
-            <!-- LAUDOS (nível 1) -->
-            <button type="button"
-              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
-              data-acc-btn="lol">
-              <span>Publicação de Laudos</span>
-              <span class="text-slate-400">›</span>
-            </button>
+            <!-- PUBLICAÇÃO DE LAUDOS -->
+            <a href="../laudos/index.html" class="menu-item">
+              <!-- Ícone Chart -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l6-6 4 4 8-8" />
+              </svg>
+              Publicação de Laudos
+            </a>
 
-            <!-- Conteúdo LAUDOS (nível 2) -->
-            <div class="hidden" data-acc-panel="lol">
-              <a href="../laudos/index.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
-                Visão Geral
-              </a>
+            <!-- NFSe -->
+            <a href="../nfse/index.html" class="menu-item">
+              <!-- Ícone Documento -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13H7z" />
+              </svg>
+              NFSe
+            </a>
+
+            <!-- NFCe / NFe -->
+            <a href="../nfe/index.html" class="menu-item">
+              <!-- Ícone Nota Fiscal -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 14h6M9 10h6M7 3h10v18l-5-3-5 3z" />
+              </svg>
+              NFCe / NFe
+            </a>
+
+            <!-- DESENVOLVIMENTO -->
+            <div class="mt-4 px-5 text-xs uppercase tracking-wider text-slate-400 font-semibold">
+              Desenvolvimento
             </div>
 
-            <!-- DFe (nível 1) -->
-            <button type="button"
-              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
-              data-acc-btn="dfe">
-              <span>DFe (Documentos Fiscais)</span>
-              <span class="text-slate-400">›</span>
-            </button>
+            <a href="../desenv/gerador_pix.html" class="menu-item">
+              <!-- Ícone PIX -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l6 6-6 6-6-6 6-6z" />
+              </svg>
+              Chave PIX
+            </a>
 
-            <!-- Conteúdo DFe (nível 2) -->
-            <div class="hidden" data-acc-panel="dfe">
-
-              <!-- NFe -->
-              <button type="button"
-                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
-                data-acc-btn="nfe">
-                <span>NFe</span>
-                <span class="text-slate-400">›</span>
-              </button>
-
-              <div class="hidden" data-acc-panel="nfe">
-                <a href="../nfe/index.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                  Visão Geral
-                </a>
-                <a href="../nfe/controle_nfe_logs.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                  Erros
-                </a>
-              </div>
-
-              <!-- NFSe -->
-              <button type="button"
-                class="w-full flex items-center justify-between pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700 font-medium"
-                data-acc-btn="nfse">
-                <span>NFSe</span>
-                <span class="text-slate-400">›</span>
-              </button>
-
-              <div class="hidden" data-acc-panel="nfse">
-                <a href="nfse_visao_geral.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                  Visão Geral
-                </a>
-                <a href="nfse_erros.html" class="block pl-12 pr-4 py-2 hover:bg-slate-100">
-                  Erros
-                </a>
-              </div>
-
-            </div>
-
-            <!-- DESENVOLVIMENTO (nível 1) -->
-            <button type="button"
-              class="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-100 font-semibold"
-              data-acc-btn="dev">
-              <span>Desenvolvimento</span>
-              <span class="text-slate-400">›</span>
-            </button>
-
-            <!-- Conteúdo Desenvolvimento (nível 2) -->
-            <div class="hidden" data-acc-panel="dev">
-              <a href="../desenv/gerador_pix.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
-                Chave PIX
-              </a>
-              <a href="../desenv/leitor_pdf.html" class="block pl-8 pr-4 py-2 hover:bg-slate-100 text-slate-700">
-                Leitor PDF (PDF.js)
-              </a>
-            </div>
+            <a href="../desenv/leitor_pdf.html" class="menu-item">
+              <!-- Ícone PDF -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13H7zM12 12h.01" />
+              </svg>
+              Leitor PDF (PDF.js)
+            </a>
 
           </div>
         </div>

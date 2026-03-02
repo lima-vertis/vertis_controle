@@ -5,6 +5,24 @@
   <meta charset="UTF-8" />
   <title>Laudos | Controle</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vertis: {
+              orange: '#F97316',
+              dark: '#0B1220'
+            }
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(2, 6, 23, 0.10)',
+            card: '0 8px 20px rgba(2, 6, 23, 0.08)'
+          }
+        }
+      }
+    }
+  </script>
   <!-- Favicons e Icones -->
   <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png" sizes="180x180">
   <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32">
@@ -169,7 +187,7 @@
 
       <!-- TEXTO -->
       <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
-        Vertis • Laudos • Publicação
+        Vertis <span class="text-vertis-orange">•</span> Laudos <span class="text-vertis-orange">•</span> Publicação
       </h1>
     </div>
 

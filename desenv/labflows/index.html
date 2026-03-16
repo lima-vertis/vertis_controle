@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LabFlows • Consulta Agenda Logística</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(139, 92, 246, 0.18), transparent 24%),
+        radial-gradient(circle at bottom center, rgba(16, 185, 129, 0.12), transparent 30%),
+        linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
+      min-height: 100vh;
+    }
+
+    .glass {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.28);
+    }
+
+    .grid-bg::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(circle at center, black 45%, transparent 85%);
+      opacity: 0.45;
+    }
+
+    .sort-indicator::after {
+      content: '↕';
+      font-size: 11px;
+      margin-left: 6px;
+      opacity: 0.5;
+    }
+
+    .sort-asc::after {
+      content: '↑';
+      opacity: 1;
+    }
+
+    .sort-desc::after {
+      content: '↓';
+      opacity: 1;
+    }
+
+    .scrollbar-modern::-webkit-scrollbar {
+      height: 10px;
+      width: 10px;
+    }
+
+    .scrollbar-modern::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 999px;
+    }
+
+    .scrollbar-modern::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.35);
+      border-radius: 999px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .fade-in {
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body class="text-slate-100 grid-bg">
+  <div class="max-w-7xl mx-auto px-4 py-8 md:px-6 lg:px-8">
+    <header class="mb-8">
+      <div class="flex items-center gap-4 mb-6">
+        <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis"
+          class="h-10 opacity-90" />
+      </div>
+      <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <div
+            class="inline-flex items-center gap-2 rounded-full border border-orange-400/20 bg-orange-400/10 px-3 py-1 text-xs font-medium text-orange-200">
+            Integração LabFlows
+          </div>
+          <h1 class="mt-4 text-3xl md:text-4xl font-bold tracking-tight">Consulta de Agenda Logística</h1>
+          <p class="mt-2 text-slate-300 max-w-3xl">
+            Gere o token de autenticação e consulte Agenda Logística, Clínicas e Motoboys em uma interface moderna, com
+            tabela ordenável e feedback visual em tempo real.
+          </p>
+        </div>
+        <div class="glass rounded-2xl px-4 py-3">
+          <p class="text-xs uppercase tracking-[0.22em] text-slate-400">Status da sessão</p>
+          <div class="mt-2 flex items-center gap-2">
+            <span id="tokenStatusDot"
+              class="h-2.5 w-2.5 rounded-full bg-amber-400 shadow-[0_0_18px_rgba(251,191,36,0.65)]"></span>
+            <span id="tokenStatusText" class="text-sm font-medium text-slate-200">Token ainda não gerado</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="glass rounded-3xl p-5 md:p-6 mb-6 fade-in">
+      <div class="flex items-center justify-between gap-4 flex-wrap mb-5">
+        <div>
+          <h2 class="text-xl font-semibold">Autenticação</h2>
+          <p class="text-sm text-slate-400 mt-1">Use os dados abaixo para gerar o token antes da consulta.</p>
+        </div>
+        <button id="btnGerarToken"
+          class="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition hover:scale-[1.01] hover:shadow-orange-500/35 disabled:cursor-not-allowed disabled:opacity-60">
+          Gerar Token
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <label class="block">
+          <span class="mb-2 block text-sm font-medium text-slate-200">URL</span>
+          <input id="loginUrl" type="text"
+            class="w-full rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-orange-400/50 focus:ring-2 focus:ring-orange-400/20"
+            value="http://constellation.newvertis.com.br/constellation/IISConstellationAPI.dll/login" />
+        </label>
+
+        <label class="block">
+          <span class="mb-2 block text-sm font-medium text-slate-200">Usuário</span>
+          <input id="loginUsuario" type="text"
+            class="w-full rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-orange-400/50 focus:ring-2 focus:ring-orange-400/20"
+            value="itf-labflow" />
+        </label>
+
+        <label class="block">
+          <span class="mb-2 block text-sm font-medium text-slate-200">Senha</span>
+          <div class="relative">
+            <input id="loginSenha" type="password"
+              class="w-full rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 pr-12 text-sm text-slate-100 outline-none transition focus:border-orange-400/50 focus:ring-2 focus:ring-orange-400/20"
+              value="oifwtlflab" />
+            <button type="button" id="toggleSenha"
+              class="absolute inset-y-0 right-0 px-4 text-slate-400 hover:text-slate-200">👁</button>
+          </div>
+        </label>
+
+        <label class="block">
+          <span class="mb-2 block text-sm font-medium text-slate-200">Token</span>
+          <div class="flex gap-2">
+            <input id="tokenInput" type="text" readonly
+              class="w-full rounded-2xl border border-emerald-400/15 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-100 outline-none"
+              placeholder="O token gerado aparecerá aqui" />
+            <button id="copiarToken" type="button"
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10">Copiar</button>
+          </div>
+        </label>
+
+        <label class="block xl:col-span-2">
+          <span class="mb-2 block text-sm font-medium text-slate-200">JSON</span>
+          <textarea id="loginJson" rows="4"
+            class="w-full rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-orange-400/50 focus:ring-2 focus:ring-orange-400/20">{"unid_negoc": 91, "unid_oper": 1, "dev_mode": "S", "svcName":"itf-labflow"}</textarea>
+        </label>
+      </div>
+    </section>
+
+    <section class="glass rounded-3xl p-5 md:p-6 mb-6 fade-in">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h2 class="text-xl font-semibold">Consulta</h2>
+          <p class="text-sm text-slate-400 mt-1">Selecione o recurso que deseja pesquisar usando o token atual.</p>
+        </div>
+
+        <div
+          class="inline-flex rounded-2xl border border-white/10 bg-slate-950/40 p-1 overflow-x-auto scrollbar-modern">
+          <button type="button"
+            class="toggle-btn rounded-xl px-4 py-2 text-sm font-medium transition bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/20"
+            data-tipo="agenda">Agenda Logística</button>
+          <button type="button"
+            class="toggle-btn rounded-xl px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/5"
+            data-tipo="clinicas">Clínicas</button>
+          <button type="button"
+            class="toggle-btn rounded-xl px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/5"
+            data-tipo="motoboys">Motoboys</button>
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center gap-3 flex-wrap">
+          <span class="badge"><span class="h-2 w-2 rounded-full bg-orange-400"></span><span
+              id="tipoConsultaLabel">Agenda Logística</span></span>
+          <span class="badge"><span class="h-2 w-2 rounded-full bg-violet-400"></span><span id="totalRegistros">0
+              registros</span></span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div id="loadingWrap" class="hidden items-center gap-2 text-sm text-slate-300">
+            <span class="h-2.5 w-2.5 animate-pulse rounded-full bg-orange-400"></span>
+            Carregando dados...
+          </div>
+          <button id="btnPesquisar"
+            class="inline-flex items-center justify-center rounded-2xl bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15 border border-white/10 disabled:cursor-not-allowed disabled:opacity-60">
+            Pesquisar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass rounded-3xl p-4 md:p-6 fade-in">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+        <div>
+          <h3 id="tituloTabela" class="text-lg font-semibold">Resultados • Agenda Logística</h3>
+          <p id="subtituloTabela" class="text-sm text-slate-400 mt-1">Nenhuma consulta executada até o momento.</p>
+        </div>
+        <div class="w-full md:w-72">
+          <input id="filtroRapido" type="text" placeholder="Filtrar resultados na tabela..."
+            class="w-full rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-orange-400/50 focus:ring-2 focus:ring-orange-400/20" />
+        </div>
+      </div>
+
+      <div id="mensagemErro"
+        class="hidden mb-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200"></div>
+
+      <div class="overflow-auto scrollbar-modern rounded-2xl border border-white/10">
+        <table class="min-w-full divide-y divide-white/10">
+          <thead id="tableHead" class="bg-white/5"></thead>
+          <tbody id="tableBody" class="divide-y divide-white/5 bg-slate-950/30"></tbody>
+        </table>
+      </div>
+
+      <div id="estadoVazio" class="py-16 text-center text-slate-400">
+        Gere um token e clique em <strong class="text-slate-200">Pesquisar</strong> para visualizar os dados.
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      tipoConsulta: 'agenda',
+      rawData: [],
+      filteredData: [],
+      sortKey: null,
+      sortDirection: 'asc'
+    };
+
+    const endpoints = {
+      agenda: {
+        label: 'Agenda Logística',
+        url: 'http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/agenda_logistica_nv',
+        columns: [
+          { key: 'id', label: 'ID' },
+          { key: 'nom_unid_oper', label: 'Unidade' },
+          { key: 'situacao', label: 'Situação' },
+          { key: 'desc_tip_servico', label: 'Tipo Serviço' },
+          { key: 'desc_frm_execucao', label: 'Forma' },
+          { key: 'desc_sit_solic', label: 'Situação' },
+          { key: 'ind_tip_parceiro', label: 'Tipo' },
+          { key: 'nom_solicitante', label: 'Solicitante' },
+          { key: 'nom_operador_logistico', label: 'Motoboy' },
+          { key: 'acao', label: 'Ação' }
+        ]
+      },
+      clinicas: {
+        label: 'Clínicas',
+        url: 'http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/parc_clinica',
+        columns: [
+          { key: 'cod_parceiro', label: 'Código' },
+          { key: 'nom_parceiro', label: 'Nome' },
+          { key: 'num_cnpj_cpf', label: 'CNPJ/CPF' }
+        ]
+      },
+      motoboys: {
+        label: 'Motoboys',
+        url: 'http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/parc_motoboy',
+        columns: [
+          { key: 'cod_parceiro', label: 'Código' },
+          { key: 'nom_parceiro', label: 'Nome' },
+          { key: 'num_cnpj_cpf', label: 'CNPJ/CPF' }
+        ]
+      }
+    };
+
+    const els = {
+      loginUrl: document.getElementById('loginUrl'),
+      loginJson: document.getElementById('loginJson'),
+      loginUsuario: document.getElementById('loginUsuario'),
+      loginSenha: document.getElementById('loginSenha'),
+      tokenInput: document.getElementById('tokenInput'),
+      btnGerarToken: document.getElementById('btnGerarToken'),
+      btnPesquisar: document.getElementById('btnPesquisar'),
+      tableHead: document.getElementById('tableHead'),
+      tableBody: document.getElementById('tableBody'),
+      estadoVazio: document.getElementById('estadoVazio'),
+      mensagemErro: document.getElementById('mensagemErro'),
+      filtroRapido: document.getElementById('filtroRapido'),
+      toggleButtons: [...document.querySelectorAll('.toggle-btn')],
+      tipoConsultaLabel: document.getElementById('tipoConsultaLabel'),
+      tituloTabela: document.getElementById('tituloTabela'),
+      subtituloTabela: document.getElementById('subtituloTabela'),
+      totalRegistros: document.getElementById('totalRegistros'),
+      tokenStatusDot: document.getElementById('tokenStatusDot'),
+      tokenStatusText: document.getElementById('tokenStatusText'),
+      loadingWrap: document.getElementById('loadingWrap'),
+      copiarToken: document.getElementById('copiarToken'),
+      toggleSenha: document.getElementById('toggleSenha')
+    };
+
+    function showError(message) {
+      els.mensagemErro.textContent = message;
+      els.mensagemErro.classList.remove('hidden');
+    }
+
+    function hideError() {
+      els.mensagemErro.classList.add('hidden');
+      els.mensagemErro.textContent = '';
+    }
+
+    function setLoading(isLoading, button) {
+      els.loadingWrap.classList.toggle('hidden', !isLoading);
+      els.loadingWrap.classList.toggle('flex', isLoading);
+      if (button) button.disabled = isLoading;
+      if (button === els.btnGerarToken) {
+        button.textContent = isLoading ? 'Gerando...' : 'Gerar Token';
+      }
+      if (button === els.btnPesquisar) {
+        button.textContent = isLoading ? 'Pesquisando...' : 'Pesquisar';
+      }
+    }
+
+    function getTokenValue(payload) {
+      if (!payload || typeof payload !== 'object') return '';
+      const candidates = ['token', 'access_token', 'jwt', 'authorization', 'Authorization'];
+      for (const key of candidates) {
+        if (payload[key]) return String(payload[key]);
+      }
+      return '';
+    }
+
+    function formatCell(value) {
+      if (value === null || value === undefined || value === '') return '—';
+      return String(value);
+    }
+
+    function compareValues(a, b) {
+      const av = a ?? '';
+      const bv = b ?? '';
+
+      const an = Number(av);
+      const bn = Number(bv);
+      const bothNumbers = !Number.isNaN(an) && !Number.isNaN(bn) && av !== '' && bv !== '';
+
+      if (bothNumbers) return an - bn;
+      return String(av).localeCompare(String(bv), 'pt-BR', { numeric: true, sensitivity: 'base' });
+    }
+
+    function applyFilterAndSort() {
+      const term = els.filtroRapido.value.trim().toLowerCase();
+      const cols = endpoints[state.tipoConsulta].columns;
+
+      let data = [...state.rawData];
+
+      if (term) {
+        data = data.filter(row =>
+          cols.some(col => String(row[col.key] ?? '').toLowerCase().includes(term))
+        );
+      }
+
+      if (state.sortKey) {
+        data.sort((a, b) => {
+          const result = compareValues(a[state.sortKey], b[state.sortKey]);
+          return state.sortDirection === 'asc' ? result : -result;
+        });
+      }
+
+      state.filteredData = data;
+      renderTable();
+    }
+
+    function renderTable() {
+      const config = endpoints[state.tipoConsulta];
+      const cols = config.columns;
+      const rows = state.filteredData;
+
+      els.tituloTabela.textContent = `Resultados • ${config.label}`;
+      els.subtituloTabela.textContent = rows.length
+        ? `${rows.length} registro(s) exibido(s) na tabela.`
+        : 'Nenhum registro encontrado para os critérios atuais.';
+      els.totalRegistros.textContent = `${rows.length} registro(s)`;
+
+      els.tableHead.innerHTML = `
+        <tr>
+          ${cols.map(col => {
+        const cls = state.sortKey === col.key
+          ? state.sortDirection === 'asc' ? 'sort-indicator sort-asc' : 'sort-indicator sort-desc'
+          : 'sort-indicator';
+        return `<th data-key="${col.key}" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 cursor-pointer whitespace-nowrap ${cls}">${col.label}</th>`;
+      }).join('')}
+        </tr>
+      `;
+
+      if (!rows.length) {
+        els.tableBody.innerHTML = '';
+        els.estadoVazio.classList.remove('hidden');
+        return;
+      }
+
+      els.estadoVazio.classList.add('hidden');
+      els.tableBody.innerHTML = rows.map(row => `
+        <tr class="transition hover:bg-white/5">
+          ${cols.map(col => `<td class="px-4 py-3 text-sm text-slate-200 whitespace-nowrap">${escapeHtml(formatCell(row[col.key]))}</td>`).join('')}
+        </tr>
+      `).join('');
+
+      [...els.tableHead.querySelectorAll('th[data-key]')].forEach(th => {
+        th.addEventListener('click', () => {
+          const { key } = th.dataset;
+          if (state.sortKey === key) {
+            state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+          } else {
+            state.sortKey = key;
+            state.sortDirection = 'asc';
+          }
+          applyFilterAndSort();
+        });
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function normalizeArrayResponse(payload) {
+      if (Array.isArray(payload)) return payload;
+      if (payload && Array.isArray(payload.data)) return payload.data;
+      if (payload && Array.isArray(payload.result)) return payload.result;
+      if (payload && Array.isArray(payload.rows)) return payload.rows;
+      return [];
+    }
+
+    async function gerarToken() {
+      hideError();
+      setLoading(true, els.btnGerarToken);
+
+      try {
+        let parsedJson;
+        try {
+          parsedJson = JSON.parse(els.loginJson.value);
+        } catch {
+          throw new Error('O conteúdo do campo JSON não é válido.');
+        }
+
+        const credentials = btoa(`${els.loginUsuario.value.trim()}:${els.loginSenha.value}`);
+
+        const response = await fetch(els.loginUrl.value.trim(), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${credentials}` // Assumindo Basic Auth            
+          },
+          body: JSON.stringify(parsedJson)
+        });
+
+        const rawText = await response.text();
+        let payload = {};
+        try {
+          payload = rawText ? JSON.parse(rawText) : {};
+        } catch {
+          payload = { raw: rawText };
+        }
+
+        if (!response.ok) {
+          throw new Error(payload.message || payload.msg || rawText || `Erro HTTP ${response.status}`);
+        }
+
+        const token = getTokenValue(payload);
+        if (!token) {
+          throw new Error('A resposta do login não trouxe um campo de token reconhecido. Ajuste a função getTokenValue conforme o retorno real da API.');
+        }
+
+        els.tokenInput.value = token;
+        els.tokenStatusDot.className = 'h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.65)]';
+        els.tokenStatusText.textContent = 'Token gerado com sucesso';
+      } catch (error) {
+        els.tokenInput.value = '';
+        els.tokenStatusDot.className = 'h-2.5 w-2.5 rounded-full bg-red-400 shadow-[0_0_18px_rgba(248,113,113,0.65)]';
+        els.tokenStatusText.textContent = 'Falha ao gerar token';
+        showError(error.message || 'Não foi possível gerar o token.');
+      } finally {
+        setLoading(false, els.btnGerarToken);
+      }
+    }
+
+    async function pesquisar() {
+      hideError();
+
+      const token = els.tokenInput.value.trim();
+      if (!token) {
+        showError('Gere o token antes de executar a pesquisa.');
+        return;
+      }
+
+      setLoading(true, els.btnPesquisar);
+
+      try {
+        const config = endpoints[state.tipoConsulta];
+        const response = await fetch(config.url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Ajuste se for apenas "Token {token}"
+          }
+        });
+
+        const rawText = await response.text();
+        let payload = [];
+        try {
+          payload = rawText ? JSON.parse(rawText) : [];
+        } catch {
+          throw new Error('A API retornou um conteúdo que não é JSON válido.');
+        }
+
+        if (!response.ok) {
+          throw new Error(payload.message || payload.msg || rawText || `Erro HTTP ${response.status}`);
+        }
+
+        state.rawData = normalizeArrayResponse(payload);
+        state.sortKey = null;
+        state.sortDirection = 'asc';
+        applyFilterAndSort();
+      } catch (error) {
+        state.rawData = [];
+        state.filteredData = [];
+        renderTable();
+        showError(error.message || 'Não foi possível carregar os dados.');
+      } finally {
+        setLoading(false, els.btnPesquisar);
+      }
+    }
+
+    function updateTipoConsulta(tipo) {
+      state.tipoConsulta = tipo;
+      const config = endpoints[tipo];
+      els.tipoConsultaLabel.textContent = config.label;
+
+      els.toggleButtons.forEach(btn => {
+        const active = btn.dataset.tipo === tipo;
+        btn.className = active
+          ? 'toggle-btn rounded-xl px-4 py-2 text-sm font-medium transition bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/20'
+          : 'toggle-btn rounded-xl px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/5';
+      });
+
+      state.rawData = [];
+      state.filteredData = [];
+      state.sortKey = null;
+      state.sortDirection = 'asc';
+      els.filtroRapido.value = '';
+      renderTable();
+    }
+
+    els.btnGerarToken.addEventListener('click', gerarToken);
+    els.btnPesquisar.addEventListener('click', pesquisar);
+    els.filtroRapido.addEventListener('input', applyFilterAndSort);
+    els.toggleButtons.forEach(btn => btn.addEventListener('click', () => updateTipoConsulta(btn.dataset.tipo)));
+
+    els.copiarToken.addEventListener('click', async () => {
+      const token = els.tokenInput.value.trim();
+      if (!token) return;
+      try {
+        await navigator.clipboard.writeText(token);
+        els.copiarToken.textContent = 'Copiado!';
+        setTimeout(() => els.copiarToken.textContent = 'Copiar', 1500);
+      } catch {
+        showError('Não foi possível copiar o token para a área de transferência.');
+      }
+    });
+
+    els.toggleSenha.addEventListener('click', () => {
+      els.loginSenha.type = els.loginSenha.type === 'password' ? 'text' : 'password';
+    });
+
+    renderTable();
+  </script>
+</body>
+
+</html>

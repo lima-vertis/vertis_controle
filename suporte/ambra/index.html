@@ -309,14 +309,22 @@
       <div class="relative grid grid-cols-1 lg:grid-cols-[1.2fr_.8fr] gap-6 items-center">
         <div>
           <span
-            class="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-vertis-orange font-semibold">Ferramenta
-            • Wizard Onboarding</span>
+            class="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-vertis-orange font-semibold">F
+            e r r a m e n t a
+            • A p o i o</span>
           <h2 class="mt-3 text-2xl lg:text-4xl font-bold leading-tight">
-            Suporte • AMBRA com fluxo guiado
+            Suporte • AMBRA
           </h2>
           <p class="mt-3 text-sm text-slate-300 max-w-2xl">
-            Um wizard em etapas para autenticar, localizar o estudo e gerar o link de visualização com menos erro
-            operacional e leitura mais rápida do diagnóstico.
+            Ferramenta para validar se o número de acesso existe no
+            <a href="https://access.ambrahealth.com/" target="_blank" rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 text-orange-400 hover:underline">
+              Portal Ambra
+
+              <svg class="w-4 h-4 opacity-80" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 3h7m0 0v7m0-7L10 14M5 5v14h14" />
+              </svg>
+            </a>.
           </p>
           <div class="mt-5 flex flex-wrap gap-2">
             <span class="mini-pill">Fluxo guiado</span>
@@ -1012,8 +1020,8 @@
     }
 
     async function generateLink() {
-      //const url = els.linkUrl.value.trim();
-      const url = "/api/suporte/ambra";
+      const url = els.linkUrl.value.trim();
+      //const url = "/api/suporte/ambra";
       const sid = els.sidStep3.value.trim();
       const studyId = els.uuidStep3.value.trim();
       const action = els.actionStep3.value.trim();

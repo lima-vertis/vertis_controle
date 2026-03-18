@@ -1,0 +1,1215 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vertis • Ambra • Validador de Acesso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              vertis: {
+                orange: "#F97316",
+                dark: "#0B1220",
+              },
+            },
+            boxShadow: {
+              soft: "0 10px 30px rgba(2, 6, 23, 0.10)",
+              card: "0 8px 20px rgba(2, 6, 23, 0.08)",
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              pulseSoft: "pulseSoft 2.2s ease-in-out infinite",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-6px)" },
+              },
+              pulseSoft: {
+                "0%, 100%": { opacity: "0.75" },
+                "50%": { opacity: "1" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      rel="apple-touch-icon"
+      href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png"
+      sizes="180x180"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://v1.laudosonline.com.br/assets/images/favicon.png"
+      sizes="32x32"
+    />
+    <style>
+      .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.625rem 1.25rem;
+        color: rgb(51 65 85);
+        text-decoration: none;
+        position: relative;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .menu-item:hover {
+        background: rgb(241 245 249);
+        color: rgb(2 6 23);
+        transform: translateX(4px);
+      }
+
+      .menu-icon {
+        width: 18px;
+        height: 18px;
+        opacity: 0.8;
+        transition:
+          transform 0.2s ease,
+          opacity 0.2s ease;
+      }
+
+      .menu-item:hover .menu-icon {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+
+      .glass {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(12px);
+      }
+
+      .status-dot {
+        width: 0.65rem;
+        height: 0.65rem;
+        border-radius: 9999px;
+        display: inline-block;
+      }
+
+      .fade-in {
+        animation: fadeInUp 0.28s ease-out;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 1;
+          transform: translateY(6px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gradient-to-br from-slate-100 via-slate-100 to-slate-200 min-h-screen flex flex-col text-slate-800"
+  >
+    <header
+      class="sticky top-0 z-50 backdrop-blur bg-gradient-to-r from-vertis-dark via-slate-900 to-slate-950/95 text-white px-6 py-4 flex justify-between items-center shadow-lg shadow-black/10 border-b border-white/10"
+    >
+      <div class="flex items-center gap-4">
+        <nav class="relative">
+          <button
+            id="menuBtn"
+            class="p-2 rounded-lg hover:bg-slate-800 transition"
+            aria-label="Abrir menu"
+            aria-expanded="false"
+            aria-controls="menuPanel"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+
+          <div
+            id="menuPanel"
+            class="absolute left-0 mt-3 w-80 rounded-2xl bg-white text-slate-800 shadow-2xl hidden overflow-hidden border border-slate-200 backdrop-blur-xl origin-top-left transform transition-all duration-200"
+          >
+            <div
+              class="px-5 py-4 border-b bg-gradient-to-r from-slate-50 to-white"
+            >
+              <div
+                class="text-xs uppercase tracking-wider text-slate-500 font-semibold"
+              >
+                Navegação
+              </div>
+            </div>
+            <div class="py-3 text-sm">
+              <a href="../index.html" class="menu-item">
+                <svg
+                  class="menu-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3 10.75L12 4l9 6.75M5 10v9h14v-9"
+                  />
+                </svg>
+                Início
+              </a>
+              <a href="../suporte/vetex/index.html" class="menu-item">
+                <svg
+                  class="menu-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 3l6 6-6 6-6-6 6-6z"
+                  />
+                </svg>
+                Vetex
+              </a>
+              <a href="../suporte/lapavet/index.html" class="menu-item">
+                <svg
+                  class="menu-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M7 3h7l5 5v13H7zM12 12h.01"
+                  />
+                </svg>
+                Lapavet
+              </a>
+              <div
+                class="mt-4 px-5 text-xs uppercase tracking-wider text-slate-400 font-semibold"
+              >
+                Ferramentas
+              </div>
+              <a href="#step-auth" class="menu-item">
+                <svg
+                  class="menu-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 11c1.657 0 3-1.567 3-3.5S13.657 4 12 4 9 5.567 9 7.5s1.343 3.5 3 3.5zm-7 9a7 7 0 0114 0"
+                  />
+                </svg>
+                1. Autenticação
+              </a>
+              <a href="#step-study" class="menu-item">
+                <svg
+                  class="menu-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 6h16M4 12h16M4 18h10"
+                  />
+                </svg>
+                2. Lista de Estudo
+              </a>
+              <a href="#step-link" class="menu-item">
+                <svg
+                  class="menu-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.828 10.172a4 4 0 010 5.656l-2 2a4 4 0 01-5.656-5.656l1-1m9.656 1.828a4 4 0 010-5.656l-2-2a4 4 0 00-5.656 5.656l1 1"
+                  />
+                </svg>
+                3. Link / Visualização
+              </a>
+            </div>
+          </div>
+        </nav>
+
+        <div>
+          <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
+            Vertis <span class="text-vertis-orange">•</span> Ambra
+            <span class="text-vertis-orange">•</span> Validador de Acesso
+          </h1>
+          <p class="text-xs text-slate-300 mt-0.5">
+            Ferramenta de apoio para o time de suporte validar acesso e
+            visualização de estudo.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span
+          id="globalStatus"
+          class="hidden md:inline-flex items-center gap-2 text-xs text-slate-200 bg-white/10 border border-white/10 rounded-full px-3 py-1.5"
+        >
+          <span class="status-dot bg-slate-400 animate-pulse"></span>
+          Aguardando ação
+        </span>
+        <img
+          src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png"
+          alt="Vertis"
+          class="h-8"
+        />
+      </div>
+    </header>
+
+    <main class="p-6 flex-1 space-y-6">
+      <section
+        class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-vertis-dark via-slate-900 to-slate-950 text-white shadow-2xl shadow-slate-900/10 p-6 lg:p-8"
+      >
+        <div
+          class="absolute -top-8 -right-8 w-40 h-40 bg-vertis-orange/20 blur-3xl rounded-full animate-pulseSoft"
+        ></div>
+        <div
+          class="absolute bottom-0 left-1/3 w-52 h-52 bg-white/5 blur-3xl rounded-full animate-float"
+        ></div>
+        <div
+          class="relative grid grid-cols-1 lg:grid-cols-[1.5fr_.9fr] gap-6 items-center"
+        >
+          <div>
+            <span
+              class="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-vertis-orange font-semibold"
+              >Suporte • Diagnóstico Ambra</span
+            >
+            <h2 class="mt-3 text-2xl lg:text-3xl font-bold leading-tight">
+              Valide autenticação, existência do estudo e geração do link em um
+              único fluxo.
+            </h2>
+            <p class="mt-3 text-sm text-slate-300 max-w-2xl">
+              A página foi estruturada no mesmo padrão visual dos monitoramentos
+              internos, com três painéis independentes e encadeados para
+              facilitar o diagnóstico do número de acesso informado.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
+            <div
+              class="glass rounded-2xl p-4 border border-white/20 text-slate-800"
+            >
+              <div class="flex items-center justify-between">
+                <span
+                  class="text-xs uppercase tracking-wider text-slate-500 font-semibold"
+                  >Passo 1</span
+                >
+                <span
+                  id="stepStatusAuth"
+                  class="status-dot bg-slate-300"
+                ></span>
+              </div>
+              <div class="mt-3 text-sm font-semibold">Autenticação</div>
+              <div id="stepHintAuth" class="mt-1 text-xs text-slate-500">
+                Informe usuário e senha.
+              </div>
+            </div>
+            <div
+              class="glass rounded-2xl p-4 border border-white/20 text-slate-800"
+            >
+              <div class="flex items-center justify-between">
+                <span
+                  class="text-xs uppercase tracking-wider text-slate-500 font-semibold"
+                  >Passo 2</span
+                >
+                <span
+                  id="stepStatusStudy"
+                  class="status-dot bg-slate-300"
+                ></span>
+              </div>
+              <div class="mt-3 text-sm font-semibold">Lista de Estudo</div>
+              <div id="stepHintStudy" class="mt-1 text-xs text-slate-500">
+                Consulta por número de acesso.
+              </div>
+            </div>
+            <div
+              class="glass rounded-2xl p-4 border border-white/20 text-slate-800"
+            >
+              <div class="flex items-center justify-between">
+                <span
+                  class="text-xs uppercase tracking-wider text-slate-500 font-semibold"
+                  >Passo 3</span
+                >
+                <span
+                  id="stepStatusLink"
+                  class="status-dot bg-slate-300"
+                ></span>
+              </div>
+              <div class="mt-3 text-sm font-semibold">Link / Visualização</div>
+              <div id="stepHintLink" class="mt-1 text-xs text-slate-500">
+                Gera o redirect_url.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div
+          class="bg-white rounded-2xl shadow-card p-4 border border-slate-200/70"
+        >
+          <div
+            class="text-xs uppercase tracking-wider text-slate-400 font-semibold"
+          >
+            SID atual
+          </div>
+          <div
+            id="summarySid"
+            class="mt-2 text-sm font-mono break-all text-slate-700"
+          >
+            —
+          </div>
+        </div>
+        <div
+          class="bg-white rounded-2xl shadow-card p-4 border border-slate-200/70"
+        >
+          <div
+            class="text-xs uppercase tracking-wider text-slate-400 font-semibold"
+          >
+            UUID atual
+          </div>
+          <div
+            id="summaryUuid"
+            class="mt-2 text-sm font-mono break-all text-slate-700"
+          >
+            —
+          </div>
+        </div>
+        <div
+          class="bg-white rounded-2xl shadow-card p-4 border border-slate-200/70"
+        >
+          <div
+            class="text-xs uppercase tracking-wider text-slate-400 font-semibold"
+          >
+            redirect_url
+          </div>
+          <div
+            id="summaryRedirect"
+            class="mt-2 text-sm break-all text-slate-700"
+          >
+            —
+          </div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+        <article
+          id="step-auth"
+          class="bg-white rounded-3xl shadow-soft border border-slate-200 overflow-hidden fade-in"
+        >
+          <div
+            class="px-5 py-4 border-b bg-gradient-to-r from-white to-slate-50"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div
+                  class="text-xs uppercase tracking-wider text-vertis-orange font-semibold"
+                >
+                  Passo 1
+                </div>
+                <h3 class="text-lg font-semibold text-slate-800 mt-1">
+                  Autenticação
+                </h3>
+                <p class="text-sm text-slate-500 mt-1">
+                  Faz o login na Ambra e captura o
+                  <span class="font-semibold">sid</span> do retorno.
+                </p>
+              </div>
+              <span
+                id="badgeAuth"
+                class="text-xs px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200"
+                >Pendente</span
+              >
+            </div>
+          </div>
+
+          <div class="p-5 space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >Login Ambra</label
+              >
+              <input
+                id="authUrl"
+                type="text"
+                class="w-full rounded-2xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                value="https://access.ambrahealth.com/api/v3/session/login"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >Usuário</label
+              >
+              <input
+                id="authUser"
+                type="text"
+                autocomplete="username"
+                class="w-full rounded-2xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                placeholder="usuario@cliente.com.br"
+                value="dummyuser9@ambrasaude.com.br"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >Senha</label
+              >
+              <input
+                id="authPassword"
+                type="password"
+                autocomplete="current-password"
+                class="w-full rounded-2xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                placeholder="••••••••"
+                value="/fIV:'8]O76C"
+              />
+            </div>
+            <div class="flex gap-3 pt-2">
+              <button
+                id="btnAuthenticate"
+                class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-vertis-orange text-white font-medium hover:brightness-110 transition shadow-lg shadow-orange-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span>Autenticar</span>
+              </button>
+              <button
+                type="button"
+                data-copy-target="sidStep2"
+                class="copy-btn inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition"
+              >
+                Copiar SID
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article
+          id="step-study"
+          class="bg-white rounded-3xl shadow-soft border border-slate-200 overflow-hidden fade-in"
+        >
+          <div
+            class="px-5 py-4 border-b bg-gradient-to-r from-white to-slate-50"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div
+                  class="text-xs uppercase tracking-wider text-vertis-orange font-semibold"
+                >
+                  Passo 2
+                </div>
+                <h3 class="text-lg font-semibold text-slate-800 mt-1">
+                  Lista de Estudo
+                </h3>
+                <p class="text-sm text-slate-500 mt-1">
+                  Consulta o estudo pelo número de acesso e retorna o
+                  <span class="font-semibold">uuid</span> do primeiro item.
+                </p>
+              </div>
+              <span
+                id="badgeStudy"
+                class="text-xs px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200"
+                >Pendente</span
+              >
+            </div>
+          </div>
+
+          <div class="p-5 space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >Link Estudo</label
+              >
+              <input
+                id="studyUrl"
+                type="text"
+                class="w-full rounded-2xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                value="https://access.ambrahealth.com/api/v3/study/list"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >SID</label
+              >
+              <input
+                id="sidStep2"
+                type="text"
+                class="w-full rounded-2xl border border-slate-300 px-4 py-3 font-mono focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                placeholder="Será preenchido após autenticação"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >Número de Acesso</label
+              >
+              <input
+                id="accessionNumber"
+                type="text"
+                class="w-full rounded-2xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                placeholder="Ex.: 211042651"
+                value="211042651"
+              />
+            </div>
+            <div class="flex gap-3 pt-2">
+              <button
+                id="btnStudy"
+                class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-900 text-white font-medium hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Consultar Estudo
+              </button>
+              <button
+                type="button"
+                data-copy-target="uuidStep3"
+                class="copy-btn inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition"
+              >
+                Copiar UUID
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article
+          id="step-link"
+          class="bg-white rounded-3xl shadow-soft border border-slate-200 overflow-hidden fade-in"
+        >
+          <div
+            class="px-5 py-4 border-b bg-gradient-to-r from-white to-slate-50"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div
+                  class="text-xs uppercase tracking-wider text-vertis-orange font-semibold"
+                >
+                  Passo 3
+                </div>
+                <h3 class="text-lg font-semibold text-slate-800 mt-1">
+                  Link / Visualização
+                </h3>
+                <p class="text-sm text-slate-500 mt-1">
+                  Gera o <span class="font-semibold">redirect_url</span> com
+                  base no SID e no UUID localizados.
+                </p>
+              </div>
+              <span
+                id="badgeLink"
+                class="text-xs px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200"
+                >Pendente</span
+              >
+            </div>
+          </div>
+
+          <div class="p-5 space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >Link Add</label
+              >
+              <input
+                id="linkUrl"
+                type="text"
+                class="w-full rounded-2xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                value="https://access.ambrahealth.com/api/v3/link/add"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >SID</label
+              >
+              <input
+                id="sidStep3"
+                type="text"
+                class="w-full rounded-2xl border border-slate-300 px-4 py-3 font-mono focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                placeholder="Será preenchido após autenticação"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >UUID</label
+              >
+              <input
+                id="uuidStep3"
+                type="text"
+                class="w-full rounded-2xl border border-slate-300 px-4 py-3 font-mono focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                placeholder="Será preenchido após consulta do estudo"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >Ação</label
+              >
+              <input
+                id="actionStep3"
+                type="text"
+                class="w-full rounded-2xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                value="STUDY_VIEW"
+              />
+            </div>
+            <div class="flex gap-3 pt-2">
+              <button
+                id="btnLink"
+                class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-emerald-600 text-white font-medium hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Gerar Link
+              </button>
+              <button
+                id="btnVisualizar"
+                class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                Visualizar
+              </button>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >redirect_url</label
+              >
+              <div class="flex gap-2">
+                <input
+                  id="redirectUrl"
+                  type="text"
+                  class="w-full rounded-2xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                  placeholder="Será preenchido após geração do link"
+                />
+                <button
+                  type="button"
+                  data-copy-target="redirectUrl"
+                  class="copy-btn px-4 py-3 rounded-2xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition"
+                >
+                  Copiar
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section
+        class="bg-white rounded-3xl shadow-soft border border-slate-200 overflow-hidden"
+      >
+        <div
+          class="px-5 py-4 border-b bg-gradient-to-r from-white to-slate-50 flex items-center justify-between gap-3"
+        >
+          <div>
+            <div
+              class="text-xs uppercase tracking-wider text-vertis-orange font-semibold"
+            >
+              Retorno técnico
+            </div>
+            <h3 class="text-lg font-semibold text-slate-800 mt-1">
+              JSON da última operação
+            </h3>
+          </div>
+          <button
+            id="btnClearJson"
+            class="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200"
+          >
+            Limpar
+          </button>
+        </div>
+        <pre
+          id="jsonViewer"
+          class="p-5 text-xs leading-6 bg-slate-950 text-emerald-300 overflow-auto max-h-[28rem]"
+        >
+Nenhum retorno recebido.</pre
+        >
+      </section>
+
+      <section
+        class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-900"
+      >
+        <div class="font-semibold">Observação importante</div>
+        <p class="mt-1">
+          Como a página faz chamadas diretas do navegador para a Ambra, o
+          funcionamento depende da política de CORS e das permissões da
+          rede/ambiente. Caso o navegador bloqueie a requisição, será necessário
+          utilizar um proxy ou backend intermediário.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const els = {
+        authUrl: document.getElementById("authUrl"),
+        authUser: document.getElementById("authUser"),
+        authPassword: document.getElementById("authPassword"),
+        studyUrl: document.getElementById("studyUrl"),
+        sidStep2: document.getElementById("sidStep2"),
+        accessionNumber: document.getElementById("accessionNumber"),
+        linkUrl: document.getElementById("linkUrl"),
+        sidStep3: document.getElementById("sidStep3"),
+        uuidStep3: document.getElementById("uuidStep3"),
+        actionStep3: document.getElementById("actionStep3"),
+        redirectUrl: document.getElementById("redirectUrl"),
+        btnAuthenticate: document.getElementById("btnAuthenticate"),
+        btnStudy: document.getElementById("btnStudy"),
+        btnLink: document.getElementById("btnLink"),
+        btnVisualizar: document.getElementById("btnVisualizar"),
+        badgeAuth: document.getElementById("badgeAuth"),
+        badgeStudy: document.getElementById("badgeStudy"),
+        badgeLink: document.getElementById("badgeLink"),
+        stepStatusAuth: document.getElementById("stepStatusAuth"),
+        stepStatusStudy: document.getElementById("stepStatusStudy"),
+        stepStatusLink: document.getElementById("stepStatusLink"),
+        stepHintAuth: document.getElementById("stepHintAuth"),
+        stepHintStudy: document.getElementById("stepHintStudy"),
+        stepHintLink: document.getElementById("stepHintLink"),
+        summarySid: document.getElementById("summarySid"),
+        summaryUuid: document.getElementById("summaryUuid"),
+        summaryRedirect: document.getElementById("summaryRedirect"),
+        jsonViewer: document.getElementById("jsonViewer"),
+        globalStatus: document.getElementById("globalStatus"),
+      };
+
+      function setGlobalStatus(text, color = "bg-slate-400") {
+        const dot = els.globalStatus.querySelector(".status-dot");
+        dot.className = `status-dot ${color} animate-pulse`;
+        els.globalStatus.lastChild.textContent = ` ${text}`;
+      }
+
+      function setBadge(step, label, tone) {
+        const map = {
+          pending: "bg-slate-100 text-slate-500 border-slate-200",
+          progress: "bg-amber-50 text-amber-700 border-amber-200",
+          success: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          error: "bg-rose-50 text-rose-700 border-rose-200",
+        };
+        step.className = `text-xs px-3 py-1.5 rounded-full border ${map[tone] || map.pending}`;
+        step.textContent = label;
+      }
+
+      function setStepDot(dot, tone) {
+        const tones = {
+          pending: "bg-slate-300",
+          progress: "bg-amber-400",
+          success: "bg-emerald-500",
+          error: "bg-rose-500",
+        };
+        dot.className = `status-dot ${tones[tone] || tones.pending}`;
+      }
+
+      function prettyJson(data) {
+        return typeof data === "string" ? data : JSON.stringify(data, null, 2);
+      }
+
+      function showJson(data) {
+        els.jsonViewer.textContent = prettyJson(data);
+      }
+
+      function logTimeline() {}
+
+      function syncSummaries() {
+        els.summarySid.textContent = els.sidStep2.value || "—";
+        els.summaryUuid.textContent = els.uuidStep3.value || "—";
+        els.summaryRedirect.textContent = els.redirectUrl.value || "—";
+        els.btnVisualizar.disabled = !els.redirectUrl.value;
+      }
+
+      function updateStepState(stepKey, tone, hintText) {
+        if (stepKey === "auth") {
+          setBadge(
+            els.badgeAuth,
+            tone === "success"
+              ? "Concluído"
+              : tone === "progress"
+                ? "Processando"
+                : tone === "error"
+                  ? "Erro"
+                  : "Pendente",
+            tone,
+          );
+          setStepDot(els.stepStatusAuth, tone);
+          els.stepHintAuth.textContent = hintText;
+        }
+        if (stepKey === "study") {
+          setBadge(
+            els.badgeStudy,
+            tone === "success"
+              ? "Concluído"
+              : tone === "progress"
+                ? "Processando"
+                : tone === "error"
+                  ? "Erro"
+                  : "Pendente",
+            tone,
+          );
+          setStepDot(els.stepStatusStudy, tone);
+          els.stepHintStudy.textContent = hintText;
+        }
+        if (stepKey === "link") {
+          setBadge(
+            els.badgeLink,
+            tone === "success"
+              ? "Concluído"
+              : tone === "progress"
+                ? "Processando"
+                : tone === "error"
+                  ? "Erro"
+                  : "Pendente",
+            tone,
+          );
+          setStepDot(els.stepStatusLink, tone);
+          els.stepHintLink.textContent = hintText;
+        }
+      }
+
+      function getBasicAuthHeader() {
+        const user = els.authUser.value.trim();
+        const password = els.authPassword.value;
+        if (!user || !password) return "";
+        return `Basic ${btoa(`${user}:${password}`)}`;
+      }
+
+      async function postFormData(url, fields, extraHeaders = {}) {
+        const formData = new FormData();
+        Object.entries(fields).forEach(([key, value]) =>
+          formData.append(key, value),
+        );
+        const response = await fetch(url, {
+          method: "POST",
+          headers: extraHeaders,
+          body: formData,
+        });
+
+        const rawText = await response.text();
+        let parsed;
+        try {
+          parsed = rawText ? JSON.parse(rawText) : {};
+        } catch {
+          parsed = { raw: rawText };
+        }
+
+        if (!response.ok) {
+          const err = new Error(`HTTP ${response.status}`);
+          err.payload = parsed;
+          throw err;
+        }
+        return parsed;
+      }
+
+      els.btnAuthenticate.addEventListener("click", async () => {
+        const url = els.authUrl.value.trim();
+        const login = els.authUser.value.trim();
+        const password = els.authPassword.value;
+
+        if (!url || !login || !password) {
+          updateStepState("auth", "error", "Preencha URL, usuário e senha.");
+          logTimeline(
+            "Autenticação não executada",
+            "Há campos obrigatórios não preenchidos no passo 1.",
+            "rose",
+          );
+          return;
+        }
+
+        els.btnAuthenticate.disabled = true;
+        updateStepState("auth", "progress", "Autenticando na Ambra...");
+        setGlobalStatus("Autenticando", "bg-amber-400");
+        logTimeline(
+          "Autenticação iniciada",
+          "Enviando login e senha para obtenção do sid.",
+          "amber",
+        );
+
+        try {
+          const data = await postFormData(url, {
+            login,
+            password,
+          });
+
+          showJson(data);
+
+          const sid = data?.sid || "";
+          if (!sid) throw new Error("Campo sid não encontrado no retorno.");
+
+          els.sidStep2.value = sid;
+          els.sidStep3.value = sid;
+          syncSummaries();
+
+          updateStepState(
+            "auth",
+            "success",
+            "SID obtido e propagado para os próximos passos.",
+          );
+          setGlobalStatus("SID obtido com sucesso", "bg-emerald-500");
+          logTimeline(
+            "Autenticação concluída",
+            "SID capturado com sucesso e preenchido nos passos 2 e 3.",
+            "emerald",
+          );
+        } catch (error) {
+          updateStepState(
+            "auth",
+            "error",
+            error?.payload
+              ? "Erro retornado pela Ambra."
+              : error.message || "Falha ao autenticar.",
+          );
+          setGlobalStatus("Erro na autenticação", "bg-rose-500");
+          showJson(
+            error.payload || { error: error.message || "Falha ao autenticar." },
+          );
+          logTimeline(
+            "Erro na autenticação",
+            error.message || "Falha ao autenticar.",
+            "rose",
+          );
+        } finally {
+          els.btnAuthenticate.disabled = false;
+        }
+      });
+
+      els.btnStudy.addEventListener("click", async () => {
+        const url = els.studyUrl.value.trim();
+        const sid = els.sidStep2.value.trim();
+        const accession = els.accessionNumber.value.trim();
+
+        if (!url || !sid || !accession) {
+          updateStepState(
+            "study",
+            "error",
+            "Preencha URL, SID e número de acesso.",
+          );
+          logTimeline(
+            "Consulta de estudo não executada",
+            "Há campos obrigatórios não preenchidos no passo 2.",
+            "rose",
+          );
+          return;
+        }
+
+        els.btnStudy.disabled = true;
+        updateStepState("study", "progress", "Consultando estudo na Ambra...");
+        setGlobalStatus("Consultando estudo", "bg-amber-400");
+        logTimeline(
+          "Consulta de estudo iniciada",
+          `Buscando estudos para o número de acesso ${accession}.`,
+          "amber",
+        );
+
+        try {
+          const data = await postFormData(url, {
+            sid,
+            "filter.accession_number.equals": accession,
+          });
+
+          showJson(data);
+
+          const uuid = data?.studies?.[0]?.uuid || "";
+          if (!uuid)
+            throw new Error(
+              "Nenhum uuid encontrado no primeiro item do array studies.",
+            );
+
+          els.uuidStep3.value = uuid;
+          syncSummaries();
+
+          updateStepState("study", "success", "UUID localizado com sucesso.");
+          setGlobalStatus("UUID encontrado", "bg-emerald-500");
+          logTimeline(
+            "Consulta de estudo concluída",
+            `UUID encontrado para o número de acesso ${accession}.`,
+            "emerald",
+          );
+        } catch (error) {
+          updateStepState(
+            "study",
+            "error",
+            error?.payload
+              ? "Erro retornado pela Ambra."
+              : error.message || "Falha ao consultar o estudo.",
+          );
+          setGlobalStatus("Erro na consulta do estudo", "bg-rose-500");
+          showJson(
+            error.payload || {
+              error: error.message || "Falha ao consultar o estudo.",
+            },
+          );
+          logTimeline(
+            "Erro na consulta de estudo",
+            error.message || "Falha ao consultar o estudo.",
+            "rose",
+          );
+        } finally {
+          els.btnStudy.disabled = false;
+        }
+      });
+
+      els.btnLink.addEventListener("click", async () => {
+        const url = els.linkUrl.value.trim();
+        const sid = els.sidStep3.value.trim();
+        const studyId = els.uuidStep3.value.trim();
+        const action = els.actionStep3.value.trim();
+
+        if (!url || !sid || !studyId || !action) {
+          updateStepState("link", "error", "Preencha URL, SID, UUID e ação.");
+          logTimeline(
+            "Geração de link não executada",
+            "Há campos obrigatórios não preenchidos no passo 3.",
+            "rose",
+          );
+          return;
+        }
+
+        els.btnLink.disabled = true;
+        updateStepState("link", "progress", "Gerando link de visualização...");
+        setGlobalStatus("Gerando link", "bg-amber-400");
+        logTimeline(
+          "Geração de link iniciada",
+          "Enviando SID, UUID e ação para a Ambra.",
+          "amber",
+        );
+
+        try {
+          const authHeader = getBasicAuthHeader();
+          const headers = authHeader ? { Authorization: authHeader } : {};
+          const data = await postFormData(
+            url,
+            {
+              sid,
+              study_id: studyId,
+              action,
+            },
+            headers,
+          );
+
+          showJson(data);
+
+          const redirectUrl = data?.redirect_url || "";
+          if (!redirectUrl)
+            throw new Error("Campo redirect_url não encontrado no retorno.");
+
+          els.redirectUrl.value = redirectUrl;
+          syncSummaries();
+
+          updateStepState(
+            "link",
+            "success",
+            "redirect_url gerado com sucesso.",
+          );
+          setGlobalStatus("Link gerado com sucesso", "bg-emerald-500");
+          logTimeline(
+            "Geração de link concluída",
+            "redirect_url preenchido e pronto para visualização.",
+            "emerald",
+          );
+        } catch (error) {
+          updateStepState(
+            "link",
+            "error",
+            error?.payload
+              ? "Erro retornado pela Ambra."
+              : error.message || "Falha ao gerar o link.",
+          );
+          setGlobalStatus("Erro ao gerar link", "bg-rose-500");
+          showJson(
+            error.payload || {
+              error: error.message || "Falha ao gerar o link.",
+            },
+          );
+          logTimeline(
+            "Erro na geração do link",
+            error.message || "Falha ao gerar o link.",
+            "rose",
+          );
+        } finally {
+          els.btnLink.disabled = false;
+        }
+      });
+
+      els.btnVisualizar.addEventListener("click", () => {
+        const url = els.redirectUrl.value.trim();
+        if (!url) return;
+        window.open(url, "_blank", "noopener,noreferrer");
+        logTimeline(
+          "Visualização aberta",
+          "redirect_url aberto em nova guia.",
+          "slate",
+        );
+      });
+
+      document.querySelectorAll(".copy-btn").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const targetId = button.getAttribute("data-copy-target");
+          const target = document.getElementById(targetId);
+          const value = target?.value?.trim();
+          if (!value) return;
+          try {
+            await navigator.clipboard.writeText(value);
+            const original = button.textContent;
+            button.textContent = "Copiado!";
+            setTimeout(() => (button.textContent = original), 1200);
+          } catch {
+            logTimeline(
+              "Falha ao copiar",
+              `Não foi possível copiar o campo ${targetId}.`,
+              "rose",
+            );
+          }
+        });
+      });
+
+      document.getElementById("btnClearJson").addEventListener("click", () => {
+        els.jsonViewer.textContent = "Nenhum retorno recebido.";
+      });
+
+      document.getElementById("menuBtn").addEventListener("click", (e) => {
+        e.stopPropagation();
+        const panel = document.getElementById("menuPanel");
+        panel.classList.toggle("hidden");
+      });
+
+      document.addEventListener("click", (e) => {
+        const panel = document.getElementById("menuPanel");
+        const btn = document.getElementById("menuBtn");
+        if (
+          !panel.contains(e.target) &&
+          e.target !== btn &&
+          !btn.contains(e.target)
+        ) {
+          panel.classList.add("hidden");
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          document.getElementById("menuPanel").classList.add("hidden");
+        }
+      });
+
+      ["sidStep2", "sidStep3", "uuidStep3", "redirectUrl"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", syncSummaries);
+      });
+
+      syncSummaries();
+      setGlobalStatus("Aguardando ação", "bg-slate-400");
+    </script>
+  </body>
+</html>

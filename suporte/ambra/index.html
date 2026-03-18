@@ -1,0 +1,1171 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vertis • Ambra • Validador de Acesso</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vertis: {
+              orange: "#F97316",
+              dark: "#0B1220",
+            },
+          },
+          boxShadow: {
+            soft: "0 10px 30px rgba(2, 6, 23, 0.10)",
+            card: "0 8px 20px rgba(2, 6, 23, 0.08)",
+            glow: "0 20px 50px rgba(249, 115, 22, 0.18)",
+          },
+          animation: {
+            float: "float 6s ease-in-out infinite",
+            pulseSoft: "pulseSoft 2.2s ease-in-out infinite",
+            shimmer: "shimmer 2.5s linear infinite",
+            slideIn: "slideIn .35s ease-out",
+          },
+          keyframes: {
+            float: {
+              "0%, 100%": { transform: "translateY(0px)" },
+              "50%": { transform: "translateY(-6px)" },
+            },
+            pulseSoft: {
+              "0%, 100%": { opacity: "0.75" },
+              "50%": { opacity: "1" },
+            },
+            shimmer: {
+              "0%": { transform: "translateX(-100%)" },
+              "100%": { transform: "translateX(220%)" },
+            },
+            slideIn: {
+              "0%": { opacity: "0", transform: "translateY(12px) scale(.98)" },
+              "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+            }
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png"
+    sizes="180x180" />
+  <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32" />
+  <style>
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.625rem 1.25rem;
+      color: rgb(51 65 85);
+      text-decoration: none;
+      position: relative;
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .menu-item:hover {
+      background: rgb(241 245 249);
+      color: rgb(2 6 23);
+      transform: translateX(4px);
+    }
+
+    .menu-icon {
+      width: 18px;
+      height: 18px;
+      opacity: 0.8;
+      transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    .menu-item:hover .menu-icon {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+    }
+
+    .status-dot {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 9999px;
+      display: inline-block;
+    }
+
+    .wizard-step {
+      transition: all .25s ease;
+      cursor: pointer;
+    }
+
+    .wizard-step.active {
+      border-color: rgba(249, 115, 22, .55);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(255, 247, 237, 1));
+      box-shadow: 0 16px 36px rgba(249, 115, 22, .12);
+      transform: translateY(-2px);
+    }
+
+    .wizard-line-fill {
+      transition: width .35s ease;
+    }
+
+    .wizard-panel {
+      display: none;
+    }
+
+    .wizard-panel.active {
+      display: block;
+      animation: slideIn .35s ease-out;
+    }
+
+    .floating-ring {
+      position: absolute;
+      inset: auto auto -40px -40px;
+      width: 160px;
+      height: 160px;
+      border-radius: 9999px;
+      border: 1px solid rgba(249, 115, 22, .18);
+      pointer-events: none;
+    }
+
+    .hero-card {
+      background:
+        radial-gradient(circle at top right, rgba(249, 115, 22, .18), transparent 28%),
+        linear-gradient(135deg, rgba(11, 18, 32, .98), rgba(15, 23, 42, .98));
+    }
+
+    .soft-grid {
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+
+    .mini-pill {
+      border: 1px solid rgb(226 232 240);
+      background: white;
+      border-radius: 9999px;
+      padding: .4rem .75rem;
+      font-size: .75rem;
+      color: rgb(71 85 105);
+    }
+
+    .json-shell {
+      background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-100 via-slate-100 to-slate-200 min-h-screen flex flex-col text-slate-800">
+  <header
+    class="sticky top-0 z-50 backdrop-blur bg-gradient-to-r from-vertis-dark via-slate-900 to-slate-950/95 text-white px-6 py-4 flex justify-between items-center shadow-lg shadow-black/10 border-b border-white/10">
+    <div class="flex items-center gap-4">
+
+      <!-- MENU SANDUÍCHE -->
+      <nav class="relative">
+        <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
+          aria-expanded="false" aria-controls="menuPanel">
+
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <!-- PAINEL -->
+        <div id="menuPanel" class="absolute left-0 mt-3 w-80 rounded-2xl bg-white text-slate-800 shadow-2xl
+        hidden overflow-hidden border border-slate-200 backdrop-blur-xl
+        origin-top-left transform transition-all duration-200">
+
+          <!-- HEADER -->
+          <div class="px-5 py-4 border-b bg-gradient-to-r from-slate-50 to-white">
+            <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold">
+              Navegação
+            </div>
+          </div>
+
+          <div class="py-3 text-sm">
+
+            <!-- INÍCIO -->
+            <a href="../index.html" class="menu-item">
+              <!-- Ícone Home -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.75L12 4l9 6.75M5 10v9h14v-9" />
+              </svg>
+              Início
+            </a>
+
+            <!-- PUBLICAÇÃO DE LAUDOS -->
+            <a href="../laudos/index.html" class="menu-item">
+              <!-- Ícone Chart -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l6-6 4 4 8-8" />
+              </svg>
+              Publicação de Laudos
+            </a>
+
+            <!-- NFSe -->
+            <a href="../nfse/index.html" class="menu-item">
+              <!-- Ícone Documento -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13H7z" />
+              </svg>
+              NFSe
+            </a>
+
+            <!-- NFCe / NFe -->
+            <a href="../nfe/index.html" class="menu-item">
+              <!-- Ícone Nota Fiscal -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 14h6M9 10h6M7 3h10v18l-5-3-5 3z" />
+              </svg>
+              NFCe / NFe
+            </a>
+
+            <!-- MONITORAMENTO -->
+            <div class="mt-4 px-5 text-xs uppercase tracking-wider text-slate-400 font-semibold">
+              Monitoramento
+            </div>
+
+            <a href="../suporte/ambra/index.html" class="menu-item">
+              <!-- Ambra -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l6 6-6 6-6-6 6-6z" />
+              </svg>
+              Ambra | Número de Acesso
+            </a>
+
+            <a href="../suporte/vetex/index.html" class="menu-item">
+              <!-- Vetex -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l6 6-6 6-6-6 6-6z" />
+              </svg>
+              Vetex (118)
+            </a>
+
+            <a href="../suporte/lapavet/index.html" class="menu-item">
+              <!-- Lapavet -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13H7zM12 12h.01" />
+              </svg>
+              Lapavet (91)
+            </a>
+
+            <!-- DESENVOLVIMENTO -->
+            <div class="mt-4 px-5 text-xs uppercase tracking-wider text-slate-400 font-semibold">
+              Desenvolvimento
+            </div>
+
+            <a href="../desenv/gerador_pix.html" class="menu-item">
+              <!-- Ícone PIX -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l6 6-6 6-6-6 6-6z" />
+              </svg>
+              Chave PIX
+            </a>
+
+            <a href="../desenv/leitor_pdf.html" class="menu-item">
+              <!-- Ícone PDF -->
+              <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13H7zM12 12h.01" />
+              </svg>
+              Leitor PDF (PDF.js)
+            </a>
+
+          </div>
+        </div>
+      </nav>
+
+      <div>
+        <h1 class="text-lg font-semibold tracking-wide whitespace-nowrap">
+          Vertis <span class="text-vertis-orange">•</span> Ambra
+          <span class="text-vertis-orange">•</span> Validador de Acesso
+        </h1>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <span id="globalStatus"
+        class="hidden md:inline-flex items-center gap-2 text-xs text-slate-200 bg-white/10 border border-white/10 rounded-full px-3 py-1.5">
+        <span class="status-dot bg-slate-400 animate-pulse"></span>
+        Aguardando ação
+      </span>
+      <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
+    </div>
+  </header>
+
+  <main class="p-6 flex-1 space-y-6">
+    <section
+      class="hero-card relative overflow-hidden rounded-3xl text-white shadow-2xl shadow-slate-900/10 p-6 lg:p-8">
+      <div class="absolute inset-0 soft-grid opacity-40"></div>
+      <div class="absolute -top-8 -right-8 w-40 h-40 bg-vertis-orange/20 blur-3xl rounded-full animate-pulseSoft"></div>
+      <div class="absolute bottom-0 left-1/3 w-52 h-52 bg-white/5 blur-3xl rounded-full animate-float"></div>
+      <div class="relative grid grid-cols-1 lg:grid-cols-[1.2fr_.8fr] gap-6 items-center">
+        <div>
+          <span
+            class="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-vertis-orange font-semibold">Ferramenta
+            • Wizard Onboarding</span>
+          <h2 class="mt-3 text-2xl lg:text-4xl font-bold leading-tight">
+            Suporte • AMBRA com fluxo guiado
+          </h2>
+          <p class="mt-3 text-sm text-slate-300 max-w-2xl">
+            Um wizard em etapas para autenticar, localizar o estudo e gerar o link de visualização com menos erro
+            operacional e leitura mais rápida do diagnóstico.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-2">
+            <span class="mini-pill">Fluxo guiado</span>
+            <span class="mini-pill">Autopreenchimento</span>
+            <span class="mini-pill">Resumo lateral</span>
+            <span class="mini-pill">Retorno técnico</span>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="glass rounded-3xl p-5 border border-white/15 text-slate-800 shadow-glow">
+            <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Diagnóstico rápido</div>
+            <div id="heroDiagnosis" class="mt-3 text-lg font-semibold text-slate-800">Aguardando início do fluxo</div>
+            <p id="heroDiagnosisHint" class="mt-2 text-sm text-slate-500">
+              Preencha usuário e senha no passo 1 para iniciar a validação.
+            </p>
+            <div class="mt-5 grid grid-cols-3 gap-3">
+              <div class="rounded-2xl bg-white border border-slate-200 p-3">
+                <div class="text-[11px] uppercase tracking-wide text-slate-400">SID</div>
+                <div id="summarySid" class="mt-2 text-xs font-mono break-all text-slate-700">—</div>
+              </div>
+              <div class="rounded-2xl bg-white border border-slate-200 p-3">
+                <div class="text-[11px] uppercase tracking-wide text-slate-400">UUID</div>
+                <div id="summaryUuid" class="mt-2 text-xs font-mono break-all text-slate-700">—</div>
+              </div>
+              <div class="rounded-2xl bg-white border border-slate-200 p-3">
+                <div class="text-[11px] uppercase tracking-wide text-slate-400">Link</div>
+                <div id="summaryRedirect" class="mt-2 text-xs break-all text-slate-700">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="floating-ring"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="wizardSection" class="grid grid-cols-1 xl:grid-cols-[1.25fr_.75fr] gap-6 items-start">
+      <div class="bg-white rounded-3xl shadow-soft border border-slate-200 overflow-hidden">
+        <div class="px-5 lg:px-6 py-5 border-b bg-gradient-to-r from-white via-slate-50 to-white">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <div class="text-xs uppercase tracking-[0.2em] text-vertis-orange font-semibold">Wizard</div>
+              <h3 class="mt-1 text-xl font-semibold text-slate-800">Fluxo guiado de validação Ambra</h3>
+              <p class="mt-1 text-sm text-slate-500">Navegue como um onboarding. Cada etapa mostra apenas o que importa
+                naquele momento.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button id="btnRunAll"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-900 text-white font-medium hover:bg-slate-800 transition">
+                Executar fluxo completo
+              </button>
+              <button id="btnResetFlow"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition">
+                Limpar fluxo
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-5 lg:px-6 py-6">
+          <div class="relative">
+            <div class="absolute left-0 right-0 top-5 h-[3px] bg-slate-200 rounded-full"></div>
+            <div id="wizardLineFill"
+              class="wizard-line-fill absolute left-0 top-5 h-[3px] bg-vertis-orange rounded-full" style="width: 0%;">
+            </div>
+            <div class="relative grid grid-cols-3 gap-3">
+              <button class="wizard-step active rounded-2xl border border-slate-200 p-4 text-left bg-white"
+                data-step="1" type="button">
+                <div class="flex items-center justify-between">
+                  <span
+                    class="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-semibold">1</span>
+                  <span id="stepStatusAuth" class="status-dot bg-slate-300"></span>
+                </div>
+                <div class="mt-4">
+                  <div class="text-sm font-semibold text-slate-800">Autenticação</div>
+                  <div id="stepHintAuth" class="mt-1 text-xs text-slate-500">Informe usuário e senha.</div>
+                </div>
+              </button>
+              <button class="wizard-step rounded-2xl border border-slate-200 p-4 text-left bg-white" data-step="2"
+                type="button">
+                <div class="flex items-center justify-between">
+                  <span
+                    class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">2</span>
+                  <span id="stepStatusStudy" class="status-dot bg-slate-300"></span>
+                </div>
+                <div class="mt-4">
+                  <div class="text-sm font-semibold text-slate-800">Lista de Estudo</div>
+                  <div id="stepHintStudy" class="mt-1 text-xs text-slate-500">Consulta por número de acesso.</div>
+                </div>
+              </button>
+              <button class="wizard-step rounded-2xl border border-slate-200 p-4 text-left bg-white" data-step="3"
+                type="button">
+                <div class="flex items-center justify-between">
+                  <span
+                    class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center font-semibold">3</span>
+                  <span id="stepStatusLink" class="status-dot bg-slate-300"></span>
+                </div>
+                <div class="mt-4">
+                  <div class="text-sm font-semibold text-slate-800">Link / Visualização</div>
+                  <div id="stepHintLink" class="mt-1 text-xs text-slate-500">Gera o link de visualização.</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-3xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-4 lg:p-6">
+            <div class="wizard-panel active" data-panel="1">
+              <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div>
+                  <div class="text-xs uppercase tracking-[0.2em] text-vertis-orange font-semibold">Passo 1</div>
+                  <h4 class="mt-1 text-2xl font-semibold text-slate-800">Autenticação</h4>
+                  <p class="mt-2 text-sm text-slate-500 max-w-2xl">
+                    Faz o login na Ambra e captura o <span class="font-semibold">sid</span> para ser reutilizado nas
+                    próximas etapas.
+                  </p>
+                </div>
+                <span id="badgeAuth"
+                  class="text-xs px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">Pendente</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-1 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Login Ambra</label>
+                  <input id="authUrl" type="text"
+                    class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                    value="https://access.ambrahealth.com/api/v3/session/login" />
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Usuário</label>
+                    <input id="authUser" type="text" autocomplete="username"
+                      class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                      placeholder="usuario@cliente.com.br" value="dummyuser9@ambrasaude.com.br" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Senha</label>
+                    <input id="authPassword" type="password" autocomplete="current-password"
+                      class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                      placeholder="••••••••" value="/fIV:'8]O76C" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 flex flex-wrap gap-3">
+                <button id="btnAuthenticate"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-vertis-orange text-white font-medium hover:brightness-110 transition shadow-lg shadow-orange-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                  Autenticar
+                </button>
+                <button type="button" data-copy-target="sidStep2"
+                  class="copy-btn inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white text-slate-700 font-medium border border-slate-200 hover:bg-slate-50 transition">
+                  Copiar SID
+                </button>
+                <button type="button"
+                  class="wizard-next inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-900 text-white font-medium hover:bg-slate-800 transition"
+                  data-go="2">
+                  Próximo passo
+                </button>
+              </div>
+            </div>
+
+            <div class="wizard-panel" data-panel="2">
+              <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div>
+                  <div class="text-xs uppercase tracking-[0.2em] text-vertis-orange font-semibold">Passo 2</div>
+                  <h4 class="mt-1 text-2xl font-semibold text-slate-800">Lista de Estudo</h4>
+                  <p class="mt-2 text-sm text-slate-500 max-w-2xl">
+                    Consulta o estudo pelo número de acesso e usa o <span class="font-semibold">uuid</span> do primeiro
+                    item localizado.
+                  </p>
+                </div>
+                <span id="badgeStudy"
+                  class="text-xs px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">Pendente</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-1 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Link Estudo</label>
+                  <input id="studyUrl" type="text"
+                    class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                    value="https://access.ambrahealth.com/api/v3/study/list" />
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-[1fr_.9fr] gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">SID</label>
+                    <input id="sidStep2" type="text"
+                      class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 font-mono focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                      placeholder="Será preenchido após autenticação" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Número de Acesso</label>
+                    <input id="accessionNumber" type="text"
+                      class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                      placeholder="Ex.: 211042651" value="211042651" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 flex flex-wrap gap-3">
+                <button type="button"
+                  class="wizard-prev inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 text-slate-700 font-medium border border-slate-200 hover:bg-slate-200 transition"
+                  data-go="1">
+                  Voltar
+                </button>
+                <button id="btnStudy"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-900 text-white font-medium hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                  Consultar Estudo
+                </button>
+                <button type="button" data-copy-target="uuidStep3"
+                  class="copy-btn inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white text-slate-700 font-medium border border-slate-200 hover:bg-slate-50 transition">
+                  Copiar UUID
+                </button>
+                <button type="button"
+                  class="wizard-next inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-vertis-orange text-white font-medium hover:brightness-110 transition"
+                  data-go="3">
+                  Próximo passo
+                </button>
+              </div>
+            </div>
+
+            <div class="wizard-panel" data-panel="3">
+              <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div>
+                  <div class="text-xs uppercase tracking-[0.2em] text-vertis-orange font-semibold">Passo 3</div>
+                  <h4 class="mt-1 text-2xl font-semibold text-slate-800">Link / Visualização</h4>
+                  <p class="mt-2 text-sm text-slate-500 max-w-2xl">
+                    Gera o <span class="font-semibold">link</span> pelo endpoint interno e libera a abertura em nova
+                    guia.
+                  </p>
+                </div>
+                <span id="badgeLink"
+                  class="text-xs px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">Pendente</span>
+              </div>
+
+              <div class="mt-6 grid grid-cols-1 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Link Add</label>
+                  <input id="linkUrl" type="text"
+                    class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                    value="http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/dicom/link_viewer_p3" />
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">SID</label>
+                    <input id="sidStep3" type="text"
+                      class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 font-mono focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                      placeholder="Será preenchido após autenticação" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">UUID</label>
+                    <input id="uuidStep3" type="text"
+                      class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 font-mono focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                      placeholder="Será preenchido após consulta do estudo" />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Ação</label>
+                  <input id="actionStep3" type="text"
+                    class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                    value="STUDY_VIEW" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Link</label>
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <input id="redirectUrl" type="text"
+                      class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-vertis-orange/40 focus:border-vertis-orange"
+                      placeholder="Será preenchido após geração do link" />
+                    <button type="button" data-copy-target="redirectUrl"
+                      class="copy-btn px-4 py-3 rounded-2xl bg-white text-slate-700 font-medium border border-slate-200 hover:bg-slate-50 transition">
+                      Copiar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 flex flex-wrap gap-3">
+                <button type="button"
+                  class="wizard-prev inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 text-slate-700 font-medium border border-slate-200 hover:bg-slate-200 transition"
+                  data-go="2">
+                  Voltar
+                </button>
+                <button id="btnLink"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-emerald-600 text-white font-medium hover:bg-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                  Gerar Link
+                </button>
+                <button id="btnVisualizar"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 text-slate-700 font-medium border border-slate-200 hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled>
+                  Visualizar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="space-y-6">
+        <section class="bg-white rounded-3xl shadow-soft border border-slate-200 overflow-hidden">
+          <div class="px-5 py-4 border-b bg-gradient-to-r from-white to-slate-50">
+            <div class="text-xs uppercase tracking-[0.2em] text-vertis-orange font-semibold">Painel lateral</div>
+            <h3 class="mt-1 text-lg font-semibold text-slate-800">Resumo do atendimento</h3>
+          </div>
+          <div class="p-5 space-y-4">
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div class="text-xs uppercase tracking-wide text-slate-400">Status geral</div>
+              <div id="sideDiagnosis" class="mt-2 text-base font-semibold text-slate-800">Aguardando ação</div>
+              <p id="sideDiagnosisHint" class="mt-1 text-sm text-slate-500">O fluxo ainda não foi iniciado.</p>
+            </div>
+            <div class="grid grid-cols-1 gap-3">
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="text-[11px] uppercase tracking-wide text-slate-400">SID atual</div>
+                <div id="sideSid" class="mt-2 text-xs font-mono break-all text-slate-700">—</div>
+              </div>
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="text-[11px] uppercase tracking-wide text-slate-400">UUID atual</div>
+                <div id="sideUuid" class="mt-2 text-xs font-mono break-all text-slate-700">—</div>
+              </div>
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="text-[11px] uppercase tracking-wide text-slate-400">Link atual</div>
+                <div id="sideLink" class="mt-2 text-xs break-all text-slate-700">—</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="bg-white rounded-3xl shadow-soft border border-slate-200 overflow-hidden">
+          <div
+            class="px-5 py-4 border-b bg-gradient-to-r from-white to-slate-50 flex items-center justify-between gap-3">
+            <div>
+              <div class="text-xs uppercase tracking-[0.2em] text-vertis-orange font-semibold">Timeline</div>
+              <h3 class="mt-1 text-lg font-semibold text-slate-800">Eventos do fluxo</h3>
+            </div>
+            <button id="btnClearTimeline"
+              class="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200">
+              Limpar
+            </button>
+          </div>
+          <div id="timeline" class="p-5 space-y-3 max-h-[22rem] overflow-auto">
+            <div class="text-sm text-slate-500">Nenhum evento registrado ainda.</div>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <section id="jsonSection" class="bg-white rounded-3xl shadow-soft border border-slate-200 overflow-hidden">
+      <div class="px-5 py-4 border-b bg-gradient-to-r from-white to-slate-50 flex items-center justify-between gap-3">
+        <div>
+          <div class="text-xs uppercase tracking-wider text-vertis-orange font-semibold">
+            Retorno técnico
+          </div>
+          <h3 class="text-lg font-semibold text-slate-800 mt-1">
+            JSON da última operação
+          </h3>
+        </div>
+        <button id="btnClearJson"
+          class="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200">
+          Limpar
+        </button>
+      </div>
+      <pre id="jsonViewer"
+        class="json-shell p-5 text-xs leading-6 text-emerald-300 overflow-auto max-h-[28rem]">Nenhum retorno recebido.</pre>
+    </section>
+
+    <section class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-900">
+      <div class="font-semibold">Observação importante</div>
+      <p class="mt-1">
+        Como a página faz chamadas diretas do navegador para a Ambra, o funcionamento depende da política de CORS e das
+        permissões da rede/ambiente. Caso o navegador bloqueie a requisição, será necessário utilizar um proxy ou
+        backend intermediário.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const els = {
+      authUrl: document.getElementById("authUrl"),
+      authUser: document.getElementById("authUser"),
+      authPassword: document.getElementById("authPassword"),
+      studyUrl: document.getElementById("studyUrl"),
+      sidStep2: document.getElementById("sidStep2"),
+      accessionNumber: document.getElementById("accessionNumber"),
+      linkUrl: document.getElementById("linkUrl"),
+      sidStep3: document.getElementById("sidStep3"),
+      uuidStep3: document.getElementById("uuidStep3"),
+      actionStep3: document.getElementById("actionStep3"),
+      redirectUrl: document.getElementById("redirectUrl"),
+      btnAuthenticate: document.getElementById("btnAuthenticate"),
+      btnStudy: document.getElementById("btnStudy"),
+      btnLink: document.getElementById("btnLink"),
+      btnVisualizar: document.getElementById("btnVisualizar"),
+      btnRunAll: document.getElementById("btnRunAll"),
+      btnResetFlow: document.getElementById("btnResetFlow"),
+      badgeAuth: document.getElementById("badgeAuth"),
+      badgeStudy: document.getElementById("badgeStudy"),
+      badgeLink: document.getElementById("badgeLink"),
+      stepStatusAuth: document.getElementById("stepStatusAuth"),
+      stepStatusStudy: document.getElementById("stepStatusStudy"),
+      stepStatusLink: document.getElementById("stepStatusLink"),
+      stepHintAuth: document.getElementById("stepHintAuth"),
+      stepHintStudy: document.getElementById("stepHintStudy"),
+      stepHintLink: document.getElementById("stepHintLink"),
+      summarySid: document.getElementById("summarySid"),
+      summaryUuid: document.getElementById("summaryUuid"),
+      summaryRedirect: document.getElementById("summaryRedirect"),
+      sideSid: document.getElementById("sideSid"),
+      sideUuid: document.getElementById("sideUuid"),
+      sideLink: document.getElementById("sideLink"),
+      heroDiagnosis: document.getElementById("heroDiagnosis"),
+      heroDiagnosisHint: document.getElementById("heroDiagnosisHint"),
+      sideDiagnosis: document.getElementById("sideDiagnosis"),
+      sideDiagnosisHint: document.getElementById("sideDiagnosisHint"),
+      jsonViewer: document.getElementById("jsonViewer"),
+      globalStatus: document.getElementById("globalStatus"),
+      timeline: document.getElementById("timeline"),
+      wizardLineFill: document.getElementById("wizardLineFill"),
+    };
+
+    let currentStep = 1;
+
+    function setGlobalStatus(text, color = "bg-slate-400") {
+      const dot = els.globalStatus.querySelector(".status-dot");
+      dot.className = `status-dot ${color} animate-pulse`;
+      els.globalStatus.lastChild.textContent = ` ${text}`;
+    }
+
+    function setBadge(step, label, tone) {
+      const map = {
+        pending: "bg-slate-100 text-slate-500 border-slate-200",
+        progress: "bg-amber-50 text-amber-700 border-amber-200",
+        success: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        error: "bg-rose-50 text-rose-700 border-rose-200",
+      };
+      step.className = `text-xs px-3 py-1.5 rounded-full border ${map[tone] || map.pending}`;
+      step.textContent = label;
+    }
+
+    function setStepDot(dot, tone) {
+      const tones = {
+        pending: "bg-slate-300",
+        progress: "bg-amber-400",
+        success: "bg-emerald-500",
+        error: "bg-rose-500",
+      };
+      dot.className = `status-dot ${tones[tone] || tones.pending}`;
+    }
+
+    function prettyJson(data) {
+      return typeof data === "string" ? data : JSON.stringify(data, null, 2);
+    }
+
+    function showJson(data) {
+      els.jsonViewer.textContent = prettyJson(data);
+    }
+
+    function logTimeline(title, message, tone = "slate") {
+      const colors = {
+        slate: "border-slate-200 bg-slate-50",
+        amber: "border-amber-200 bg-amber-50",
+        emerald: "border-emerald-200 bg-emerald-50",
+        rose: "border-rose-200 bg-rose-50",
+      };
+      const time = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      if (els.timeline.textContent.includes("Nenhum evento registrado ainda.")) {
+        els.timeline.innerHTML = "";
+      }
+      const item = document.createElement("div");
+      item.className = `rounded-2xl border p-3 ${colors[tone] || colors.slate}`;
+      item.innerHTML = `
+        <div class="flex items-center justify-between gap-3">
+          <div class="text-sm font-semibold text-slate-800">${title}</div>
+          <div class="text-[11px] uppercase tracking-wide text-slate-400">${time}</div>
+        </div>
+        <div class="mt-1 text-sm text-slate-600">${message}</div>
+      `;
+      els.timeline.prepend(item);
+    }
+
+    function syncSummaries() {
+      const sid = els.sidStep2.value || "—";
+      const uuid = els.uuidStep3.value || "—";
+      const link = els.redirectUrl.value || "—";
+
+      els.summarySid.textContent = sid;
+      els.summaryUuid.textContent = uuid;
+      els.summaryRedirect.textContent = link;
+      els.sideSid.textContent = sid;
+      els.sideUuid.textContent = uuid;
+      els.sideLink.textContent = link;
+      els.btnVisualizar.disabled = !els.redirectUrl.value;
+      refreshDiagnosis();
+    }
+
+    function refreshDiagnosis() {
+      let title = "Aguardando início do fluxo";
+      let hint = "Preencha usuário e senha no passo 1 para iniciar a validação.";
+
+      if (els.redirectUrl.value) {
+        title = "Fluxo concluído com sucesso";
+        hint = "O link foi gerado e já pode ser aberto na etapa final.";
+      } else if (els.uuidStep3.value) {
+        title = "UUID localizado";
+        hint = "A etapa final já tem dados suficientes para gerar o link.";
+      } else if (els.sidStep2.value) {
+        title = "SID obtido";
+        hint = "Agora consulte o estudo pelo número de acesso.";
+      }
+
+      els.heroDiagnosis.textContent = title;
+      els.heroDiagnosisHint.textContent = hint;
+      els.sideDiagnosis.textContent = title;
+      els.sideDiagnosisHint.textContent = hint;
+    }
+
+    function updateStepState(stepKey, tone, hintText) {
+      if (stepKey === "auth") {
+        setBadge(
+          els.badgeAuth,
+          tone === "success" ? "Concluído" : tone === "progress" ? "Processando" : tone === "error" ? "Erro" : "Pendente",
+          tone,
+        );
+        setStepDot(els.stepStatusAuth, tone);
+        els.stepHintAuth.textContent = hintText;
+      }
+      if (stepKey === "study") {
+        setBadge(
+          els.badgeStudy,
+          tone === "success" ? "Concluído" : tone === "progress" ? "Processando" : tone === "error" ? "Erro" : "Pendente",
+          tone,
+        );
+        setStepDot(els.stepStatusStudy, tone);
+        els.stepHintStudy.textContent = hintText;
+      }
+      if (stepKey === "link") {
+        setBadge(
+          els.badgeLink,
+          tone === "success" ? "Concluído" : tone === "progress" ? "Processando" : tone === "error" ? "Erro" : "Pendente",
+          tone,
+        );
+        setStepDot(els.stepStatusLink, tone);
+        els.stepHintLink.textContent = hintText;
+      }
+    }
+
+    async function postFormData(url, fields, extraHeaders = {}) {
+      const formData = new FormData();
+      Object.entries(fields).forEach(([key, value]) => formData.append(key, value));
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: extraHeaders,
+        body: formData,
+      });
+
+      const rawText = await response.text();
+      let parsed;
+      try {
+        parsed = rawText ? JSON.parse(rawText) : {};
+      } catch {
+        parsed = { raw: rawText };
+      }
+
+      if (!response.ok) {
+        const err = new Error(`HTTP ${response.status}`);
+        err.payload = parsed;
+        throw err;
+      }
+      return parsed;
+    }
+
+    function goToStep(step) {
+      currentStep = Math.max(1, Math.min(3, step));
+      const fillWidths = { 1: "0%", 2: "50%", 3: "100%" };
+      els.wizardLineFill.style.width = fillWidths[currentStep];
+
+      document.querySelectorAll(".wizard-step").forEach((button) => {
+        const buttonStep = Number(button.dataset.step);
+        button.classList.toggle("active", buttonStep === currentStep);
+
+        const numberCircle = button.querySelector("span");
+        if (buttonStep === currentStep) {
+          numberCircle.className = "w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-semibold";
+        } else {
+          numberCircle.className = "w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center font-semibold";
+        }
+      });
+
+      document.querySelectorAll(".wizard-panel").forEach((panel) => {
+        panel.classList.toggle("active", Number(panel.dataset.panel) === currentStep);
+      });
+    }
+
+    function resetFlow() {
+      ["sidStep2", "sidStep3", "uuidStep3", "redirectUrl"].forEach((id) => {
+        document.getElementById(id).value = "";
+      });
+      updateStepState("auth", "pending", "Informe usuário e senha.");
+      updateStepState("study", "pending", "Consulta por número de acesso.");
+      updateStepState("link", "pending", "Gera o link de visualização.");
+      showJson("Nenhum retorno recebido.");
+      setGlobalStatus("Aguardando ação", "bg-slate-400");
+      refreshDiagnosis();
+      syncSummaries();
+      goToStep(1);
+      logTimeline("Fluxo reiniciado", "Os campos gerados pelo processo foram limpos.", "slate");
+    }
+
+    async function authenticate() {
+      const url = els.authUrl.value.trim();
+      const login = els.authUser.value.trim();
+      const password = els.authPassword.value;
+
+      if (!url || !login || !password) {
+        updateStepState("auth", "error", "Preencha URL, usuário e senha.");
+        logTimeline("Autenticação não executada", "Há campos obrigatórios não preenchidos no passo 1.", "rose");
+        throw new Error("Preencha URL, usuário e senha.");
+      }
+
+      els.btnAuthenticate.disabled = true;
+      updateStepState("auth", "progress", "Autenticando na Ambra...");
+      setGlobalStatus("Autenticando", "bg-amber-400");
+      logTimeline("Autenticação iniciada", "Enviando login e senha para obtenção do SID.", "amber");
+
+      try {
+        const data = await postFormData(url, { login, password });
+        showJson(data);
+
+        const sid = data?.sid || "";
+        if (!sid) throw new Error("Campo sid não encontrado no retorno.");
+
+        els.sidStep2.value = sid;
+        els.sidStep3.value = sid;
+        syncSummaries();
+
+        updateStepState("auth", "success", "SID obtido e propagado para os próximos passos.");
+        setGlobalStatus("SID obtido com sucesso", "bg-emerald-500");
+        logTimeline("Autenticação concluída", "SID capturado com sucesso e preenchido nos passos 2 e 3.", "emerald");
+        goToStep(2);
+        return data;
+      } catch (error) {
+        updateStepState("auth", "error", error?.payload ? "Erro retornado pela Ambra." : error.message || "Falha ao autenticar.");
+        setGlobalStatus("Erro na autenticação", "bg-rose-500");
+        showJson(error.payload || { error: error.message || "Falha ao autenticar." });
+        logTimeline("Erro na autenticação", error.message || "Falha ao autenticar.", "rose");
+        throw error;
+      } finally {
+        els.btnAuthenticate.disabled = false;
+      }
+    }
+
+    async function searchStudy() {
+      const url = els.studyUrl.value.trim();
+      const sid = els.sidStep2.value.trim();
+      const accession = els.accessionNumber.value.trim();
+
+      if (!url || !sid || !accession) {
+        updateStepState("study", "error", "Preencha URL, SID e número de acesso.");
+        logTimeline("Consulta de estudo não executada", "Há campos obrigatórios não preenchidos no passo 2.", "rose");
+        throw new Error("Preencha URL, SID e número de acesso.");
+      }
+
+      els.btnStudy.disabled = true;
+      updateStepState("study", "progress", "Consultando estudo na Ambra...");
+      setGlobalStatus("Consultando estudo", "bg-amber-400");
+      logTimeline("Consulta de estudo iniciada", `Buscando estudos para o número de acesso ${accession}.`, "amber");
+
+      try {
+        const data = await postFormData(url, {
+          sid,
+          "filter.accession_number.equals": accession,
+        });
+
+        showJson(data);
+
+        const uuid = data?.studies?.[0]?.uuid || "";
+        if (!uuid) throw new Error("Nenhum uuid encontrado no primeiro item do array studies.");
+
+        els.uuidStep3.value = uuid;
+        syncSummaries();
+
+        updateStepState("study", "success", "UUID localizado com sucesso.");
+        setGlobalStatus("UUID encontrado", "bg-emerald-500");
+        logTimeline("Consulta de estudo concluída", `UUID encontrado para o número de acesso ${accession}.`, "emerald");
+        goToStep(3);
+        return data;
+      } catch (error) {
+        updateStepState("study", "error", error?.payload ? "Erro retornado pela Ambra." : error.message || "Falha ao consultar o estudo.");
+        setGlobalStatus("Erro na consulta do estudo", "bg-rose-500");
+        showJson(error.payload || { error: error.message || "Falha ao consultar o estudo." });
+        logTimeline("Erro na consulta de estudo", error.message || "Falha ao consultar o estudo.", "rose");
+        throw error;
+      } finally {
+        els.btnStudy.disabled = false;
+      }
+    }
+
+    async function generateLink() {
+      const url = els.linkUrl.value.trim();
+      const sid = els.sidStep3.value.trim();
+      const studyId = els.uuidStep3.value.trim();
+      const action = els.actionStep3.value.trim();
+
+      if (!url || !sid || !studyId || !action) {
+        updateStepState("link", "error", "Preencha URL, SID, UUID e ação.");
+        throw new Error("Preencha URL, SID, UUID e ação.");
+      }
+
+      els.btnLink.disabled = true;
+      updateStepState("link", "progress", "Gerando link de visualização...");
+      setGlobalStatus("Gerando link", "bg-amber-400");
+      logTimeline("Geração do link iniciada", "Enviando SID, UUID e ação para o endpoint interno.", "amber");
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sid: sid,
+            uuid: studyId,
+            action: action,
+          }),
+        });
+
+        const rawText = await response.text();
+        let data;
+        try {
+          data = rawText ? JSON.parse(rawText) : {};
+        } catch {
+          data = { raw: rawText };
+        }
+
+        if (!response.ok) {
+          const err = new Error(`HTTP ${response.status}`);
+          err.payload = data;
+          throw err;
+        }
+
+        showJson(data);
+
+        const redirectUrl = data?.link || "";
+        if (!redirectUrl) throw new Error("Campo link não encontrado no retorno.");
+
+        els.redirectUrl.value = redirectUrl;
+        syncSummaries();
+
+        updateStepState("link", "success", "Link gerado com sucesso.");
+        setGlobalStatus("Link gerado com sucesso", "bg-emerald-500");
+        logTimeline("Link gerado", "O retorno trouxe o campo link e a visualização já pode ser aberta.", "emerald");
+        return data;
+      } catch (error) {
+        updateStepState("link", "error", error?.payload ? "Erro retornado pela Ambra." : error.message || "Falha ao gerar o link.");
+        setGlobalStatus("Erro ao gerar link", "bg-rose-500");
+        showJson(error.payload || { error: error.message || "Falha ao gerar o link." });
+        logTimeline("Erro ao gerar link", error.message || "Falha ao gerar o link.", "rose");
+        throw error;
+      } finally {
+        els.btnLink.disabled = false;
+      }
+    }
+
+    async function runFullFlow() {
+      els.btnRunAll.disabled = true;
+      try {
+        await authenticate();
+        await searchStudy();
+        await generateLink();
+      } catch (error) {
+        // handled in each step
+      } finally {
+        els.btnRunAll.disabled = false;
+      }
+    }
+
+    els.btnAuthenticate.addEventListener("click", async () => {
+      try { await authenticate(); } catch { }
+    });
+
+    els.btnStudy.addEventListener("click", async () => {
+      try { await searchStudy(); } catch { }
+    });
+
+    els.btnLink.addEventListener("click", async () => {
+      try { await generateLink(); } catch { }
+    });
+
+    els.btnRunAll.addEventListener("click", runFullFlow);
+    els.btnResetFlow.addEventListener("click", resetFlow);
+
+    els.btnVisualizar.addEventListener("click", () => {
+      const url = els.redirectUrl.value.trim();
+      if (!url) return;
+      window.open(url, "_blank", "noopener,noreferrer");
+      logTimeline("Visualização aberta", "Link aberto em nova guia.", "slate");
+    });
+
+    document.querySelectorAll(".copy-btn").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const targetId = button.getAttribute("data-copy-target");
+        const target = document.getElementById(targetId);
+        const value = target?.value?.trim();
+        if (!value) return;
+        try {
+          await navigator.clipboard.writeText(value);
+          const original = button.textContent;
+          button.textContent = "Copiado!";
+          setTimeout(() => (button.textContent = original), 1200);
+        } catch {
+          logTimeline("Falha ao copiar", `Não foi possível copiar o campo ${targetId}.`, "rose");
+        }
+      });
+    });
+
+    document.getElementById("btnClearJson").addEventListener("click", () => {
+      els.jsonViewer.textContent = "Nenhum retorno recebido.";
+    });
+
+    document.getElementById("btnClearTimeline").addEventListener("click", () => {
+      els.timeline.innerHTML = '<div class="text-sm text-slate-500">Nenhum evento registrado ainda.</div>';
+    });
+
+    document.querySelectorAll(".wizard-step, .wizard-next, .wizard-prev").forEach((button) => {
+      button.addEventListener("click", () => goToStep(Number(button.dataset.step || button.dataset.go)));
+    });
+
+    document.getElementById("menuBtn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      document.getElementById("menuPanel").classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", (e) => {
+      const panel = document.getElementById("menuPanel");
+      const btn = document.getElementById("menuBtn");
+      if (!panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+        panel.classList.add("hidden");
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") document.getElementById("menuPanel").classList.add("hidden");
+      if (e.key === "ArrowRight") goToStep(currentStep + 1);
+      if (e.key === "ArrowLeft") goToStep(currentStep - 1);
+    });
+
+    ["sidStep2", "sidStep3", "uuidStep3", "redirectUrl"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", syncSummaries);
+    });
+
+    syncSummaries();
+    goToStep(1);
+    setGlobalStatus("Aguardando ação", "bg-slate-400");
+  </script>
+</body>
+
+</html>

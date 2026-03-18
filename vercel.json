@@ -29,6 +29,10 @@
             "destination": "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/vertis_laudos_hora"
         },
         {
+            "source": "/api/suporte/ambra",
+            "destination": "http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/dicom/link_viewer_p3"
+        },
+        {
             "source": "/api/suporte/vetex",
             "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/dados_gerais/118/1"
         },

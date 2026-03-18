@@ -1070,32 +1070,23 @@ Nenhum retorno recebido.</pre
 
         if (!url || !sid || !studyId || !action) {
           updateStepState("link", "error", "Preencha URL, SID, UUID e ação.");
-          logTimeline(
-            "Geração de link não executada",
-            "Há campos obrigatórios não preenchidos no passo 3.",
-            "rose",
-          );
           return;
         }
 
         els.btnLink.disabled = true;
         updateStepState("link", "progress", "Gerando link de visualização...");
         setGlobalStatus("Gerando link", "bg-amber-400");
-        logTimeline(
-          "Geração de link iniciada",
-          "Enviando SID, UUID e ação para a Ambra.",
-          "amber",
-        );
 
         try {
           const authHeader = getBasicAuthHeader();
           const headers = authHeader ? { Authorization: authHeader } : {};
+
           const data = await postFormData(
             url,
             {
-              sid,
-              study_id: studyId,
-              action,
+              sid: `"${sid}"`,
+              study_id: `"${studyId}"`,
+              action: `"${action}"`,
             },
             headers,
           );
@@ -1103,8 +1094,9 @@ Nenhum retorno recebido.</pre
           showJson(data);
 
           const redirectUrl = data?.redirect_url || "";
-          if (!redirectUrl)
+          if (!redirectUrl) {
             throw new Error("Campo redirect_url não encontrado no retorno.");
+          }
 
           els.redirectUrl.value = redirectUrl;
           syncSummaries();
@@ -1115,11 +1107,6 @@ Nenhum retorno recebido.</pre
             "redirect_url gerado com sucesso.",
           );
           setGlobalStatus("Link gerado com sucesso", "bg-emerald-500");
-          logTimeline(
-            "Geração de link concluída",
-            "redirect_url preenchido e pronto para visualização.",
-            "emerald",
-          );
         } catch (error) {
           updateStepState(
             "link",
@@ -1128,16 +1115,13 @@ Nenhum retorno recebido.</pre
               ? "Erro retornado pela Ambra."
               : error.message || "Falha ao gerar o link.",
           );
+
           setGlobalStatus("Erro ao gerar link", "bg-rose-500");
+
           showJson(
             error.payload || {
               error: error.message || "Falha ao gerar o link.",
             },
-          );
-          logTimeline(
-            "Erro na geração do link",
-            error.message || "Falha ao gerar o link.",
-            "rose",
           );
         } finally {
           els.btnLink.disabled = false;

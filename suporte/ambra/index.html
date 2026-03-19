@@ -466,6 +466,20 @@
                       placeholder="••••••••" value="/fIV:'8]O76C" />
                   </div>
                 </div>
+
+                <div class="mt-4 flex flex-wrap items-center gap-3">
+                  <button id="btnOpenClientModal" type="button"
+                    class="inline-flex items-center gap-2 px-3 py-2 rounded-2xl border border-slate-200 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 hover:border-slate-300 transition">
+                    Escolher cliente
+                  </button>
+
+                  <div id="selectedClientBadge"
+                    class="hidden items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-2 text-xs text-orange-800">
+                    <span class="font-semibold">Cliente:</span>
+                    <span id="selectedClientName">—</span>
+                  </div>
+                </div>
+
               </div>
 
               <div class="mt-6 flex flex-wrap gap-3">
@@ -697,6 +711,25 @@
     </section>
   </main>
 
+  <div id="clientModal"
+    class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-950/55 backdrop-blur-sm">
+    <div class="w-full max-w-5xl max-h-[88vh] overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-200">
+      <div class="px-6 py-4 border-b bg-gradient-to-r from-white to-slate-50 flex items-center justify-between gap-4">
+        <div>
+          <div class="text-xs uppercase tracking-[0.2em] text-vertis-orange font-semibold">Clientes Ambra</div>
+          <h3 class="mt-1 text-xl font-semibold text-slate-800">Escolha o cliente</h3>
+        </div>
+        <button id="btnCloseClientModal" type="button"
+          class="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+          ✕
+        </button>
+      </div>
+
+      <div id="clientList" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[calc(88vh-88px)]">
+      </div>
+    </div>
+  </div>
+
   <script>
     const els = {
       authUrl: document.getElementById("authUrl"),
@@ -739,9 +772,111 @@
       globalStatus: document.getElementById("globalStatus"),
       timeline: document.getElementById("timeline"),
       wizardLineFill: document.getElementById("wizardLineFill"),
+
+      btnOpenClientModal: document.getElementById("btnOpenClientModal"),
+      btnCloseClientModal: document.getElementById("btnCloseClientModal"),
+      clientModal: document.getElementById("clientModal"),
+      clientList: document.getElementById("clientList"),
+      selectedClientBadge: document.getElementById("selectedClientBadge"),
+      selectedClientName: document.getElementById("selectedClientName"),
     };
 
     let currentStep = 1;
+
+    const ambraClients = [
+      {
+        client: "Vet Popular",
+        user: "dummyuservertisvetp@ambrasaude.com.br",
+        password: "@m!Ra123*56",
+      },
+      {
+        client: "Clínica Animais",
+        user: "dummyuserclinicaanimais@ambrasaude.com.br",
+        password: "@M!Ra123*56",
+      },
+      {
+        client: "Animalab",
+        user: "dummyuservertisanimalab@ambrasaude.com.br",
+        password: "9&6!F3oE@5",
+      },
+      {
+        client: "SUPPORT DIAGNÓSTICO",
+        user: "dummyvertissupport@ambrasaude.com.br",
+        password: "@m!Ra123*56",
+      },
+      {
+        client: "Anchieta",
+        user: "dummyuseranchieta@ambrasaude.com.br",
+        password: "@m!Ra123*56",
+      },
+      {
+        client: "Lapavet",
+        user: "dummyuserlapavet@ambrasaude.com.br",
+        password: '15=/1"HXUCe^',
+      },
+      {
+        client: "Vet Support Moema",
+        user: "dummyvetsupport@ambrasaude.com.br",
+        password: "2c(g4549D[<E",
+      },
+    ];
+
+    function openClientModal() {
+      els.clientModal.classList.remove("hidden");
+      document.body.classList.add("overflow-hidden");
+    }
+
+    function closeClientModal() {
+      els.clientModal.classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    function selectClient(clientData) {
+      els.authUser.value = clientData.user;
+      els.authPassword.value = clientData.password;
+      els.selectedClientName.textContent = clientData.client;
+      els.selectedClientBadge.classList.remove("hidden");
+      els.selectedClientBadge.classList.add("inline-flex");
+      closeClientModal();
+    }
+
+    function renderClientList() {
+      els.clientList.innerHTML = ambraClients.map((item, index) => `
+        <div class="rounded-3xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-5 shadow-sm hover:shadow-md transition">
+          <div>
+            <div class="text-xs uppercase tracking-[0.2em] text-vertis-orange font-semibold">Cliente</div>
+            <h4 class="mt-1 text-lg font-semibold text-slate-800">${item.client}</h4>
+          </div>
+
+          <div class="mt-4 space-y-3">
+            <div class="rounded-2xl border border-slate-200 bg-white p-3">
+              <div class="text-[11px] uppercase tracking-wide text-slate-400">Usuário</div>
+              <div class="mt-1 text-sm break-all text-slate-700 font-medium">${item.user}</div>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-3">
+              <div class="text-[11px] uppercase tracking-wide text-slate-400">Senha</div>
+              <div class="mt-1 text-sm break-all text-slate-700 font-medium">${item.password}</div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <button
+              type="button"
+              class="btnSelectClient inline-flex items-center justify-center gap-2 w-full px-4 py-3 rounded-2xl bg-slate-900 text-white font-medium hover:bg-slate-800 transition"
+              data-client-index="${index}">
+              Usar este cliente
+            </button>
+          </div>
+        </div>
+      `).join("");
+
+      document.querySelectorAll(".btnSelectClient").forEach((button) => {
+        button.addEventListener("click", () => {
+          const index = Number(button.dataset.clientIndex);
+          selectClient(ambraClients[index]);
+        });
+      });
+    }
 
     function setGlobalStatus(text, color = "bg-slate-400") {
       const dot = els.globalStatus.querySelector(".status-dot");
@@ -1162,7 +1297,10 @@
     });
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") document.getElementById("menuPanel").classList.add("hidden");
+      if (e.key === "Escape") {
+        document.getElementById("menuPanel").classList.add("hidden");
+        closeClientModal();
+      }
       if (e.key === "ArrowRight") goToStep(currentStep + 1);
       if (e.key === "ArrowLeft") goToStep(currentStep - 1);
     });
@@ -1171,10 +1309,22 @@
       document.getElementById(id).addEventListener("input", syncSummaries);
     });
 
+    renderClientList();
+
+    els.btnOpenClientModal.addEventListener("click", openClientModal);
+    els.btnCloseClientModal.addEventListener("click", closeClientModal);
+
+    els.clientModal.addEventListener("click", (e) => {
+      if (e.target === els.clientModal) {
+        closeClientModal();
+      }
+    });
+
     syncSummaries();
     goToStep(1);
     setGlobalStatus("Aguardando ação", "bg-slate-400");
   </script>
+
 </body>
 
 </html>

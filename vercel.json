@@ -5,6 +5,10 @@
             "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfse_controle"
         },
         {
+            "source": "/api/nfse/controle_rt",
+            "destination": "http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/get_controle_nfse_rt"
+        },
+        {
             "source": "/api/nfse/logs",
             "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_nfse_controle_logs"
         },

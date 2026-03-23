@@ -483,13 +483,25 @@
     }
 
     function flagBadge(value) {
-      const yes = isYes(value);
+      const raw = String(value ?? '').trim().toUpperCase();
+      const isS = raw === 'S';
+      const isN = raw === 'N';
+      const label = raw || '—';
+
+      let cls = 'bg-slate-100 text-slate-500 border-slate-200';
+
+      if (isS) {
+        cls = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      } else if (isN) {
+        cls = 'bg-slate-100 text-slate-500 border-slate-200';
+      } else {
+        cls = 'bg-amber-50 text-amber-700 border-amber-200';
+      }
+
       return `
-        <span class="inline-flex items-center justify-center min-w-[42px] px-2.5 py-1 rounded-full text-xs font-semibold border ${yes
-          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-          : 'bg-slate-100 text-slate-500 border-slate-200'}">
-          ${yes ? 'S' : 'N'}
-        </span>`;
+    <span class="inline-flex items-center justify-center min-w-[42px] px-2.5 py-1 rounded-full text-xs font-semibold border ${cls}">
+      ${label}
+    </span>`;
     }
 
     function sortData() {

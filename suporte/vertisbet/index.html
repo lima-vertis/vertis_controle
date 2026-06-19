@@ -543,6 +543,120 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes appear { to { transform: translateY(0); opacity: 1; } }
 
+
+
+    .status-filter-wrap {
+      min-width: 220px;
+    }
+
+    .refresh-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 13px;
+      border-radius: 999px;
+      background: #111827;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+      box-shadow: 0 12px 28px rgba(17,24,39,.16);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    .refresh-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 0 rgba(34,197,94,.7);
+      animation: pulse 1.8s infinite;
+    }
+
+    body.is-refreshing .refresh-dot {
+      background: var(--primary);
+      animation: spinDot .7s linear infinite;
+    }
+
+    @keyframes spinDot {
+      0% { transform: scale(1) rotate(0deg); opacity: .7; }
+      50% { transform: scale(1.45) rotate(180deg); opacity: 1; }
+      100% { transform: scale(1) rotate(360deg); opacity: .7; }
+    }
+
+    .bet-card {
+      isolation: isolate;
+    }
+
+    .bet-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.85) 45%, transparent 72%);
+      transform: translateX(-120%);
+      transition: opacity .2s ease;
+      z-index: -1;
+    }
+
+    .bet-card:hover::after {
+      opacity: .55;
+      animation: shine 1s ease;
+    }
+
+    @keyframes shine {
+      to { transform: translateX(120%); }
+    }
+
+    .chance-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 10px 22px rgba(15,23,42,.06);
+    }
+
+    .chance-badge.alive::after,
+    .chance-badge.current-hit::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: .75;
+      animation: pulseMini 1.6s infinite;
+    }
+
+    @keyframes pulseMini {
+      0%, 100% { transform: scale(.85); opacity: .45; }
+      50% { transform: scale(1.25); opacity: 1; }
+    }
+
+    .bet-card.dead .score,
+    .bet-card.dead .avatar {
+      opacity: .75;
+    }
+
+    .bet-card.dead::before {
+      content: "ELIMINADO";
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .bet-card.alive::before {
+      content: "NA BRIGA";
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .bet-card.current-hit::before {
+      content: "CRAVANDO";
+      background: #ffedd5;
+      color: #c2410c;
+    }
+
     @media (max-width: 980px) {
       .scoreboard { grid-template-columns: 1fr; }
       .real-score { order: 2; width: min(100%, 360px); margin: 0 auto; }
@@ -648,6 +762,18 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
       <select id="sectorFilter">
         <option value="">Todas as torcidas</option>
       </select>
+
+      <select id="chanceFilter" class="status-filter-wrap">
+        <option value="">Todos os status</option>
+        <option value="alive">✅ Ainda tem chance</option>
+        <option value="current-hit">🔥 Cravando agora</option>
+        <option value="dead">❌ Sem chance</option>
+      </select>
+
+      <div class="refresh-pill" title="Atualização automática a cada 5 minutos">
+        <span class="refresh-dot"></span>
+        <span id="refreshStatus">Atualiza a cada 5 min</span>
+      </div>
     </section>
 
     <section id="content">
@@ -660,7 +786,7 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
 
   <script>
     //const ENDPOINT = 'http://localhost:9000/api/V1.1/wc_jogo/2';
-    const ENDPOINT = '/api/suporte/vertisbet';
+	const ENDPOINT = '/api/suporte/vertisbet';
 
     let bets = [];
 
@@ -668,6 +794,8 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
       content: document.getElementById('content'),
       searchInput: document.getElementById('searchInput'),
       sectorFilter: document.getElementById('sectorFilter'),
+      chanceFilter: document.getElementById('chanceFilter'),
+      refreshStatus: document.getElementById('refreshStatus'),
       matchDate: document.getElementById('matchDate'),
       team1Name: document.getElementById('team1Name'),
       team2Name: document.getElementById('team2Name'),
@@ -883,7 +1011,10 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
     }
 
     function fillSectorFilter(data) {
+      const currentValue = elements.sectorFilter.value;
       const sectors = [...new Set(data.map(item => item.setor).filter(Boolean))].sort();
+
+      elements.sectorFilter.innerHTML = '<option value="">Todas as torcidas</option>';
 
       sectors.forEach(sector => {
         const option = document.createElement('option');
@@ -891,17 +1022,24 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
         option.textContent = sector;
         elements.sectorFilter.appendChild(option);
       });
+
+      if (sectors.includes(currentValue)) {
+        elements.sectorFilter.value = currentValue;
+      }
     }
 
     function getFilteredBets() {
       const search = elements.searchInput.value.trim().toLowerCase();
       const sector = elements.sectorFilter.value;
+      const chanceStatus = elements.chanceFilter.value;
 
       return bets.filter(item => {
         const matchesName = item.nome.toLowerCase().includes(search);
         const matchesSector = !sector || item.setor === sector;
+        const status = getBetStatus(item).className;
+        const matchesChance = !chanceStatus || status === chanceStatus;
 
-        return matchesName && matchesSector;
+        return matchesName && matchesSector && matchesChance;
       });
     }
 
@@ -956,9 +1094,28 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
       `;
     }
 
-    async function loadBets() {
+    function formatRefreshTime() {
+      return new Intl.DateTimeFormat('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }).format(new Date());
+    }
+
+    async function loadBets(silent = false) {
       try {
-        const response = await fetch(ENDPOINT);
+        document.body.classList.add('is-refreshing');
+
+        if (!silent) {
+          elements.content.innerHTML = `
+            <div class="panel loading">
+              <div class="loader"></div>
+              Carregando apostas...
+            </div>
+          `;
+        }
+
+        const response = await fetch(`${ENDPOINT}?_=${Date.now()}`, { cache: 'no-store' });
 
         if (!response.ok) {
           throw new Error(`Erro HTTP ${response.status}`);
@@ -969,6 +1126,7 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
         updateMatchInfo(bets);
         fillSectorFilter(bets);
         renderCards();
+        elements.refreshStatus.textContent = `Atualizado às ${formatRefreshTime()}`;
       } catch (error) {
         elements.content.innerHTML = `
           <div class="panel error">
@@ -978,13 +1136,18 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
             Detalhe: ${error.message}
           </div>
         `;
+        elements.refreshStatus.textContent = 'Falha ao atualizar';
+      } finally {
+        document.body.classList.remove('is-refreshing');
       }
     }
 
     elements.searchInput.addEventListener('input', renderCards);
     elements.sectorFilter.addEventListener('change', renderCards);
+    elements.chanceFilter.addEventListener('change', renderCards);
 
     loadBets();
+    setInterval(() => loadBets(true), 5 * 60 * 1000);
   </script>
 </body>
 </html>

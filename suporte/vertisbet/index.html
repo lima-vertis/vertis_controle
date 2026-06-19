@@ -412,6 +412,51 @@
       box-shadow: 0 16px 36px rgba(249, 115, 22, .16);
     }
 
+
+    .chance-badge {
+      width: fit-content;
+      margin-bottom: 12px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 950;
+      border: 1px solid transparent;
+    }
+
+    .chance-badge.alive {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #86efac;
+    }
+
+    .chance-badge.dead {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .chance-badge.current-hit {
+      background: var(--primary-soft);
+      color: #c2410c;
+      border-color: var(--border-orange);
+    }
+
+    .bet-card.dead {
+      opacity: .62;
+      filter: grayscale(.2);
+    }
+
+    .bet-card.alive {
+      box-shadow: 0 14px 34px rgba(34,197,94,.10);
+    }
+
+    .bet-card.current-hit {
+      background:
+        linear-gradient(180deg, #ffffff, #fff7ed) padding-box,
+        linear-gradient(135deg, var(--primary), var(--green)) border-box;
+      box-shadow: 0 16px 36px rgba(249, 115, 22, .16);
+    }
+
     .hit-badge {
       width: fit-content;
       margin-bottom: 12px;
@@ -614,8 +659,7 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
   </main>
 
   <script>
-    //const ENDPOINT = 'http://localhost:9000/api/V1.1/wc_jogo/2';
-	const ENDPOINT = '/api/suporte/vertisbet';
+    const ENDPOINT = 'http://localhost:9000/api/V1.1/wc_jogo/2';
 
     let bets = [];
 
@@ -779,6 +823,43 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
         Number(item.gol_2) === Number(item.pc_gol_2);
     }
 
+    function getBetStatus(item) {
+      if (!hasRealScore(item)) {
+        return {
+          className: 'alive',
+          label: '⏳ Aguardando placar',
+          title: 'Ainda não há placar real informado.'
+        };
+      }
+
+      const bet1 = Number(item.gol_1);
+      const bet2 = Number(item.gol_2);
+      const real1 = Number(item.pc_gol_1);
+      const real2 = Number(item.pc_gol_2);
+
+      if (real1 === bet1 && real2 === bet2) {
+        return {
+          className: 'current-hit',
+          label: '🔥 Cravando agora',
+          title: 'O placar atual está exatamente igual ao palpite.'
+        };
+      }
+
+      if (real1 <= bet1 && real2 <= bet2) {
+        return {
+          className: 'alive',
+          label: '✅ Ainda tem chance',
+          title: 'O placar atual ainda permite que esse palpite aconteça.'
+        };
+      }
+
+      return {
+        className: 'dead',
+        label: '❌ Sem chance',
+        title: 'O placar atual já passou do palpite em pelo menos um dos times.'
+      };
+    }
+
     function updateMatchInfo(data) {
       if (!data.length) return;
 
@@ -839,10 +920,12 @@ box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
         <div class="cards">
           ${filtered.map((item, index) => {
             const exact = isExactHit(item);
+            const status = getBetStatus(item);
 
             return `
-              <article class="bet-card ${exact ? 'exact' : ''}" style="animation-delay: ${index * 45}ms">
-                ${exact ? '<div class="hit-badge">🏆 Cravou o placar</div>' : ''}
+              <article class="bet-card ${exact ? 'exact' : ''} ${status.className}" style="animation-delay: ${index * 45}ms">
+                <div class="chance-badge ${status.className}" title="${status.title}">${status.label}</div>
+                ${exact ? '<div class="hit-badge">🏆 Cravou o placar final</div>' : ''}
 
                 <div class="person">
                   <div class="avatar">${initials(item.nome)}</div>

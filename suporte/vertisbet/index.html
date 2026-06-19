@@ -517,7 +517,17 @@
       .toolbar { flex-direction: column; align-items: stretch; }
       .toolbar select { max-width: none; }
     }
-  </style>
+  
+.vertisbet-header{text-align:center;margin-bottom:30px;position:relative;z-index:2;}
+.vertisbet-logo{width:110px;height:auto;margin-bottom:12px;filter:drop-shadow(0 10px 20px rgba(249,115,22,.25));}
+.vertisbet-title{font-size:clamp(42px,6vw,84px);font-weight:1000;letter-spacing:-3px;line-height:1;}
+.vertisbet-title .vertis{color:#111827;}
+.vertisbet-title .bet{color:#f97316;margin-left:6px;position:relative;}
+.vertisbet-title .bet::after{content:"";position:absolute;right:-45px;top:50%;width:35px;height:4px;background:#f97316;
+box-shadow:0 -8px 0 #f97316,0 8px 0 #f97316;transform:translateY(-50%);}
+.vertisbet-subtitle{margin-top:10px;font-size:18px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.12em;}
+
+</style>
 </head>
 
 <body>
@@ -535,9 +545,15 @@
         <div class="match-date" id="matchDate">Carregando partida...</div>
       </div>
 
-      <h1>
-        Apostas em campo: <span class="gradient-text">quem cravou?</span>
-      </h1>
+      
+<div class="vertisbet-header">
+    <img src="https://static.wixstatic.com/media/80b593_1e4875e92ea34b39a3980864877915ae%7Emv2.png/v1/fill/w_192,h_192,lg_1,usm_0.66_1.00_0.01/80b593_1e4875e92ea34b39a3980864877915ae%7Emv2.png" alt="VertisBET" class="vertisbet-logo">
+    <div class="vertisbet-title">
+        <span class="vertis">VERTIS</span><span class="bet">BET</span>
+    </div>
+    <div class="vertisbet-subtitle">O bolão oficial da empresa</div>
+</div>
+
 
       <div class="scoreboard">
         <div class="team">
@@ -598,7 +614,8 @@
   </main>
 
   <script>
-    const ENDPOINT = 'http://localhost:9000/api/V1.1/wc_jogo/2';
+    //const ENDPOINT = 'http://localhost:9000/api/V1.1/wc_jogo/2';
+	const ENDPOINT = 'api/suporte/vertisbet';
 
     let bets = [];
 

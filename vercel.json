@@ -46,7 +46,7 @@
         },
         {
             "source": "/api/suporte/vertisbet",
-            "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/wc_jogo/5"
+            "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/wc_jogo/6"
         },
         {
             "source": "/api/status/constellation",

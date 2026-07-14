@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VertisBET - Ranking de Acertos</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card: #fff;
+            --text: #1f2937;
+            --strong: #111827;
+            --muted: #6b7280;
+            --orange: #f97316;
+            --orange-dark: #c2410c;
+            --orange-soft: #ffedd5;
+            --green: #16a34a;
+            --green-soft: #dcfce7;
+            --border: #e5e7eb;
+            --shadow: 0 14px 40px rgba(15, 23, 42, .08);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 15% 10%, rgba(249, 115, 22, .20), transparent 28%),
+                radial-gradient(circle at 88% 18%, rgba(34, 197, 94, .18), transparent 30%),
+                linear-gradient(180deg, #fff 0%, #f8fafc 50%, #fff 100%);
+            overflow-x: hidden
+        }
+
+        body:before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(15, 23, 42, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, .035) 1px, transparent 1px);
+            background-size: 46px 46px;
+            mask-image: linear-gradient(to bottom, #000, transparent 78%);
+            pointer-events: none
+        }
+
+        .orb {
+            position: fixed;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            filter: blur(34px);
+            opacity: .18;
+            pointer-events: none;
+            background: var(--orange);
+            animation: float 8s ease-in-out infinite
+        }
+
+        .orb.one {
+            left: -90px;
+            top: 210px
+        }
+
+        .orb.two {
+            right: -90px;
+            bottom: 80px;
+            background: #22c55e;
+            animation-delay: -3s
+        }
+
+        @keyframes float {
+            50% {
+                transform: translateY(-28px) scale(1.05)
+            }
+        }
+
+        .page {
+            position: relative;
+            z-index: 1;
+            width: min(1180px, calc(100% - 32px));
+            margin: auto;
+            padding: 34px 0 56px
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, .94);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(16px)
+        }
+
+        .hero {
+            padding: 34px;
+            margin-bottom: 22px;
+            background: linear-gradient(115deg, rgba(255, 255, 255, .96), rgba(255, 247, 237, .94) 48%, rgba(240, 253, 244, .94));
+            overflow: hidden;
+            position: relative
+        }
+
+        .topline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 20px
+        }
+
+        .badge,
+        .refresh-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            border-radius: 999px;
+            background: #111827;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 900
+        }
+
+        .pulse,
+        .refresh-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, .7);
+            animation: pulse 1.8s infinite
+        }
+
+        @keyframes pulse {
+            70% {
+                box-shadow: 0 0 0 12px rgba(34, 197, 94, 0)
+            }
+        }
+
+        .vertisbet-header {
+            text-align: center;
+            margin: 10px 0 28px
+        }
+
+        .vertisbet-logo {
+            width: 110px;
+            filter: drop-shadow(0 10px 20px rgba(249, 115, 22, .25))
+        }
+
+        .vertisbet-title {
+            font-size: clamp(42px, 6vw, 84px);
+            font-weight: 1000;
+            letter-spacing: -3px;
+            line-height: 1
+        }
+
+        .vertisbet-title .bet {
+            color: var(--orange);
+            margin-left: 6px
+        }
+
+        .vertisbet-subtitle {
+            margin-top: 10px;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .12em
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 18px;
+            margin-bottom: 20px
+        }
+
+        .toolbar input {
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            outline: none
+        }
+
+        .toolbar input:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, .12)
+        }
+
+        .content-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 22px;
+            color: var(--strong)
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 18px
+        }
+
+        .section-kicker {
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--orange-dark);
+            text-transform: uppercase;
+            letter-spacing: .09em
+        }
+
+        .ranking,
+        .results {
+            padding: 24px
+        }
+
+        .podium {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+            align-items: end
+        }
+
+        .podium-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            min-height: 190px;
+            padding: 24px 18px 18px;
+            border-radius: 24px;
+            background: #fff;
+            border: 1px solid var(--border);
+            text-align: center;
+            overflow: hidden
+        }
+
+        .podium-card:before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent, rgba(249, 115, 22, .06));
+            pointer-events: none
+        }
+
+        .podium-card.first {
+            min-height: 230px;
+            border-color: #fdba74;
+            background: linear-gradient(180deg, #fff7ed, #fff)
+        }
+
+        .podium-card.second {
+            min-height: 205px;
+            background: linear-gradient(180deg, #f8fafc, #fff)
+        }
+
+        .podium-card.third {
+            min-height: 185px;
+            background: linear-gradient(180deg, #fffaf5, #fff)
+        }
+
+        .podium-medal {
+            font-size: 34px;
+            margin-bottom: 8px
+        }
+
+        .podium-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--orange), #fb923c);
+            color: #fff;
+            font-size: 20px;
+            font-weight: 950;
+            border: 4px solid #fff;
+            box-shadow: 0 12px 26px rgba(249, 115, 22, .22);
+            margin-bottom: 10px
+        }
+
+        .podium-card.first .podium-avatar {
+            width: 76px;
+            height: 76px;
+            font-size: 24px
+        }
+
+        .podium-name {
+            position: relative;
+            font-weight: 950;
+            color: var(--strong);
+            font-size: 17px
+        }
+
+        .podium-score {
+            position: relative;
+            margin-top: 7px;
+            font-size: 28px;
+            font-weight: 1000;
+            color: var(--orange-dark)
+        }
+
+        .podium-score small {
+            display: block;
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em
+        }
+
+        .rank-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px
+        }
+
+        .rank-item {
+            display: grid;
+            grid-template-columns: 48px 1fr auto;
+            align-items: center;
+            gap: 12px;
+            padding: 13px;
+            border-radius: 18px;
+            background: #fff;
+            border: 1px solid var(--border)
+        }
+
+        .position {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: #111827;
+            color: #fff;
+            font-weight: 950
+        }
+
+        .rank-name {
+            font-weight: 950;
+            color: var(--strong)
+        }
+
+        .rank-count {
+            font-weight: 950;
+            color: var(--orange-dark);
+            white-space: nowrap
+        }
+
+        .rank-count small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            text-align: right
+        }
+
+        .table-wrap {
+            overflow: auto;
+            border: 1px solid var(--border);
+            border-radius: 20px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 660px;
+            background: #fff
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background: #111827;
+            color: #fff;
+            text-align: left;
+            padding: 14px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em
+        }
+
+        tbody td {
+            padding: 14px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        tbody tr:hover {
+            background: #fff7ed
+        }
+
+        .player {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            color: var(--strong)
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--orange), #fb923c);
+            color: #fff;
+            font-weight: 950
+        }
+
+        .game {
+            font-weight: 850
+        }
+
+        .date {
+            color: var(--muted);
+            white-space: nowrap
+        }
+
+        .hit {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: var(--green-soft);
+            color: #166534;
+            font-size: 12px;
+            font-weight: 900
+        }
+
+        .loading,
+        .error,
+        .empty {
+            padding: 36px;
+            text-align: center;
+            color: var(--muted)
+        }
+
+        .loader {
+            width: 44px;
+            height: 44px;
+            margin: 0 auto 14px;
+            border: 4px solid #fed7aa;
+            border-top-color: var(--orange);
+            border-radius: 50%;
+            animation: spin 1s linear infinite
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        code {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: #f3f4f6;
+            border: 1px solid var(--border);
+            color: var(--strong);
+            word-break: break-all
+        }
+
+        @media(max-width:900px) {
+            .summary {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .rank-list {
+                grid-template-columns: 1fr
+            }
+
+            .podium {
+                gap: 10px
+            }
+
+            .podium-card {
+                padding-inline: 10px
+            }
+        }
+
+        @media(max-width:620px) {
+            .page {
+                width: min(100% - 22px, 1180px);
+                padding-top: 18px
+            }
+
+            .hero {
+                padding: 22px
+            }
+
+            .summary {
+                grid-template-columns: 1fr
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch
+            }
+
+            .refresh-pill {
+                justify-content: center
+            }
+
+            .ranking,
+            .results {
+                padding: 16px
+            }
+
+            .vertisbet-title {
+                font-size: 48px
+            }
+
+            .podium {
+                grid-template-columns: 1fr
+            }
+
+            .podium-card,
+            .podium-card.first,
+            .podium-card.second,
+            .podium-card.third {
+                min-height: 0;
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+                align-items: center;
+                text-align: left;
+                gap: 12px
+            }
+
+            .podium-medal {
+                margin: 0
+            }
+
+            .podium-avatar,
+            .podium-card.first .podium-avatar {
+                width: 52px;
+                height: 52px;
+                font-size: 17px;
+                margin: 0
+            }
+
+            .podium-score {
+                margin: 0;
+                text-align: right
+            }
+
+            .section-head {
+                align-items: flex-start;
+                flex-direction: column
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="orb one"></div>
+    <div class="orb two"></div>
+    <main class="page">
+        <section class="panel hero">
+            <div class="topline">
+                <div class="badge"><span class="pulse"></span>Bolão da firma ⚽</div>
+                <div class="refresh-pill"><span class="refresh-dot"></span><span id="refreshStatus">Carregando...</span>
+                </div>
+            </div>
+            <div class="vertisbet-header">
+                <img class="vertisbet-logo"
+                    src="https://static.wixstatic.com/media/80b593_1e4875e92ea34b39a3980864877915ae%7Emv2.png/v1/fill/w_192,h_192,lg_1,usm_0.66_1.00_0.01/80b593_1e4875e92ea34b39a3980864877915ae%7Emv2.png"
+                    alt="VertisBET">
+                <div class="vertisbet-title"><span>VERTIS</span><span class="bet">BET</span></div>
+                <div class="vertisbet-subtitle">Ranking oficial de placares cravados</div>
+            </div>
+        </section>
+
+        <section class="panel toolbar">
+            <input id="searchInput" type="text" placeholder="🔎 Buscar jogador ou partida...">
+        </section>
+
+        <section id="content">
+            <div class="panel loading">
+                <div class="loader"></div>Carregando resultados...
+            </div>
+        </section>
+    </main>
+
+    <script>
+        //const ENDPOINT = 'http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/vertisbet_bolao';
+        const ENDPOINT = '/api/suporte/vertisbetbolao';
+        let results = [];
+
+        const els = {
+            content: document.getElementById('content'),
+            searchInput: document.getElementById('searchInput'),
+            refreshStatus: document.getElementById('refreshStatus'),
+        };
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
+        }
+
+        function initials(name) {
+            return String(name || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+        }
+
+        function formatDate(value) {
+            if (!value) return '-';
+            const date = new Date(String(value).replace(' ', 'T'));
+            if (Number.isNaN(date.getTime())) return value;
+            return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(date);
+        }
+
+        function buildRanking(data) {
+            const map = new Map();
+            data.forEach(item => {
+                const player = String(item.jogador || 'Sem nome').trim();
+                map.set(player, (map.get(player) || 0) + 1);
+            });
+            return [...map.entries()]
+                .map(([jogador, acertos]) => ({ jogador, acertos }))
+                .sort((a, b) => b.acertos - a.acertos || a.jogador.localeCompare(b.jogador, 'pt-BR'));
+        }
+
+        function filteredResults() {
+            const term = els.searchInput.value.trim().toLocaleLowerCase('pt-BR');
+            if (!term) return results;
+            return results.filter(item =>
+                String(item.jogador || '').toLocaleLowerCase('pt-BR').includes(term) ||
+                String(item.jogo || '').toLocaleLowerCase('pt-BR').includes(term)
+            );
+        }
+
+        function render() {
+            const filtered = filteredResults();
+            const ranking = buildRanking(filtered);
+
+            if (!filtered.length) {
+                els.content.innerHTML = '<div class="panel empty">Nenhum resultado encontrado.</div>';
+                return;
+            }
+
+            const topThree = ranking.slice(0, 3);
+            const podiumOrder = [topThree[1], topThree[0], topThree[2]].filter(Boolean);
+            const podiumClasses = topThree.length >= 2 ? ['second', 'first', 'third'] : ['first'];
+            const podiumMedals = topThree.length >= 2 ? ['🥈', '🥇', '🥉'] : ['🥇'];
+
+            const podiumHtml = podiumOrder.map((item, index) => `
+      <article class="podium-card ${podiumClasses[index]}">
+        <div class="podium-medal">${podiumMedals[index]}</div>
+        <div class="podium-avatar">${escapeHtml(initials(item.jogador))}</div>
+        <div>
+          <div class="podium-name">${escapeHtml(item.jogador)}</div>
+          <div class="podium-score">${item.acertos}<small>${item.acertos === 1 ? 'acerto' : 'acertos'}</small></div>
+        </div>
+      </article>`).join('');
+
+            const rankingHtml = ranking.slice(3).map((item, index) => `
+      <div class="rank-item">
+        <div class="position">${index + 4}</div>
+        <div class="rank-name">${escapeHtml(item.jogador)}</div>
+        <div class="rank-count">${item.acertos}<small>${item.acertos === 1 ? 'acerto' : 'acertos'}</small></div>
+      </div>`).join('');
+
+            const rows = filtered
+                .slice()
+                .sort((a, b) => String(b.dth_jogo).localeCompare(String(a.dth_jogo)))
+                .map(item => `
+        <tr>
+          <td><div class="player"><div class="avatar">${escapeHtml(initials(item.jogador))}</div>${escapeHtml(item.jogador)}</div></td>
+          <td class="game">${escapeHtml(item.jogo)}</td>
+          <td class="date">${escapeHtml(formatDate(item.dth_jogo))}</td>
+          <td><span class="hit">✅ Acertou</span></td>
+        </tr>`).join('');
+
+            els.content.innerHTML = `
+      <div class="content-stack">
+        <section class="panel ranking">
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Classificação geral</div>
+              <h2 class="section-title">🏆 Ranking dos jogadores</h2>
+            </div>
+            <div class="hit">${ranking.length} ${ranking.length === 1 ? 'jogador pontuando' : 'jogadores pontuando'}</div>
+          </div>
+          <div class="podium">${podiumHtml}</div>
+          ${rankingHtml ? `<div class="rank-list">${rankingHtml}</div>` : ''}
+        </section>
+
+        <section class="panel results">
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Histórico de resultados</div>
+              <h2 class="section-title">⚽ Placares acertados</h2>
+            </div>
+            <div class="hit">${filtered.length} ${filtered.length === 1 ? 'acerto exibido' : 'acertos exibidos'}</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Jogador</th><th>Partida</th><th>Data</th><th>Resultado</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </section>
+      </div>`;
+        }
+
+
+        function currentTime() {
+            return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
+        }
+
+        async function loadResults(silent = false) {
+            try {
+                if (!silent) els.content.innerHTML = '<div class="panel loading"><div class="loader"></div>Carregando resultados...</div>';
+                els.refreshStatus.textContent = 'Atualizando...';
+
+                const response = await fetch(`${ENDPOINT}?_=${Date.now()}`, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
+
+                const data = await response.json();
+                if (!Array.isArray(data)) throw new Error('O endpoint não retornou uma lista JSON.');
+
+                results = data;
+                render();
+                els.refreshStatus.textContent = `Atualizado às ${currentTime()}`;
+            } catch (error) {
+                els.content.innerHTML = `<div class="panel error"><strong>Não foi possível carregar os resultados.</strong><br><br>Endpoint:<br><code>${escapeHtml(ENDPOINT)}</code><br><br>Detalhe: ${escapeHtml(error.message)}<br><br><small>Se esta página estiver publicada em HTTPS, o navegador poderá bloquear este endpoint HTTP por conteúdo misto.</small></div>`;
+                els.refreshStatus.textContent = 'Falha ao atualizar';
+            }
+        }
+
+        els.searchInput.addEventListener('input', render);
+        loadResults();
+        setInterval(() => loadResults(true), 5 * 60 * 1000);
+    </script>
+</body>
+
+</html>

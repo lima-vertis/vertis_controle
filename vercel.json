@@ -49,6 +49,10 @@
             "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/wc_jogo/19"
         },
         {
+            "source": "/api/suporte/vertisbetbolao",
+            "destination": "http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/vertisbet_bolao"
+        },
+        {
             "source": "/api/status/constellation",
             "destination": "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/status"
         },

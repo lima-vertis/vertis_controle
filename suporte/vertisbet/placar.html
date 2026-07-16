@@ -304,7 +304,7 @@
 
         .switch-track {
             display: inline-grid;
-            grid-template-columns: repeat(2, minmax(120px, 1fr));
+            grid-template-columns: repeat(3, minmax(120px, 1fr));
             gap: 5px;
             padding: 5px;
             border-radius: 18px;
@@ -894,7 +894,7 @@
 
             .switch-track {
                 width: 100%;
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: repeat(3, 1fr);
             }
 
             .mode-button {
@@ -981,6 +981,93 @@
                 scroll-behavior: auto !important;
             }
         }
+
+
+        .ranking-table tbody tr.top-1 {
+            background: linear-gradient(90deg, rgba(247, 189, 50, .22), rgba(255, 255, 255, .92));
+        }
+
+        .ranking-table tbody tr.top-2 {
+            background: linear-gradient(90deg, rgba(183, 192, 204, .24), rgba(255, 255, 255, .92));
+        }
+
+        .ranking-table tbody tr.top-3 {
+            background: linear-gradient(90deg, rgba(201, 130, 80, .20), rgba(255, 255, 255, .92));
+        }
+
+        .ranking-position {
+            width: 54px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            font-weight: 1000;
+            color: #fff;
+            background: linear-gradient(135deg, #111827, #334155);
+            box-shadow: 0 9px 20px rgba(15, 23, 42, .16);
+        }
+
+        .top-1 .ranking-position {
+            background: linear-gradient(135deg, #f3b829, #ff8b20);
+        }
+
+        .top-2 .ranking-position {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+        }
+
+        .top-3 .ranking-position {
+            background: linear-gradient(135deg, #c98250, #9a5a34);
+        }
+
+        .points-badge {
+            display: inline-flex;
+            min-width: 88px;
+            justify-content: center;
+            padding: 9px 13px;
+            border-radius: 999px;
+            color: #fff;
+            font-weight: 1000;
+            background: linear-gradient(135deg, var(--orange), var(--orange-2));
+            box-shadow: 0 9px 20px rgba(255, 122, 24, .2);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .page-button {
+            border: 1px solid rgba(148, 163, 184, .28);
+            background: #fff;
+            color: var(--strong);
+            min-width: 40px;
+            height: 40px;
+            border-radius: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .page-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: rgba(255, 122, 24, .48);
+        }
+
+        .page-button.active {
+            color: #fff;
+            background: linear-gradient(135deg, var(--orange), var(--orange-2));
+            border-color: transparent;
+            box-shadow: 0 9px 20px rgba(255, 122, 24, .2);
+        }
+
+        .page-button:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
     </style>
 
 </head>
@@ -1004,7 +1091,8 @@
             </div>
             <div class="mode-switch" aria-label="Tipo de ranking">
                 <div class="switch-track">
-                    <button class="mode-button active" type="button" data-mode="placar">🎯 Placar</button>
+                    <button class="mode-button active" type="button" data-mode="ranking">🏆 Ranking</button>
+                    <button class="mode-button" type="button" data-mode="placar">🎯 Placar</button>
                     <button class="mode-button" type="button" data-mode="vencedor">🏅 Vencedor</button>
                 </div>
             </div>
@@ -1023,11 +1111,18 @@
 
     <script>
         const ENDPOINTS = {
+            ranking: '/api/suporte/vertisbetranking',
             placar: '/api/suporte/vertisbetbolao',
             vencedor: '/api/suporte/vertisbetbolao2'
         };
 
         const MODE_CONFIG = {
+            ranking: {
+                subtitle: 'Classificação geral por pontuação',
+                sectionTitle: '📋 Pontuações por partida',
+                resultText: 'pontos',
+                loadingText: 'Carregando ranking...'
+            },
             placar: {
                 subtitle: 'Ranking oficial de placares cravados',
                 sectionTitle: '⚽ Placares acertados',
@@ -1042,9 +1137,11 @@
             }
         };
 
-        let currentMode = 'placar';
+        let currentMode = 'ranking';
         let results = [];
-        const cache = { placar: null, vencedor: null };
+        let rankingPage = 1;
+        const RANKING_PAGE_SIZE = 6;
+        const cache = { ranking: null, placar: null, vencedor: null };
 
         const els = {
             content: document.getElementById('content'),
@@ -1062,22 +1159,31 @@
             return String(name || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
         }
 
+        function parseDate(value) {
+            if (!value) return null;
+            const text = String(value).trim();
+            const br = text.match(/^(\d{2})\/(\d{2})\/(\d{4})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/);
+            if (br) return new Date(+br[3], +br[2] - 1, +br[1], +br[4], +br[5], +(br[6] || 0));
+            const date = new Date(text.replace(' ', 'T'));
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
         function formatDate(value) {
-            if (!value) return '-';
-            const date = new Date(String(value).replace(' ', 'T'));
-            if (Number.isNaN(date.getTime())) return value;
+            const date = parseDate(value);
+            if (!date) return value || '-';
             return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(date);
         }
 
-        function buildRanking(data) {
+        function buildRanking(data, usePoints = false) {
             const map = new Map();
             data.forEach(item => {
                 const player = String(item.jogador || 'Sem nome').trim();
-                map.set(player, (map.get(player) || 0) + 1);
+                const value = usePoints ? Number(item.pontos || 0) : 1;
+                map.set(player, (map.get(player) || 0) + value);
             });
             return [...map.entries()]
-                .map(([jogador, acertos]) => ({ jogador, acertos }))
-                .sort((a, b) => b.acertos - a.acertos || a.jogador.localeCompare(b.jogador, 'pt-BR'));
+                .map(([jogador, total]) => ({ jogador, total }))
+                .sort((a, b) => b.total - a.total || a.jogador.localeCompare(b.jogador, 'pt-BR'));
         }
 
         function filteredResults() {
@@ -1090,81 +1196,103 @@
             );
         }
 
-        function render() {
-            const filtered = filteredResults();
-            const ranking = buildRanking(filtered);
+        function paginationHtml(totalPages) {
+            if (totalPages <= 1) return '';
+            const buttons = Array.from({ length: totalPages }, (_, i) => i + 1).map(page =>
+                `<button class="page-button ${page === rankingPage ? 'active' : ''}" data-page="${page}">${page}</button>`
+            ).join('');
+            return `<div class="pagination">
+                <button class="page-button" data-page="${rankingPage - 1}" ${rankingPage === 1 ? 'disabled' : ''}>‹</button>
+                ${buttons}
+                <button class="page-button" data-page="${rankingPage + 1}" ${rankingPage === totalPages ? 'disabled' : ''}>›</button>
+            </div>`;
+        }
+
+        function renderRankingMode(filtered) {
+            const ranking = buildRanking(filtered, true);
+            const totalPages = Math.max(1, Math.ceil(ranking.length / RANKING_PAGE_SIZE));
+            rankingPage = Math.min(rankingPage, totalPages);
+            const start = (rankingPage - 1) * RANKING_PAGE_SIZE;
+            const visibleRanking = ranking.slice(start, start + RANKING_PAGE_SIZE);
+
+            const rankingRows = visibleRanking.map((item, index) => {
+                const position = start + index + 1;
+                const topClass = position <= 3 ? `top-${position}` : '';
+                const medal = position === 1 ? '🥇 ' : position === 2 ? '🥈 ' : position === 3 ? '🥉 ' : '';
+                return `<tr class="${topClass}">
+                    <td><div class="ranking-position">${position}</div></td>
+                    <td><div class="player"><div class="avatar">${escapeHtml(initials(item.jogador))}</div>${medal}${escapeHtml(item.jogador)}</div></td>
+                    <td><span class="points-badge">${item.total} pts</span></td>
+                </tr>`;
+            }).join('');
+
+            const detailRows = filtered.slice().sort((a, b) => {
+                const da = parseDate(a.dth_jogo), db = parseDate(b.dth_jogo);
+                return (db?.getTime() || 0) - (da?.getTime() || 0);
+            }).map((item, index) => `<tr style="animation-delay:${Math.min(index * 25, 450)}ms">
+                <td><div class="player"><div class="avatar">${escapeHtml(initials(item.jogador))}</div>${escapeHtml(item.jogador)}</div></td>
+                <td class="game">${escapeHtml(item.jogo)}</td>
+                <td class="game">${escapeHtml(item.palpite || '-')}</td>
+                <td class="date">${escapeHtml(formatDate(item.dth_jogo))}</td>
+                <td><span class="points-badge">${Number(item.pontos || 0)} pts</span></td>
+            </tr>`).join('');
+
+            els.content.innerHTML = `<div class="content-stack">
+                <section class="panel ranking">
+                    <div class="section-head">
+                        <div><div class="section-kicker">Classificação geral</div><h2 class="section-title">🏆 Ranking por pontuação</h2></div>
+                        <div class="hit">${ranking.length} ${ranking.length === 1 ? 'jogador' : 'jogadores'}</div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="ranking-table">
+                            <thead><tr><th>Posição</th><th>Jogador</th><th>Pontuação total</th></tr></thead>
+                            <tbody>${rankingRows}</tbody>
+                        </table>
+                    </div>
+                    ${paginationHtml(totalPages)}
+                </section>
+                <section class="panel results">
+                    <div class="section-head">
+                        <div><div class="section-kicker">Histórico de pontuação</div><h2 class="section-title">📋 Resultados contabilizados</h2></div>
+                        <div class="hit">${filtered.length} ${filtered.length === 1 ? 'resultado' : 'resultados'}</div>
+                    </div>
+                    <div class="table-wrap"><table>
+                        <thead><tr><th>Jogador</th><th>Partida</th><th>Palpite</th><th>Data</th><th>Pontos</th></tr></thead>
+                        <tbody>${detailRows}</tbody>
+                    </table></div>
+                </section>
+            </div>`;
+
+            els.content.querySelectorAll('[data-page]').forEach(button => button.addEventListener('click', () => {
+                if (button.disabled) return;
+                rankingPage = Number(button.dataset.page);
+                render();
+                document.querySelector('.ranking')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }));
+        }
+
+        function renderLegacyMode(filtered) {
+            const ranking = buildRanking(filtered, false);
             const config = MODE_CONFIG[currentMode];
-
-            if (!filtered.length) {
-                els.content.innerHTML = '<div class="panel empty">Nenhum resultado encontrado.</div>';
-                return;
-            }
-
             const topThree = ranking.slice(0, 3);
             const podiumOrder = [topThree[1], topThree[0], topThree[2]].filter(Boolean);
             const podiumClasses = topThree.length >= 2 ? ['second', 'first', 'third'] : ['first'];
             const podiumMedals = topThree.length >= 2 ? ['🥈', '🥇', '🥉'] : ['🥇'];
-
-            const podiumHtml = podiumOrder.map((item, index) => `
-      <article class="podium-card ${podiumClasses[index]}">
-        <div class="podium-medal">${podiumMedals[index]}</div>
-        <div class="podium-avatar">${escapeHtml(initials(item.jogador))}</div>
-        <div>
-          <div class="podium-name">${escapeHtml(item.jogador)}</div>
-          <div class="podium-score">${item.acertos}<small>${item.acertos === 1 ? 'acerto' : 'acertos'}</small></div>
-        </div>
-      </article>`).join('');
-
-            const rankingHtml = ranking.slice(3).map((item, index) => `
-      <div class="rank-item" style="animation-delay:${Math.min(index * 45, 450)}ms">
-        <div class="position">${index + 4}</div>
-        <div class="rank-name">${escapeHtml(item.jogador)}</div>
-        <div class="rank-count">${item.acertos}<small>${item.acertos === 1 ? 'acerto' : 'acertos'}</small></div>
-      </div>`).join('');
-
+            const podiumHtml = podiumOrder.map((item, index) => `<article class="podium-card ${podiumClasses[index]}"><div class="podium-medal">${podiumMedals[index]}</div><div class="podium-avatar">${escapeHtml(initials(item.jogador))}</div><div><div class="podium-name">${escapeHtml(item.jogador)}</div><div class="podium-score">${item.total}<small>${item.total === 1 ? 'acerto' : 'acertos'}</small></div></div></article>`).join('');
+            const rankingHtml = ranking.slice(3).map((item, index) => `<div class="rank-item"><div class="position">${index + 4}</div><div class="rank-name">${escapeHtml(item.jogador)}</div><div class="rank-count">${item.total}<small>${item.total === 1 ? 'acerto' : 'acertos'}</small></div></div>`).join('');
             const showGuess = currentMode === 'vencedor';
-            const rows = filtered
-                .slice()
-                .sort((a, b) => String(b.dth_jogo).localeCompare(String(a.dth_jogo)))
-                .map((item, index) => `
-        <tr style="animation-delay:${Math.min(index * 35, 500)}ms">
-          <td><div class="player"><div class="avatar">${escapeHtml(initials(item.jogador))}</div>${escapeHtml(item.jogador)}</div></td>
-          <td class="game">${escapeHtml(item.jogo)}</td>
-          ${showGuess ? `<td class="game">${escapeHtml(item.palpite || '-')}</td>` : ''}
-          <td class="date">${escapeHtml(formatDate(item.dth_jogo))}</td>
-          <td><span class="hit">${config.resultText}</span></td>
-        </tr>`).join('');
+            const rows = filtered.slice().sort((a, b) => (parseDate(b.dth_jogo)?.getTime() || 0) - (parseDate(a.dth_jogo)?.getTime() || 0)).map(item => `<tr><td><div class="player"><div class="avatar">${escapeHtml(initials(item.jogador))}</div>${escapeHtml(item.jogador)}</div></td><td class="game">${escapeHtml(item.jogo)}</td>${showGuess ? `<td class="game">${escapeHtml(item.palpite || '-')}</td>` : ''}<td class="date">${escapeHtml(formatDate(item.dth_jogo))}</td><td><span class="hit">${config.resultText}</span></td></tr>`).join('');
+            els.content.innerHTML = `<div class="content-stack"><section class="panel ranking"><div class="section-head"><div><div class="section-kicker">Classificação geral</div><h2 class="section-title">🏆 Ranking dos jogadores</h2></div><div class="hit">${ranking.length} jogadores pontuando</div></div><div class="podium">${podiumHtml}</div>${rankingHtml ? `<div class="rank-list">${rankingHtml}</div>` : ''}</section><section class="panel results"><div class="section-head"><div><div class="section-kicker">Histórico de resultados</div><h2 class="section-title">${config.sectionTitle}</h2></div><div class="hit">${filtered.length} acertos exibidos</div></div><div class="table-wrap"><table><thead><tr><th>Jogador</th><th>Partida</th>${showGuess ? '<th>Palpite</th>' : ''}<th>Data</th><th>Resultado</th></tr></thead><tbody>${rows}</tbody></table></div></section></div>`;
+        }
 
-            els.content.innerHTML = `
-      <div class="content-stack">
-        <section class="panel ranking">
-          <div class="section-head">
-            <div>
-              <div class="section-kicker">Classificação geral</div>
-              <h2 class="section-title">🏆 Ranking dos jogadores</h2>
-            </div>
-            <div class="hit">${ranking.length} ${ranking.length === 1 ? 'jogador pontuando' : 'jogadores pontuando'}</div>
-          </div>
-          <div class="podium">${podiumHtml}</div>
-          ${rankingHtml ? `<div class="rank-list">${rankingHtml}</div>` : ''}
-        </section>
-
-        <section class="panel results">
-          <div class="section-head">
-            <div>
-              <div class="section-kicker">Histórico de resultados</div>
-              <h2 class="section-title">${config.sectionTitle}</h2>
-            </div>
-            <div class="hit">${filtered.length} ${filtered.length === 1 ? 'acerto exibido' : 'acertos exibidos'}</div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Jogador</th><th>Partida</th>${showGuess ? '<th>Palpite</th>' : ''}<th>Data</th><th>Resultado</th></tr></thead>
-              <tbody>${rows}</tbody>
-            </table>
-          </div>
-        </section>
-      </div>`;
+        function render() {
+            const filtered = filteredResults();
+            if (!filtered.length) {
+                els.content.innerHTML = '<div class="panel empty">Nenhum resultado encontrado.</div>';
+                return;
+            }
+            if (currentMode === 'ranking') renderRankingMode(filtered);
+            else renderLegacyMode(filtered);
         }
 
         function currentTime() {
@@ -1178,46 +1306,36 @@
                 button.setAttribute('aria-pressed', String(active));
             });
             els.pageSubtitle.textContent = MODE_CONFIG[currentMode].subtitle;
-            els.searchInput.placeholder = currentMode === 'placar'
-                ? '🔎 Buscar jogador ou partida...'
-                : '🔎 Buscar jogador, partida ou palpite...';
+            els.searchInput.placeholder = currentMode === 'placar' ? '🔎 Buscar jogador ou partida...' : '🔎 Buscar jogador, partida ou palpite...';
         }
 
         async function setMode(mode) {
             if (!ENDPOINTS[mode] || mode === currentMode) return;
             currentMode = mode;
+            rankingPage = 1;
             updateModeUI();
             els.searchInput.value = '';
-
             if (cache[mode]) {
                 results = cache[mode];
                 render();
                 els.refreshStatus.textContent = `Atualizado às ${currentTime()}`;
                 return;
             }
-
             await loadResults();
         }
 
         async function loadResults(silent = false) {
             const requestedMode = currentMode;
             const endpoint = ENDPOINTS[requestedMode];
-
             try {
-                if (!silent) {
-                    els.content.innerHTML = `<div class="panel loading"><div class="loader"></div>${MODE_CONFIG[requestedMode].loadingText}</div>`;
-                }
+                if (!silent) els.content.innerHTML = `<div class="panel loading"><div class="loader"></div>${MODE_CONFIG[requestedMode].loadingText}</div>`;
                 els.refreshStatus.textContent = 'Atualizando...';
-
                 const response = await fetch(`${endpoint}?_=${Date.now()}`, { cache: 'no-store' });
                 if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
-
                 const data = await response.json();
                 if (!Array.isArray(data)) throw new Error('O endpoint não retornou uma lista JSON.');
-
                 cache[requestedMode] = data;
                 if (currentMode !== requestedMode) return;
-
                 results = data;
                 render();
                 els.refreshStatus.textContent = `Atualizado às ${currentTime()}`;
@@ -1228,9 +1346,8 @@
             }
         }
 
-        els.searchInput.addEventListener('input', render);
+        els.searchInput.addEventListener('input', () => { rankingPage = 1; render(); });
         els.modeButtons.forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
-
         updateModeUI();
         loadResults();
         setInterval(() => loadResults(true), 5 * 60 * 1000);

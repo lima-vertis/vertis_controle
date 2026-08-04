@@ -1,0 +1,2772 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Callbacks | Monitoramento</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vertis: {
+                            orange: '#F97316',
+                            dark: '#0B1220'
+                        }
+                    },
+                    boxShadow: {
+                        soft: '0 10px 30px rgba(2, 6, 23, 0.10)',
+                        card: '0 8px 20px rgba(2, 6, 23, 0.08)'
+                    }
+                }
+            }
+        };
+    </script>
+
+    <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png"
+        sizes="180x180">
+
+    <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32">
+
+    <style>
+        html,
+        body {
+            max-width: 100%;
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.25s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .count {
+            transition: all 0.3s ease;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 1.25rem;
+            color: rgb(51 65 85);
+            text-decoration: none;
+            position: relative;
+            transition:
+                background-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background: rgb(241 245 249);
+            color: rgb(2 6 23);
+            transform: translateX(4px);
+        }
+
+        .menu-icon {
+            width: 18px;
+            height: 18px;
+            opacity: 0.8;
+            transition:
+                transform 0.2s ease,
+                opacity 0.2s ease;
+        }
+
+        .menu-item:hover .menu-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            background:
+                linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.98),
+                    rgba(248, 250, 252, 0.92));
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
+            border-color: rgba(249, 115, 22, 0.28);
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            right: -28px;
+            top: -28px;
+            width: 96px;
+            height: 96px;
+            border-radius: 999px;
+            background:
+                radial-gradient(circle,
+                    rgba(249, 115, 22, 0.14),
+                    transparent 68%);
+            pointer-events: none;
+        }
+
+        .mini-chart {
+            width: 148px;
+            height: 148px;
+            border-radius: 999px;
+            background: conic-gradient(#e2e8f0 0deg 360deg);
+            position: relative;
+            box-shadow:
+                inset 0 0 0 1px rgba(15, 23, 42, 0.06),
+                0 14px 30px rgba(15, 23, 42, 0.08);
+            flex: 0 0 auto;
+        }
+
+        .mini-chart::after {
+            content: '';
+            position: absolute;
+            inset: 28px;
+            border-radius: 999px;
+            background: white;
+            box-shadow:
+                inset 0 0 0 1px rgba(226, 232, 240, 0.9);
+        }
+
+        .mini-chart-center {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            pointer-events: none;
+        }
+
+        .legend-dot {
+            width: 0.65rem;
+            height: 0.65rem;
+            border-radius: 999px;
+            flex: 0 0 auto;
+        }
+
+        .callback-table {
+            width: 100%;
+            min-width: 1160px;
+            table-layout: auto;
+        }
+
+        #mobileCardsContainer {
+            display: none;
+        }
+
+        .callback-mobile-card {
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            background:
+                linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.98),
+                    rgba(248, 250, 252, 0.94));
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .table-row-pending {
+            background:
+                linear-gradient(90deg,
+                    rgba(255, 241, 242, 0.75),
+                    rgba(255, 255, 255, 1));
+        }
+
+        .table-row-warning {
+            background:
+                linear-gradient(90deg,
+                    rgba(255, 247, 237, 0.95),
+                    rgba(255, 255, 255, 1));
+        }
+
+        .table-row-success {
+            background:
+                linear-gradient(90deg,
+                    rgba(236, 253, 245, 0.5),
+                    rgba(255, 255, 255, 1));
+        }
+
+        @media (max-width: 767px) {
+            .desktop-table-wrap {
+                display: none !important;
+            }
+
+            #mobileCardsContainer {
+                display: grid;
+            }
+
+            .callback-mobile-card {
+                animation: fadeInUp 0.22s ease-out;
+            }
+        }
+
+        .app-header {
+            gap: 0.75rem;
+        }
+
+        .mobile-safe-text {
+            min-width: 0;
+        }
+
+        @media (max-width: 640px) {
+            .app-header {
+                padding: 0.75rem 0.875rem !important;
+                align-items: center;
+            }
+
+            #menuPanel {
+                position: fixed !important;
+                left: 0.75rem !important;
+                right: 0.75rem !important;
+                top: 3.75rem !important;
+                width: auto !important;
+                max-height: calc(100vh - 5rem);
+                overflow-y: auto;
+            }
+
+            .metric-card {
+                border-radius: 1.25rem !important;
+                padding: 1rem !important;
+            }
+
+            .metric-card p[id] {
+                font-size: 1.55rem !important;
+                line-height: 1.15 !important;
+                word-break: break-word;
+            }
+
+            .mini-chart {
+                width: 128px;
+                height: 128px;
+            }
+
+            .mini-chart::after {
+                inset: 24px;
+            }
+
+            .mobile-card {
+                border-radius: 1.35rem !important;
+                padding: 1rem !important;
+            }
+
+            .mobile-section-title {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+            .mobile-filter {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 0.75rem !important;
+            }
+
+            .mobile-pagination {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 0.75rem;
+            }
+
+            #pagination {
+                overflow-x: auto;
+                padding-bottom: 0.25rem;
+                justify-content: flex-start;
+            }
+
+            #detailsModal .relative.min-h-screen {
+                align-items: flex-end !important;
+                padding: 0.75rem !important;
+            }
+
+            #detailsModal .max-w-5xl {
+                border-radius: 1.35rem 1.35rem 0 0 !important;
+                max-height: 92vh;
+            }
+
+            #detailsModal .px-6 {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            #detailsModal .p-6 {
+                padding: 1rem !important;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .mini-chart {
+                width: 112px;
+                height: 112px;
+            }
+
+            .mini-chart::after {
+                inset: 21px;
+            }
+
+            .mini-chart-center span:first-child {
+                font-size: 1.25rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body
+    class="bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.12),_transparent_30%),linear-gradient(135deg,_#f8fafc_0%,_#e2e8f0_100%)] min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- HEADER -->
+    <header
+        class="app-header sticky top-0 z-50 backdrop-blur bg-gradient-to-r from-vertis-dark via-slate-900 to-slate-950/95 text-white px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center shadow-lg shadow-black/10 border-b border-white/10">
+        <div class="flex items-center gap-2 sm:gap-4 min-w-0 mobile-safe-text">
+
+            <nav class="relative">
+                <button id="menuBtn" class="p-2 rounded-lg hover:bg-slate-800 transition" aria-label="Abrir menu"
+                    aria-expanded="false" aria-controls="menuPanel">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <div id="menuPanel"
+                    class="absolute left-0 mt-3 w-80 rounded-2xl bg-white text-slate-800 shadow-2xl hidden overflow-hidden border border-slate-200 backdrop-blur-xl origin-top-left transform transition-all duration-200">
+                    <div class="px-5 py-4 border-b bg-gradient-to-r from-slate-50 to-white">
+                        <div class="text-xs uppercase tracking-wider text-slate-500 font-semibold">
+                            Navegação
+                        </div>
+                    </div>
+
+                    <div class="py-3 text-sm">
+
+                        <a href="index.html" class="menu-item">
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 10.75L12 4l9 6.75M5 10v9h14v-9" />
+                            </svg>
+
+                            Início
+                        </a>
+
+                        <a href="pix.html" class="menu-item">
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18v10H3z" />
+
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v4" />
+
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 12h4" />
+                            </svg>
+
+                            PIX | Controle
+                        </a>
+
+                        <a href="pix_callback.html" class="menu-item">
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8m0 0l-3-3m3 3l-3 3" />
+
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 17H8m0 0l3-3m-3 3l3 3" />
+                            </svg>
+
+                            Callbacks | Monitoramento
+                        </a>
+
+                    </div>
+                </div>
+            </nav>
+
+            <div class="min-w-0">
+                <h1 class="text-base sm:text-lg font-semibold tracking-wide whitespace-nowrap truncate">
+                    Vertis
+                    <span class="text-vertis-orange">•</span>
+                    Callbacks
+                </h1>
+
+                <p class="hidden sm:block text-[11px] text-slate-400">
+                    Monitoramento de recebimento e integração
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+
+            <div class="hidden md:flex items-center gap-2 text-xs text-slate-300">
+                <span id="autoRefreshDot" class="h-2 w-2 rounded-full bg-emerald-400"></span>
+
+                <span id="lastUpdateText">
+                    Aguardando atualização
+                </span>
+            </div>
+
+            <span id="refreshIndicator" class="hidden sm:inline text-xs text-slate-300 opacity-0 transition-opacity">
+                Atualizando...
+            </span>
+
+            <button type="button" onclick="loadData()" title="Atualizar agora"
+                class="group relative inline-flex items-center justify-center h-10 w-10 rounded-xl bg-white/10 border border-white/15 hover:bg-white/15 hover:border-white/25 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-white/90 group-hover:rotate-180 transition-transform duration-500" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6" />
+
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M20 9A8 8 0 006.3 5.3L4 10m16 4-2.3 4.7A8 8 0 014 15" />
+                </svg>
+            </button>
+
+            <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis"
+                class="h-7 sm:h-8">
+        </div>
+    </header>
+
+    <main class="p-3 sm:p-4 md:p-6 flex-1 space-y-4 sm:space-y-6">
+
+        <!-- INDICADORES -->
+        <section class="space-y-4">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+
+                <div class="metric-card rounded-3xl p-4 sm:p-5">
+                    <div class="flex items-start justify-between gap-3">
+
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">
+                                Total
+                            </p>
+
+                            <p id="kpiTotal" class="mt-2 text-3xl font-black text-slate-900 count">
+                                0
+                            </p>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                callbacks recebidos
+                            </p>
+                        </div>
+
+                        <div
+                            class="h-11 w-11 rounded-2xl bg-orange-50 text-vertis-orange flex items-center justify-center border border-orange-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8m0 0l-3-3m3 3l-3 3" />
+
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 17H8m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card rounded-3xl p-4 sm:p-5">
+                    <div class="flex items-start justify-between gap-3">
+
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">
+                                Integrados
+                            </p>
+
+                            <p id="kpiIntegrados" class="mt-2 text-3xl font-black text-emerald-600 count">
+                                0
+                            </p>
+
+                            <p id="kpiIntegradosPct" class="mt-1 text-xs text-slate-500">
+                                0% do total
+                            </p>
+                        </div>
+
+                        <div
+                            class="h-11 w-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card rounded-3xl p-4 sm:p-5">
+                    <div class="flex items-start justify-between gap-3">
+
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">
+                                Pendentes
+                            </p>
+
+                            <p id="kpiPendentes" class="mt-2 text-3xl font-black text-rose-600 count">
+                                0
+                            </p>
+
+                            <p id="kpiPendentesCriticos" class="mt-1 text-xs text-slate-500">
+                                0 acima de 5 minutos
+                            </p>
+                        </div>
+
+                        <div
+                            class="h-11 w-11 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01" />
+
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M10.3 3.7L2.5 17.2A2 2 0 004.2 20h15.6a2 2 0 001.7-2.8L13.7 3.7a2 2 0 00-3.4 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card rounded-3xl p-4 sm:p-5">
+                    <div class="flex items-start justify-between gap-3">
+
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">
+                                Tempo médio
+                            </p>
+
+                            <p id="kpiTempoMedio" class="mt-2 text-3xl font-black text-slate-900 count">
+                                —
+                            </p>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                entre inclusão e integração
+                            </p>
+                        </div>
+
+                        <div
+                            class="h-11 w-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2" />
+
+                                <circle cx="12" cy="12" r="9"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+                <div
+                    class="mobile-card bg-white rounded-3xl shadow-card border border-slate-200 p-4 sm:p-5 overflow-hidden">
+                    <div class="mobile-section-title flex items-start justify-between gap-3 sm:gap-4 mb-4 sm:mb-5">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">
+                                Origem
+                            </p>
+
+                            <h2 class="text-lg font-black text-slate-900">
+                                Tipos de callback
+                            </h2>
+                        </div>
+
+                        <span id="kpiTiposUnicos"
+                            class="text-[11px] px-2.5 py-1 rounded-full bg-orange-50 text-vertis-orange font-bold border border-orange-100">
+                            0 tipos
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                        <div id="chartTipos" class="mini-chart">
+                            <div class="mini-chart-center">
+                                <span id="chartTiposTotal" class="text-2xl font-black text-slate-900">
+                                    0
+                                </span>
+
+                                <span class="text-[10px] uppercase tracking-wide text-slate-400 font-bold">
+                                    callbacks
+                                </span>
+                            </div>
+                        </div>
+
+                        <div id="legendTipos" class="w-full space-y-2 max-h-56 sm:max-h-44 overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+
+                <div
+                    class="mobile-card bg-white rounded-3xl shadow-card border border-slate-200 p-4 sm:p-5 overflow-hidden">
+                    <div class="mobile-section-title flex items-start justify-between gap-3 sm:gap-4 mb-4 sm:mb-5">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">
+                                Processamento
+                            </p>
+
+                            <h2 class="text-lg font-black text-slate-900">
+                                Situação da integração
+                            </h2>
+                        </div>
+
+                        <span id="kpiTaxaIntegracao"
+                            class="text-[11px] px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">
+                            0% integrado
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                        <div id="chartSituacao" class="mini-chart">
+                            <div class="mini-chart-center">
+                                <span id="chartSituacaoTotal" class="text-2xl font-black text-slate-900">
+                                    0
+                                </span>
+
+                                <span class="text-[10px] uppercase tracking-wide text-slate-400 font-bold">
+                                    callbacks
+                                </span>
+                            </div>
+                        </div>
+
+                        <div id="legendSituacao" class="w-full space-y-2"></div>
+                    </div>
+                </div>
+
+                <div
+                    class="mobile-card bg-white rounded-3xl shadow-card border border-slate-200 p-4 sm:p-5 overflow-hidden">
+                    <div class="mobile-section-title flex items-start justify-between gap-3 sm:gap-4 mb-4 sm:mb-5">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">
+                                Clientes
+                            </p>
+
+                            <h2 class="text-lg font-black text-slate-900">
+                                Callbacks por unidade
+                            </h2>
+                        </div>
+
+                        <span id="kpiUnidadesUnicas"
+                            class="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-bold border border-slate-200">
+                            0 unidades
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                        <div id="chartUnidades" class="mini-chart">
+                            <div class="mini-chart-center">
+                                <span id="chartUnidadesTotal" class="text-2xl font-black text-slate-900">
+                                    0
+                                </span>
+
+                                <span class="text-[10px] uppercase tracking-wide text-slate-400 font-bold">
+                                    callbacks
+                                </span>
+                            </div>
+                        </div>
+
+                        <div id="legendUnidades" class="w-full space-y-2 max-h-56 sm:max-h-44 overflow-y-auto pr-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILTROS -->
+        <div class="bg-white rounded-2xl shadow-card border border-slate-200 p-3 sm:p-4 space-y-3">
+            <div class="grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-3 xl:items-end">
+                <div class="mobile-filter flex items-center gap-4">
+                    <input id="filterInput" type="text"
+                        placeholder="🔍 Filtrar por ID, unidade, tipo ou chave externa..."
+                        class="w-full border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-300"
+                        oninput="applyFilter()">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-[auto_auto_auto] gap-2 sm:items-end">
+                    <label class="block rounded-2xl border border-orange-100 bg-orange-50/60 p-3 shadow-sm">
+                        <span class="block mb-1 text-[11px] uppercase tracking-[0.18em] text-vertis-orange font-black">
+                            Data inicial
+                        </span>
+
+                        <input id="datInicialInput" type="date"
+                            class="w-full sm:w-40 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200"
+                            onchange="handleDateFilterChange()">
+                    </label>
+
+                    <label class="block rounded-2xl border border-orange-100 bg-orange-50/60 p-3 shadow-sm">
+                        <span class="block mb-1 text-[11px] uppercase tracking-[0.18em] text-vertis-orange font-black">
+                            Data final
+                        </span>
+
+                        <input id="datFinalInput" type="date"
+                            class="w-full sm:w-40 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200"
+                            onchange="handleDateFilterChange()">
+                    </label>
+
+                    <button type="button" onclick="loadData()"
+                        class="h-[42px] px-5 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-700 transition shadow-sm">
+                        Buscar
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2" id="typeFilters" aria-label="Filtro por tipo de callback">
+                <button type="button" data-type="" onclick="setTypeFilter('', this)"
+                    class="type-chip px-3 py-1.5 rounded-full text-xs font-bold border transition bg-slate-900 text-white border-slate-900 ring-2 ring-offset-1 ring-slate-400">
+                    Todos os tipos
+                </button>
+            </div>
+
+            <div class="flex flex-wrap gap-2" aria-label="Filtro por situação de integração">
+                <button type="button" data-status="" onclick="setStatusFilter('', this)"
+                    class="status-chip px-3 py-1.5 rounded-full text-xs font-bold border transition bg-slate-900 text-white border-slate-900 ring-2 ring-offset-1 ring-slate-400">
+                    Todas as situações
+                </button>
+
+                <button type="button" data-status="integrado" onclick="setStatusFilter('integrado', this)"
+                    class="status-chip px-3 py-1.5 rounded-full text-xs font-bold border transition bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100">
+                    Integrados
+                </button>
+
+                <button type="button" data-status="pendente" onclick="setStatusFilter('pendente', this)"
+                    class="status-chip px-3 py-1.5 rounded-full text-xs font-bold border transition bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100">
+                    Pendentes
+                </button>
+
+                <button type="button" data-status="atrasado" onclick="setStatusFilter('atrasado', this)"
+                    class="status-chip px-3 py-1.5 rounded-full text-xs font-bold border transition bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100">
+                    Pendentes acima de 5 min
+                </button>
+
+                <button type="button" data-status="sem-chave" onclick="setStatusFilter('sem-chave', this)"
+                    class="status-chip px-3 py-1.5 rounded-full text-xs font-bold border transition bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100">
+                    Sem chave externa
+                </button>
+            </div>
+        </div>
+
+        <!-- TABELA DESKTOP -->
+        <div
+            class="desktop-table-wrap bg-white rounded-2xl shadow-card border border-slate-200 overflow-x-auto max-h-[64vh] sm:max-h-[70vh]">
+            <table class="callback-table text-xs sm:text-sm border-collapse">
+                <thead class="bg-slate-200 sticky top-0 z-40">
+                    <tr id="table-head"></tr>
+                </thead>
+
+                <tbody id="table-body" class="divide-y"></tbody>
+
+                <tfoot class="bg-slate-100 sticky bottom-0 font-semibold">
+                    <tr id="table-footer"></tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- CARDS MOBILE -->
+        <div id="mobileCardsContainer" class="grid grid-cols-1 gap-3"></div>
+
+        <!-- PAGINAÇÃO -->
+        <div class="mobile-pagination flex items-center justify-between px-1 sm:px-2 text-xs sm:text-sm text-slate-600">
+            <span id="pageInfo"></span>
+
+            <div id="pagination" class="flex gap-1"></div>
+        </div>
+    </main>
+
+    <!-- MODAL -->
+    <div id="detailsModal" class="fixed inset-0 z-[100] hidden" aria-labelledby="detailsModalTitle" role="dialog"
+        aria-modal="true">
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onclick="closeDetailsModal()"></div>
+
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div
+                class="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden fade-in">
+                <div
+                    class="px-6 py-5 bg-gradient-to-r from-vertis-dark via-slate-900 to-slate-950 text-white flex items-start justify-between gap-4">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.2em] text-orange-200 font-semibold">
+                            Detalhes do callback
+                        </p>
+
+                        <h2 id="detailsModalTitle" class="mt-1 text-xl font-bold">
+                            Registro selecionado
+                        </h2>
+
+                        <p id="detailsModalSubtitle" class="mt-1 text-sm text-slate-300"></p>
+                    </div>
+
+                    <button type="button" onclick="closeDetailsModal()"
+                        class="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 transition"
+                        aria-label="Fechar modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="p-6 bg-slate-50 max-h-[75vh] overflow-y-auto">
+                    <div id="detailsHighlights" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5"></div>
+
+                    <div id="detailsContent" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /*
+         * Endpoint mantido conforme estava no arquivo original.
+         * Os parâmetros de data também continuam:
+         *
+         * dat_inicial=YYYY-MM-DD
+         * dat_final=YYYY-MM-DD
+         */
+        //const endpoint = "/api/pix";
+        const endpoint = "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/get_callback";
+
+        const PAGE_SIZE = 15;
+        const PENDING_WARNING_MINUTES = 5;
+
+        let originalData = [];
+        let filteredData = [];
+
+        let currentPage = 1;
+        let sortKey = null;
+        let sortAsc = true;
+
+        let currentTypeFilter = '';
+        let currentStatusFilter = '';
+
+        const columns = [
+            {
+                key: 'id_callback',
+                label: 'ID',
+                width: 80
+            },
+            {
+                key: 'fkid_unid_negoc',
+                label: 'Unid. Neg.',
+                width: 90
+            },
+            {
+                key: 'cod_unid_oper',
+                label: 'Oper.',
+                width: 70
+            },
+            {
+                key: 'nom_unid_oper',
+                label: 'Unidade operacional'
+            },
+            {
+                key: 'ind_tip_callback',
+                label: 'Tipo',
+                width: 100
+            },
+            {
+                key: 'chave_externa',
+                label: 'Chave externa'
+            },
+            {
+                key: 'dth_inclusao',
+                label: 'Inclusão'
+            },
+            {
+                key: 'dth_integracao',
+                label: 'Integração'
+            },
+            {
+                key: '__tempo',
+                label: 'Tempo'
+            },
+            {
+                key: '__status',
+                label: 'Situação'
+            },
+            {
+                key: '__actions',
+                label: '',
+                action: true,
+                width: 70
+            }
+        ];
+
+        const fieldLabels = {
+            id_callback: 'ID do callback',
+            fkid_unid_negoc: 'Código da unidade de negócio',
+            cod_unid_oper: 'Código da unidade operacional',
+            nom_unid_oper: 'Unidade operacional',
+            ind_tip_callback: 'Tipo do callback',
+            chave_externa: 'Chave externa',
+            dth_inclusao: 'Data/hora de inclusão',
+            dth_integracao: 'Data/hora de integração',
+            recordcount: 'Record count'
+        };
+
+        const chartColors = [
+            '#F97316',
+            '#0F172A',
+            '#38BDF8',
+            '#8B5CF6',
+            '#10B981',
+            '#F59E0B',
+            '#EF4444',
+            '#64748B'
+        ];
+
+        const normalizeText = value =>
+            String(value ?? '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim()
+                .toLowerCase();
+
+        const escapeHtml = value =>
+            String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+
+        const formatDateInput = date => {
+            const pad = value => String(value).padStart(2, '0');
+
+            return [
+                date.getFullYear(),
+                pad(date.getMonth() + 1),
+                pad(date.getDate())
+            ].join('-');
+        };
+
+        const parseIsoDateTime = value => {
+            if (!value || typeof value !== 'string') {
+                return null;
+            }
+
+            const match = value.trim().match(
+                /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/
+            );
+
+            if (!match) {
+                return null;
+            }
+
+            const [
+                ,
+                year,
+                month,
+                day,
+                hour,
+                minute,
+                second
+            ] = match;
+
+            const date = new Date(
+                Number(year),
+                Number(month) - 1,
+                Number(day),
+                Number(hour),
+                Number(minute),
+                Number(second || 0)
+            );
+
+            return Number.isNaN(date.getTime()) ? null : date;
+        };
+
+        const formatDateTimeBR = value => {
+            const date = value instanceof Date
+                ? value
+                : parseIsoDateTime(value);
+
+            if (!date || Number.isNaN(date.getTime())) {
+                return '—';
+            }
+
+            return date.toLocaleString('pt-BR');
+        };
+
+        const formatTimeOnly = date => {
+            if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+                return '';
+            }
+
+            return date.toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        };
+
+        const getElapsedMilliseconds = row => {
+            const inclusionDate = parseIsoDateTime(row.dth_inclusao);
+
+            if (!inclusionDate) {
+                return null;
+            }
+
+            const integrationDate =
+                parseIsoDateTime(row.dth_integracao) || new Date();
+
+            return Math.max(
+                0,
+                integrationDate.getTime() - inclusionDate.getTime()
+            );
+        };
+
+        const getIntegrationMilliseconds = row => {
+            const inclusionDate = parseIsoDateTime(row.dth_inclusao);
+            const integrationDate = parseIsoDateTime(row.dth_integracao);
+
+            if (!inclusionDate || !integrationDate) {
+                return null;
+            }
+
+            return Math.max(
+                0,
+                integrationDate.getTime() - inclusionDate.getTime()
+            );
+        };
+
+        const getElapsedMinutes = row => {
+            const milliseconds = getElapsedMilliseconds(row);
+
+            if (milliseconds === null) {
+                return null;
+            }
+
+            return milliseconds / 60000;
+        };
+
+        const isIntegrated = row =>
+            Boolean(
+                row.dth_integracao &&
+                String(row.dth_integracao).trim()
+            );
+
+        const hasExternalKey = row =>
+            Boolean(
+                row.chave_externa &&
+                String(row.chave_externa).trim()
+            );
+
+        const isDelayed = row => {
+            if (isIntegrated(row)) {
+                return false;
+            }
+
+            const minutes = getElapsedMinutes(row);
+
+            return (
+                minutes !== null &&
+                minutes > PENDING_WARNING_MINUTES
+            );
+        };
+
+        const getCallbackStatus = row => {
+            if (isIntegrated(row)) {
+                return 'integrado';
+            }
+
+            if (isDelayed(row)) {
+                return 'atrasado';
+            }
+
+            return 'pendente';
+        };
+
+        const formatDuration = milliseconds => {
+            if (
+                milliseconds === null ||
+                milliseconds === undefined ||
+                Number.isNaN(milliseconds)
+            ) {
+                return '—';
+            }
+
+            const totalSeconds = Math.max(
+                0,
+                Math.floor(milliseconds / 1000)
+            );
+
+            if (totalSeconds < 60) {
+                return `${totalSeconds}s`;
+            }
+
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+
+            if (totalMinutes < 60) {
+                return seconds > 0
+                    ? `${totalMinutes}m ${seconds}s`
+                    : `${totalMinutes}m`;
+            }
+
+            const totalHours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+
+            if (totalHours < 24) {
+                return minutes > 0
+                    ? `${totalHours}h ${minutes}m`
+                    : `${totalHours}h`;
+            }
+
+            const days = Math.floor(totalHours / 24);
+            const hours = totalHours % 24;
+
+            return hours > 0
+                ? `${days}d ${hours}h`
+                : `${days}d`;
+        };
+
+        const formatValue = (key, value) => {
+            if (
+                value === null ||
+                value === undefined ||
+                value === ''
+            ) {
+                return '—';
+            }
+
+            if (
+                key === 'dth_inclusao' ||
+                key === 'dth_integracao'
+            ) {
+                return formatDateTimeBR(value);
+            }
+
+            return String(value);
+        };
+
+        const getPagedData = () =>
+            filteredData.slice(
+                (currentPage - 1) * PAGE_SIZE,
+                currentPage * PAGE_SIZE
+            );
+
+        const totalPages = () =>
+            Math.ceil(filteredData.length / PAGE_SIZE) || 1;
+
+        const pct = (value, total) =>
+            total > 0
+                ? `${((value / total) * 100).toFixed(1)}%`
+                : '0%';
+
+        function initializeDateFilters() {
+            const today = formatDateInput(new Date());
+
+            const initialInput =
+                document.getElementById('datInicialInput');
+
+            const finalInput =
+                document.getElementById('datFinalInput');
+
+            if (initialInput && !initialInput.value) {
+                initialInput.value = today;
+            }
+
+            if (finalInput && !finalInput.value) {
+                finalInput.value = today;
+            }
+        }
+
+        function buildEndpoint() {
+            const initialDate =
+                document.getElementById('datInicialInput')?.value ||
+                formatDateInput(new Date());
+
+            const finalDate =
+                document.getElementById('datFinalInput')?.value ||
+                initialDate;
+
+            const params = new URLSearchParams({
+                dat_inicial: initialDate,
+                dat_final: finalDate
+            });
+
+            return `${endpoint}?${params.toString()}`;
+        }
+
+        function handleDateFilterChange() {
+            currentPage = 1;
+            loadData();
+        }
+
+        function getTypeMeta(type) {
+            const normalized = normalizeText(type);
+
+            if (normalized === 'pix') {
+                return {
+                    color: '#10B981',
+                    badge:
+                        'bg-emerald-50 text-emerald-700 border-emerald-200'
+                };
+            }
+
+            if (normalized === 'rpacs') {
+                return {
+                    color: '#F97316',
+                    badge:
+                        'bg-orange-50 text-orange-700 border-orange-200'
+                };
+            }
+
+            if (normalized === 'suporte') {
+                return {
+                    color: '#8B5CF6',
+                    badge:
+                        'bg-violet-50 text-violet-700 border-violet-200'
+                };
+            }
+
+            return {
+                color: '#64748B',
+                badge:
+                    'bg-slate-50 text-slate-700 border-slate-200'
+            };
+        }
+
+        function renderTypeBadge(type) {
+            const label = String(type || 'Não informado');
+            const meta = getTypeMeta(label);
+
+            return `
+                <span
+                    class="inline-flex items-center justify-center px-2.5 py-1 rounded-full border text-xs font-bold ${meta.badge}"
+                >
+                    ${escapeHtml(label)}
+                </span>
+            `;
+        }
+
+        function renderStatusBadge(row) {
+            const status = getCallbackStatus(row);
+
+            if (status === 'integrado') {
+                return `
+                    <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold bg-emerald-50 text-emerald-700 border-emerald-200"
+                    >
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        Integrado
+                    </span>
+                `;
+            }
+
+            if (status === 'atrasado') {
+                return `
+                    <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold bg-orange-50 text-orange-700 border-orange-200"
+                    >
+                        <span class="h-1.5 w-1.5 rounded-full bg-orange-500"></span>
+                        Aguardando
+                    </span>
+                `;
+            }
+
+            return `
+                <span
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold bg-rose-50 text-rose-700 border-rose-200"
+                >
+                    <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+                    Pendente
+                </span>
+            `;
+        }
+
+        function getRowClass(row) {
+            const status = getCallbackStatus(row);
+
+            if (status === 'integrado') {
+                return 'table-row-success';
+            }
+
+            if (status === 'atrasado') {
+                return 'table-row-warning';
+            }
+
+            return 'table-row-pending';
+        }
+
+        function countBy(data, getter) {
+            return data.reduce((accumulator, row) => {
+                const rawValue = typeof getter === 'function'
+                    ? getter(row)
+                    : row[getter];
+
+                const label =
+                    String(rawValue ?? '').trim() ||
+                    'Não informado';
+
+                accumulator[label] =
+                    (accumulator[label] || 0) + 1;
+
+                return accumulator;
+            }, {});
+        }
+
+        function topEntries(object, limit = 8) {
+            return Object
+                .entries(object)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, limit);
+        }
+
+        function getChartColor(chartId, label, index) {
+            if (chartId === 'chartTipos') {
+                return getTypeMeta(label).color;
+            }
+
+            if (chartId === 'chartSituacao') {
+                if (normalizeText(label) === 'integrados') {
+                    return '#10B981';
+                }
+
+                if (normalizeText(label).includes('atras')) {
+                    return '#F97316';
+                }
+
+                return '#EF4444';
+            }
+
+            return chartColors[index % chartColors.length];
+        }
+
+        function renderPieChart(
+            chartId,
+            legendId,
+            entries,
+            total
+        ) {
+            const chart = document.getElementById(chartId);
+            const legend = document.getElementById(legendId);
+
+            if (!chart || !legend) {
+                return;
+            }
+
+            if (!total || entries.length === 0) {
+                chart.style.background =
+                    'conic-gradient(#e2e8f0 0deg 360deg)';
+
+                legend.innerHTML =
+                    '<p class="text-sm text-slate-400">Sem dados para exibir.</p>';
+
+                return;
+            }
+
+            let start = 0;
+
+            const gradient = entries
+                .map(([label, value], index) => {
+                    const degrees = (value / total) * 360;
+                    const color = getChartColor(
+                        chartId,
+                        label,
+                        index
+                    );
+
+                    const part =
+                        `${color} ${start}deg ${start + degrees}deg`;
+
+                    start += degrees;
+
+                    return part;
+                })
+                .join(', ');
+
+            chart.style.background =
+                `conic-gradient(${gradient})`;
+
+            legend.innerHTML = entries
+                .map(([label, value], index) => {
+                    const percentage =
+                        total > 0
+                            ? ((value / total) * 100).toFixed(1)
+                            : '0.0';
+
+                    const color = getChartColor(
+                        chartId,
+                        label,
+                        index
+                    );
+
+                    return `
+                        <div
+                            class="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 px-3 py-2"
+                        >
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span
+                                    class="legend-dot"
+                                    style="background:${color}"
+                                ></span>
+
+                                <span
+                                    class="text-sm font-semibold text-slate-700 truncate"
+                                    title="${escapeHtml(label)}"
+                                >
+                                    ${escapeHtml(label)}
+                                </span>
+                            </div>
+
+                            <div class="text-right flex-shrink-0">
+                                <p class="text-sm font-black text-slate-900">
+                                    ${value}
+                                </p>
+
+                                <p class="text-[10px] text-slate-400 font-bold">
+                                    ${percentage}%
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                })
+                .join('');
+        }
+
+        function updateKPIs() {
+            const total = filteredData.length;
+
+            const integrated = filteredData.filter(isIntegrated);
+            const pending = filteredData.filter(
+                row => !isIntegrated(row)
+            );
+
+            const delayed = filteredData.filter(isDelayed);
+
+            const integrationTimes = integrated
+                .map(getIntegrationMilliseconds)
+                .filter(value => value !== null);
+
+            const averageTime =
+                integrationTimes.length > 0
+                    ? integrationTimes.reduce(
+                        (totalValue, currentValue) =>
+                            totalValue + currentValue,
+                        0
+                    ) / integrationTimes.length
+                    : null;
+
+            const uniqueTypes = new Set(
+                filteredData.map(
+                    row =>
+                        String(
+                            row.ind_tip_callback ||
+                            'Não informado'
+                        ).trim()
+                )
+            );
+
+            const uniqueUnits = new Set(
+                filteredData.map(
+                    row =>
+                        String(
+                            row.nom_unid_oper ||
+                            'Não informado'
+                        ).trim()
+                )
+            );
+
+            document.getElementById('kpiTotal').textContent =
+                total;
+
+            document.getElementById('kpiIntegrados').textContent =
+                integrated.length;
+
+            document.getElementById('kpiPendentes').textContent =
+                pending.length;
+
+            document.getElementById('kpiIntegradosPct').textContent =
+                `${pct(integrated.length, total)} do total`;
+
+            document.getElementById(
+                'kpiPendentesCriticos'
+            ).textContent =
+                `${delayed.length} acima de ${PENDING_WARNING_MINUTES} minutos`;
+
+            document.getElementById('kpiTempoMedio').textContent =
+                formatDuration(averageTime);
+
+            document.getElementById('kpiTiposUnicos').textContent =
+                `${uniqueTypes.size} tipo${uniqueTypes.size === 1 ? '' : 's'}`;
+
+            document.getElementById(
+                'kpiUnidadesUnicas'
+            ).textContent =
+                `${uniqueUnits.size} unidade${uniqueUnits.size === 1 ? '' : 's'}`;
+
+            document.getElementById(
+                'kpiTaxaIntegracao'
+            ).textContent =
+                `${pct(integrated.length, total)} integrado`;
+
+            document.getElementById(
+                'chartTiposTotal'
+            ).textContent = total;
+
+            document.getElementById(
+                'chartSituacaoTotal'
+            ).textContent = total;
+
+            document.getElementById(
+                'chartUnidadesTotal'
+            ).textContent = total;
+
+            const typeEntries = topEntries(
+                countBy(filteredData, 'ind_tip_callback'),
+                8
+            );
+
+            const statusEntries = [
+                ['Integrados', integrated.length],
+                ['Pendentes', pending.length - delayed.length],
+                ['Atrasados', delayed.length]
+            ].filter(([, value]) => value > 0);
+
+            const unitEntries = topEntries(
+                countBy(filteredData, row => {
+                    if (row.nom_unid_oper) {
+                        return row.nom_unid_oper;
+                    }
+
+                    if (
+                        Number(row.fkid_unid_negoc) === 0 &&
+                        Number(row.cod_unid_oper) === 0
+                    ) {
+                        return 'Sem unidade';
+                    }
+
+                    return (
+                        `Unid. ${row.fkid_unid_negoc || 0}` +
+                        ` / Oper. ${row.cod_unid_oper || 0}`
+                    );
+                }),
+                8
+            );
+
+            renderPieChart(
+                'chartTipos',
+                'legendTipos',
+                typeEntries,
+                total
+            );
+
+            renderPieChart(
+                'chartSituacao',
+                'legendSituacao',
+                statusEntries,
+                total
+            );
+
+            renderPieChart(
+                'chartUnidades',
+                'legendUnidades',
+                unitEntries,
+                total
+            );
+        }
+
+        function buildTypeFilters() {
+            const container =
+                document.getElementById('typeFilters');
+
+            if (!container) {
+                return;
+            }
+
+            const types = [
+                ...new Set(
+                    originalData
+                        .map(row =>
+                            String(
+                                row.ind_tip_callback || ''
+                            ).trim()
+                        )
+                        .filter(Boolean)
+                )
+            ].sort((a, b) => a.localeCompare(b));
+
+            const allButton = `
+                <button
+                    type="button"
+                    data-type=""
+                    onclick="setTypeFilter('', this)"
+                    class="type-chip px-3 py-1.5 rounded-full text-xs font-bold border transition ${currentTypeFilter === ''
+                    ? 'bg-slate-900 text-white border-slate-900 ring-2 ring-offset-1 ring-slate-400'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                }"
+                >
+                    Todos os tipos
+                </button>
+            `;
+
+            const typeButtons = types
+                .map(type => {
+                    const meta = getTypeMeta(type);
+                    const active =
+                        normalizeText(currentTypeFilter) ===
+                        normalizeText(type);
+
+                    return `
+                        <button
+                            type="button"
+                            data-type="${escapeHtml(type)}"
+                            onclick="setTypeFilter('${escapeHtml(type)}', this)"
+                            class="type-chip px-3 py-1.5 rounded-full text-xs font-bold border transition ${active
+                            ? `${meta.badge} ring-2 ring-offset-1 ring-slate-400`
+                            : `${meta.badge} hover:brightness-95`
+                        }"
+                        >
+                            ${escapeHtml(type)}
+                        </button>
+                    `;
+                })
+                .join('');
+
+            container.innerHTML =
+                allButton + typeButtons;
+        }
+
+        function setTypeFilter(value, button) {
+            currentTypeFilter = value;
+
+            document
+                .querySelectorAll('.type-chip')
+                .forEach(element => {
+                    element.classList.remove(
+                        'ring-2',
+                        'ring-offset-1',
+                        'ring-slate-400'
+                    );
+                });
+
+            if (button) {
+                button.classList.add(
+                    'ring-2',
+                    'ring-offset-1',
+                    'ring-slate-400'
+                );
+            }
+
+            currentPage = 1;
+            applyFilter();
+        }
+
+        function setStatusFilter(value, button) {
+            currentStatusFilter = value;
+
+            document
+                .querySelectorAll('.status-chip')
+                .forEach(element => {
+                    element.classList.remove(
+                        'ring-2',
+                        'ring-offset-1',
+                        'ring-slate-400'
+                    );
+                });
+
+            if (button) {
+                button.classList.add(
+                    'ring-2',
+                    'ring-offset-1',
+                    'ring-slate-400'
+                );
+            }
+
+            currentPage = 1;
+            applyFilter();
+        }
+
+        function matchesStatusFilter(row) {
+            if (!currentStatusFilter) {
+                return true;
+            }
+
+            if (currentStatusFilter === 'integrado') {
+                return isIntegrated(row);
+            }
+
+            if (currentStatusFilter === 'pendente') {
+                return !isIntegrated(row);
+            }
+
+            if (currentStatusFilter === 'atrasado') {
+                return isDelayed(row);
+            }
+
+            if (currentStatusFilter === 'sem-chave') {
+                return !hasExternalKey(row);
+            }
+
+            return true;
+        }
+
+        function applyFilter() {
+            const filterValue = normalizeText(
+                document.getElementById('filterInput')?.value
+            );
+
+            filteredData = originalData.filter(row => {
+                const searchableValues = [
+                    row.id_callback,
+                    row.fkid_unid_negoc,
+                    row.cod_unid_oper,
+                    row.nom_unid_oper,
+                    row.ind_tip_callback,
+                    row.chave_externa,
+                    row.dth_inclusao,
+                    row.dth_integracao
+                ];
+
+                const matchesText =
+                    !filterValue ||
+                    searchableValues.some(value =>
+                        normalizeText(value).includes(filterValue)
+                    );
+
+                const matchesType =
+                    !currentTypeFilter ||
+                    normalizeText(row.ind_tip_callback) ===
+                    normalizeText(currentTypeFilter);
+
+                return (
+                    matchesText &&
+                    matchesType &&
+                    matchesStatusFilter(row)
+                );
+            });
+
+            if (sortKey) {
+                sortData();
+            }
+
+            currentPage = Math.min(
+                currentPage,
+                totalPages()
+            );
+
+            renderTable();
+        }
+
+        function getSortValue(row, key) {
+            if (key === '__tempo') {
+                return getElapsedMilliseconds(row) ?? -1;
+            }
+
+            if (key === '__status') {
+                const statusOrder = {
+                    atrasado: 1,
+                    pendente: 2,
+                    integrado: 3
+                };
+
+                return (
+                    statusOrder[getCallbackStatus(row)] || 99
+                );
+            }
+
+            if (
+                key === 'dth_inclusao' ||
+                key === 'dth_integracao'
+            ) {
+                return (
+                    parseIsoDateTime(row[key])?.getTime() || 0
+                );
+            }
+
+            const numeric = Number(row[key]);
+
+            if (
+                row[key] !== '' &&
+                row[key] !== null &&
+                !Number.isNaN(numeric)
+            ) {
+                return numeric;
+            }
+
+            return normalizeText(row[key]);
+        }
+
+        function sortData() {
+            filteredData.sort((first, second) => {
+                const firstValue =
+                    getSortValue(first, sortKey);
+
+                const secondValue =
+                    getSortValue(second, sortKey);
+
+                let comparison = 0;
+
+                if (
+                    typeof firstValue === 'number' &&
+                    typeof secondValue === 'number'
+                ) {
+                    comparison = firstValue - secondValue;
+                } else {
+                    comparison = String(firstValue).localeCompare(
+                        String(secondValue),
+                        'pt-BR'
+                    );
+                }
+
+                return sortAsc
+                    ? comparison
+                    : -comparison;
+            });
+        }
+
+        function sortBy(key) {
+            sortAsc =
+                sortKey === key
+                    ? !sortAsc
+                    : true;
+
+            sortKey = key;
+            currentPage = 1;
+
+            sortData();
+            renderTable();
+        }
+
+        function createHeader() {
+            const row =
+                document.getElementById('table-head');
+
+            row.innerHTML = '';
+
+            columns.forEach(column => {
+                const header =
+                    document.createElement('th');
+
+                header.className =
+                    'px-3 py-2.5 whitespace-nowrap text-left text-[11px] uppercase tracking-wide text-slate-600';
+
+                if (!column.action) {
+                    header.classList.add(
+                        'cursor-pointer',
+                        'hover:bg-slate-300',
+                        'transition'
+                    );
+
+                    header.onclick = () =>
+                        sortBy(column.key);
+                } else {
+                    header.classList.add('text-center');
+                }
+
+                if (column.width) {
+                    header.style.width =
+                        `${column.width}px`;
+
+                    header.style.minWidth =
+                        `${column.width}px`;
+                }
+
+                const sortIndicator =
+                    sortKey === column.key
+                        ? sortAsc
+                            ? ' ▲'
+                            : ' ▼'
+                        : '';
+
+                header.textContent =
+                    `${column.label}${sortIndicator}`;
+
+                row.appendChild(header);
+            });
+        }
+
+        function renderTable() {
+            createHeader();
+
+            const body =
+                document.getElementById('table-body');
+
+            body.innerHTML = '';
+
+            const rows = getPagedData();
+
+            if (rows.length === 0) {
+                const emptyRow =
+                    document.createElement('tr');
+
+                emptyRow.innerHTML = `
+                    <td
+                        colspan="${columns.length}"
+                        class="px-4 py-12 text-center text-sm text-slate-500 bg-white"
+                    >
+                        Nenhum callback encontrado para os filtros selecionados.
+                    </td>
+                `;
+
+                body.appendChild(emptyRow);
+            } else {
+                rows.forEach(row => {
+                    const tableRow =
+                        document.createElement('tr');
+
+                    tableRow.className =
+                        `${getRowClass(row)} hover:brightness-[0.98] fade-in`;
+
+                    columns.forEach(column => {
+                        const cell =
+                            document.createElement('td');
+
+                        cell.className =
+                            'px-3 py-2.5 whitespace-nowrap text-slate-700';
+
+                        if (column.width) {
+                            cell.style.width =
+                                `${column.width}px`;
+
+                            cell.style.minWidth =
+                                `${column.width}px`;
+                        }
+
+                        if (column.key === '__actions') {
+                            const rowIndex =
+                                filteredData.indexOf(row);
+
+                            cell.classList.add('text-center');
+
+                            cell.innerHTML = `
+                                <button
+                                    type="button"
+                                    onclick="openDetailsModal(${rowIndex})"
+                                    title="Ver detalhes"
+                                    class="group inline-flex items-center justify-center h-9 w-9 rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-orange-50 hover:text-vertis-orange hover:border-orange-200 transition"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12z"
+                                        />
+
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                    </svg>
+                                </button>
+                            `;
+                        } else if (
+                            column.key === 'ind_tip_callback'
+                        ) {
+                            cell.innerHTML =
+                                renderTypeBadge(
+                                    row.ind_tip_callback
+                                );
+                        } else if (
+                            column.key === '__status'
+                        ) {
+                            cell.innerHTML =
+                                renderStatusBadge(row);
+                        } else if (
+                            column.key === '__tempo'
+                        ) {
+                            const elapsed =
+                                getElapsedMilliseconds(row);
+
+                            const delayed =
+                                isDelayed(row);
+
+                            cell.innerHTML = `
+                                <span
+                                    class="font-bold ${delayed
+                                    ? 'text-orange-700'
+                                    : isIntegrated(row)
+                                        ? 'text-emerald-700'
+                                        : 'text-rose-700'
+                                }"
+                                >
+                                    ${formatDuration(elapsed)}
+                                </span>
+                            `;
+                        } else if (
+                            column.key === 'chave_externa'
+                        ) {
+                            if (hasExternalKey(row)) {
+                                cell.innerHTML = `
+                                    <span
+                                        class="font-mono text-xs text-slate-700"
+                                        title="${escapeHtml(row.chave_externa)}"
+                                    >
+                                        ${escapeHtml(row.chave_externa)}
+                                    </span>
+                                `;
+                            } else {
+                                cell.innerHTML = `
+                                    <span
+                                        class="inline-flex items-center px-2 py-1 rounded-lg bg-violet-50 text-violet-700 border border-violet-200 text-xs font-bold"
+                                    >
+                                        Não informada
+                                    </span>
+                                `;
+                            }
+                        } else if (
+                            column.key === 'nom_unid_oper'
+                        ) {
+                            const unitName =
+                                row.nom_unid_oper ||
+                                (
+                                    Number(row.fkid_unid_negoc) === 0 &&
+                                        Number(row.cod_unid_oper) === 0
+                                        ? 'Sem unidade vinculada'
+                                        : 'Unidade não informada'
+                                );
+
+                            cell.innerHTML = `
+                                <div class="max-w-[310px]">
+                                    <p
+                                        class="font-semibold text-slate-900 truncate"
+                                        title="${escapeHtml(unitName)}"
+                                    >
+                                        ${escapeHtml(unitName)}
+                                    </p>
+                                </div>
+                            `;
+                        } else if (
+                            column.key === 'dth_inclusao' ||
+                            column.key === 'dth_integracao'
+                        ) {
+                            cell.textContent =
+                                formatDateTimeBR(
+                                    row[column.key]
+                                );
+                        } else {
+                            cell.textContent =
+                                formatValue(
+                                    column.key,
+                                    row[column.key]
+                                );
+                        }
+
+                        tableRow.appendChild(cell);
+                    });
+
+                    body.appendChild(tableRow);
+                });
+            }
+
+            renderMobileCards();
+            renderFooter();
+            updateKPIs();
+            renderPagination();
+        }
+
+        function renderFooter() {
+            const footer =
+                document.getElementById('table-footer');
+
+            footer.innerHTML = '';
+
+            columns.forEach((column, index) => {
+                const cell =
+                    document.createElement('td');
+
+                cell.className =
+                    'px-3 py-2.5 text-xs text-slate-600';
+
+                if (index === 0) {
+                    cell.textContent = 'Total';
+                } else if (
+                    column.key === 'nom_unid_oper'
+                ) {
+                    cell.textContent =
+                        `${filteredData.length} registro${filteredData.length === 1 ? '' : 's'}`;
+                } else if (
+                    column.key === '__status'
+                ) {
+                    const pending =
+                        filteredData.filter(
+                            row => !isIntegrated(row)
+                        ).length;
+
+                    cell.textContent =
+                        `${pending} pendente${pending === 1 ? '' : 's'}`;
+                } else {
+                    cell.textContent = '';
+                }
+
+                footer.appendChild(cell);
+            });
+        }
+
+        function renderMobileCards() {
+            const container =
+                document.getElementById(
+                    'mobileCardsContainer'
+                );
+
+            const rows = getPagedData();
+
+            if (rows.length === 0) {
+                container.innerHTML = `
+                    <div
+                        class="rounded-2xl border border-slate-200 bg-white p-5 text-center text-sm text-slate-500 shadow-card"
+                    >
+                        Nenhum callback encontrado para os filtros selecionados.
+                    </div>
+                `;
+
+                return;
+            }
+
+            container.innerHTML = rows
+                .map(row => {
+                    const rowIndex =
+                        filteredData.indexOf(row);
+
+                    const unitName =
+                        row.nom_unid_oper ||
+                        (
+                            Number(row.fkid_unid_negoc) === 0 &&
+                                Number(row.cod_unid_oper) === 0
+                                ? 'Sem unidade vinculada'
+                                : 'Unidade não informada'
+                        );
+
+                    const status =
+                        getCallbackStatus(row);
+
+                    const cardBorder =
+                        status === 'integrado'
+                            ? 'border-emerald-200'
+                            : status === 'atrasado'
+                                ? 'border-orange-200'
+                                : 'border-rose-200';
+
+                    return `
+                        <article
+                            class="callback-mobile-card ${cardBorder} rounded-3xl p-4 fade-in"
+                        >
+                            <div
+                                class="flex items-start justify-between gap-3"
+                            >
+                                <div class="min-w-0">
+                                    <div
+                                        class="flex flex-wrap items-center gap-2"
+                                    >
+                                        ${renderTypeBadge(row.ind_tip_callback)}
+                                        ${renderStatusBadge(row)}
+                                    </div>
+
+                                    <h3
+                                        class="mt-3 text-base font-black text-slate-900 leading-snug break-words"
+                                    >
+                                        ${escapeHtml(unitName)}
+                                    </h3>
+
+                                    <p
+                                        class="mt-1 text-xs text-slate-500"
+                                    >
+                                        Callback #${escapeHtml(row.id_callback)}
+                                        • Unidade ${escapeHtml(row.fkid_unid_negoc)}
+                                        / ${escapeHtml(row.cod_unid_oper)}
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onclick="openDetailsModal(${rowIndex})"
+                                    title="Ver detalhes"
+                                    class="shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-2xl border border-orange-100 bg-orange-50 text-vertis-orange shadow-sm hover:bg-orange-100 transition"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12z"
+                                        />
+
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div
+                                class="mt-4 grid grid-cols-2 gap-3"
+                            >
+                                <div
+                                    class="rounded-2xl bg-slate-50 border border-slate-100 p-3"
+                                >
+                                    <p
+                                        class="text-[10px] uppercase tracking-wide text-slate-400 font-bold"
+                                    >
+                                        Inclusão
+                                    </p>
+
+                                    <p
+                                        class="mt-1 text-sm font-bold text-slate-800 leading-snug"
+                                    >
+                                        ${escapeHtml(formatDateTimeBR(row.dth_inclusao))}
+                                    </p>
+                                </div>
+
+                                <div
+                                    class="rounded-2xl bg-slate-50 border border-slate-100 p-3"
+                                >
+                                    <p
+                                        class="text-[10px] uppercase tracking-wide text-slate-400 font-bold"
+                                    >
+                                        Integração
+                                    </p>
+
+                                    <p
+                                        class="mt-1 text-sm font-bold text-slate-800 leading-snug"
+                                    >
+                                        ${escapeHtml(formatDateTimeBR(row.dth_integracao))}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="mt-3 grid grid-cols-[1fr_auto] gap-3"
+                            >
+                                <div
+                                    class="rounded-2xl bg-white border border-slate-100 p-3 min-w-0"
+                                >
+                                    <p
+                                        class="text-[10px] uppercase tracking-wide text-slate-400 font-bold"
+                                    >
+                                        Chave externa
+                                    </p>
+
+                                    <p
+                                        class="mt-1 text-sm font-mono font-bold text-slate-800 truncate"
+                                        title="${escapeHtml(row.chave_externa || '')}"
+                                    >
+                                        ${escapeHtml(row.chave_externa || 'Não informada')}
+                                    </p>
+                                </div>
+
+                                <div
+                                    class="rounded-2xl bg-orange-50 border border-orange-100 p-3 text-right"
+                                >
+                                    <p
+                                        class="text-[10px] uppercase tracking-wide text-orange-600 font-bold"
+                                    >
+                                        Tempo
+                                    </p>
+
+                                    <p
+                                        class="mt-1 text-sm font-black text-orange-700"
+                                    >
+                                        ${formatDuration(getElapsedMilliseconds(row))}
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+                    `;
+                })
+                .join('');
+        }
+
+        function renderPagination() {
+            const total = totalPages();
+            const pageInfo =
+                document.getElementById('pageInfo');
+
+            const pagination =
+                document.getElementById('pagination');
+
+            pageInfo.textContent =
+                `Página ${currentPage} de ${total} • ` +
+                `${filteredData.length} registros`;
+
+            pagination.innerHTML = '';
+
+            const addButton = (
+                label,
+                page,
+                disabled = false,
+                active = false
+            ) => {
+                const button =
+                    document.createElement('button');
+
+                button.textContent = label;
+
+                button.className =
+                    'px-3 py-1.5 rounded-lg border transition ' +
+                    (
+                        active
+                            ? 'bg-slate-900 text-white border-slate-900'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                    );
+
+                if (disabled) {
+                    button.disabled = true;
+
+                    button.classList.add(
+                        'opacity-40',
+                        'cursor-not-allowed'
+                    );
+                } else {
+                    button.onclick = () => {
+                        currentPage = page;
+                        renderTable();
+
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    };
+                }
+
+                pagination.appendChild(button);
+            };
+
+            addButton(
+                '‹',
+                currentPage - 1,
+                currentPage === 1
+            );
+
+            const pages = new Set([
+                1,
+                total,
+                currentPage - 1,
+                currentPage,
+                currentPage + 1
+            ]);
+
+            let previousPage = 0;
+
+            [...pages]
+                .filter(page => page >= 1 && page <= total)
+                .sort((a, b) => a - b)
+                .forEach(page => {
+                    if (page - previousPage > 1) {
+                        const ellipsis =
+                            document.createElement('span');
+
+                        ellipsis.textContent = '…';
+                        ellipsis.className =
+                            'px-2 py-1.5 text-slate-400';
+
+                        pagination.appendChild(ellipsis);
+                    }
+
+                    addButton(
+                        String(page),
+                        page,
+                        false,
+                        page === currentPage
+                    );
+
+                    previousPage = page;
+                });
+
+            addButton(
+                '›',
+                currentPage + 1,
+                currentPage === total
+            );
+        }
+
+        function createDetailCard(
+            label,
+            value,
+            extraClass = ''
+        ) {
+            const card =
+                document.createElement('div');
+
+            card.className =
+                `rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ${extraClass}`;
+
+            const labelElement =
+                document.createElement('p');
+
+            labelElement.className =
+                'text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-1';
+
+            labelElement.textContent = label;
+
+            const valueElement =
+                document.createElement('p');
+
+            valueElement.className =
+                'text-sm font-semibold text-slate-800 break-words';
+
+            valueElement.textContent = value;
+
+            card.appendChild(labelElement);
+            card.appendChild(valueElement);
+
+            return card;
+        }
+
+        function openDetailsModal(rowIndex) {
+            const row = filteredData[rowIndex];
+
+            if (!row) {
+                return;
+            }
+
+            const modal =
+                document.getElementById('detailsModal');
+
+            const title =
+                document.getElementById(
+                    'detailsModalTitle'
+                );
+
+            const subtitle =
+                document.getElementById(
+                    'detailsModalSubtitle'
+                );
+
+            const highlights =
+                document.getElementById(
+                    'detailsHighlights'
+                );
+
+            const content =
+                document.getElementById(
+                    'detailsContent'
+                );
+
+            title.textContent =
+                `Callback #${row.id_callback}`;
+
+            subtitle.textContent =
+                row.nom_unid_oper ||
+                `Unidade ${row.fkid_unid_negoc || 0} / ${row.cod_unid_oper || 0}`;
+
+            highlights.innerHTML = '';
+
+            highlights.appendChild(
+                createDetailCard(
+                    'Situação',
+                    getCallbackStatus(row) === 'integrado'
+                        ? 'Integrado'
+                        : getCallbackStatus(row) === 'atrasado'
+                            ? 'Pendente acima de 5 minutos'
+                            : 'Pendente',
+                    isIntegrated(row)
+                        ? 'border-emerald-200'
+                        : isDelayed(row)
+                            ? 'border-orange-200'
+                            : 'border-rose-200'
+                )
+            );
+
+            highlights.appendChild(
+                createDetailCard(
+                    'Tipo',
+                    formatValue(
+                        'ind_tip_callback',
+                        row.ind_tip_callback
+                    ),
+                    'border-orange-200'
+                )
+            );
+
+            highlights.appendChild(
+                createDetailCard(
+                    'Tempo de processamento',
+                    formatDuration(
+                        getElapsedMilliseconds(row)
+                    ),
+                    'border-sky-200'
+                )
+            );
+
+            content.innerHTML = '';
+
+            Object.entries(row).forEach(
+                ([key, value]) => {
+                    content.appendChild(
+                        createDetailCard(
+                            fieldLabels[key] || key,
+                            formatValue(key, value)
+                        )
+                    );
+                }
+            );
+
+            content.appendChild(
+                createDetailCard(
+                    'Situação calculada',
+                    getCallbackStatus(row)
+                )
+            );
+
+            content.appendChild(
+                createDetailCard(
+                    'Possui chave externa',
+                    hasExternalKey(row) ? 'Sim' : 'Não'
+                )
+            );
+
+            modal.classList.remove('hidden');
+
+            document.body.classList.add(
+                'overflow-hidden'
+            );
+        }
+
+        function closeDetailsModal() {
+            document
+                .getElementById('detailsModal')
+                .classList.add('hidden');
+
+            document.body.classList.remove(
+                'overflow-hidden'
+            );
+        }
+
+        function updateLastRefresh() {
+            const now = new Date();
+
+            const text =
+                document.getElementById(
+                    'lastUpdateText'
+                );
+
+            if (text) {
+                text.textContent =
+                    `Atualizado às ${formatTimeOnly(now)}`;
+            }
+        }
+
+        async function loadData() {
+            initializeDateFilters();
+
+            const refreshIndicator =
+                document.getElementById(
+                    'refreshIndicator'
+                );
+
+            const refreshDot =
+                document.getElementById(
+                    'autoRefreshDot'
+                );
+
+            refreshIndicator?.classList.remove(
+                'opacity-0'
+            );
+
+            refreshDot?.classList.remove(
+                'bg-emerald-400',
+                'bg-rose-400'
+            );
+
+            refreshDot?.classList.add(
+                'bg-orange-400',
+                'animate-pulse'
+            );
+
+            try {
+                const response = await fetch(
+                    buildEndpoint(),
+                    {
+                        cache: 'no-store'
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Erro HTTP ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+
+                originalData =
+                    Array.isArray(data)
+                        ? data
+                        : [];
+
+                /*
+                 * Ordenação padrão:
+                 * callbacks mais recentes primeiro.
+                 */
+                originalData.sort((first, second) => {
+                    const firstDate =
+                        parseIsoDateTime(
+                            first.dth_inclusao
+                        )?.getTime() || 0;
+
+                    const secondDate =
+                        parseIsoDateTime(
+                            second.dth_inclusao
+                        )?.getTime() || 0;
+
+                    return secondDate - firstDate;
+                });
+
+                currentPage = 1;
+
+                buildTypeFilters();
+                applyFilter();
+                updateLastRefresh();
+
+                refreshDot?.classList.remove(
+                    'bg-orange-400',
+                    'bg-rose-400'
+                );
+
+                refreshDot?.classList.add(
+                    'bg-emerald-400'
+                );
+            } catch (error) {
+                console.error(
+                    'Erro ao carregar callbacks:',
+                    error
+                );
+
+                originalData = [];
+                filteredData = [];
+
+                buildTypeFilters();
+                renderTable();
+
+                const lastUpdateText =
+                    document.getElementById(
+                        'lastUpdateText'
+                    );
+
+                if (lastUpdateText) {
+                    lastUpdateText.textContent =
+                        'Erro na atualização';
+                }
+
+                refreshDot?.classList.remove(
+                    'bg-orange-400',
+                    'bg-emerald-400'
+                );
+
+                refreshDot?.classList.add(
+                    'bg-rose-400'
+                );
+            } finally {
+                refreshDot?.classList.remove(
+                    'animate-pulse'
+                );
+
+                setTimeout(() => {
+                    refreshIndicator?.classList.add(
+                        'opacity-0'
+                    );
+                }, 800);
+            }
+        }
+
+        document.addEventListener(
+            'keydown',
+            event => {
+                if (event.key === 'Escape') {
+                    closeDetailsModal();
+                }
+            }
+        );
+
+        initializeDateFilters();
+        loadData();
+
+        /*
+         * Atualização automática a cada 5 minutos.
+         */
+        setInterval(loadData, 300000);
+    </script>
+
+    <!-- MENU -->
+    <script>
+        (function () {
+            const button =
+                document.getElementById('menuBtn');
+
+            const panel =
+                document.getElementById('menuPanel');
+
+            if (!button || !panel) {
+                return;
+            }
+
+            const openMenu = () => {
+                panel.classList.remove('hidden');
+
+                button.setAttribute(
+                    'aria-expanded',
+                    'true'
+                );
+            };
+
+            const closeMenu = () => {
+                panel.classList.add('hidden');
+
+                button.setAttribute(
+                    'aria-expanded',
+                    'false'
+                );
+            };
+
+            button.addEventListener(
+                'click',
+                event => {
+                    event.stopPropagation();
+
+                    if (
+                        panel.classList.contains('hidden')
+                    ) {
+                        openMenu();
+                    } else {
+                        closeMenu();
+                    }
+                }
+            );
+
+            document.addEventListener(
+                'click',
+                event => {
+                    if (
+                        !panel.contains(event.target) &&
+                        event.target !== button
+                    ) {
+                        closeMenu();
+                    }
+                }
+            );
+
+            document.addEventListener(
+                'keydown',
+                event => {
+                    if (event.key === 'Escape') {
+                        closeMenu();
+                    }
+                }
+            );
+        })();
+    </script>
+
+</body>
+
+</html>

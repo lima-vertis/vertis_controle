@@ -45,12 +45,12 @@
             "destination": "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/dados_gerais/91/1"
         },
         {
-            "source": "/api/callback",
-            "destination": "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/get_callback"
-        },
-        {
             "source": "/api/callback_json",
             "destination": "http://constellation.newvertis.com.br/constellation/IISConstellationAPI.dll/constellation-api/V1.1/callback_json"
+        },
+        {
+            "source": "/api/callback_json/:id",
+            "destination": "http://constellation.newvertis.com.br/constellation/IISConstellationAPI.dll/constellation-api/V1.1/callback_json/:id"
         },
         {
             "source": "/api/suporte/vertisbet",

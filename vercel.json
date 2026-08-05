@@ -90,7 +90,7 @@
         },
         {
             "source": "/api/consulta_laudos",
-            "destination": "http://177.11.209.38:8080/api/status"
+            "destination": "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/get_laudos"
         }        
     ]
 }

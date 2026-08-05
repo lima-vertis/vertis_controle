@@ -295,22 +295,22 @@
                 justify-content: flex-start;
             }
 
-            #detailsModal .relative.min-h-screen {
+            #callbackJsonModal .relative.min-h-screen {
                 align-items: flex-end !important;
                 padding: 0.75rem !important;
             }
 
-            #detailsModal .max-w-5xl {
+            #callbackJsonModal .max-w-6xl {
                 border-radius: 1.35rem 1.35rem 0 0 !important;
                 max-height: 92vh;
             }
 
-            #detailsModal .px-6 {
+            #callbackJsonModal .px-6 {
                 padding-left: 1rem !important;
                 padding-right: 1rem !important;
             }
 
-            #detailsModal .p-6 {
+            #callbackJsonModal .p-6 {
                 padding: 1rem !important;
             }
         }
@@ -328,6 +328,24 @@
             .mini-chart-center span:first-child {
                 font-size: 1.25rem !important;
             }
+        }
+
+        .json-viewer {
+            font-family:
+                ui-monospace,
+                SFMono-Regular,
+                Menlo,
+                Monaco,
+                Consolas,
+                "Liberation Mono",
+                "Courier New",
+                monospace;
+
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            line-height: 1.6;
+            tab-size: 4;
         }
     </style>
 </head>
@@ -778,42 +796,139 @@
         </div>
     </main>
 
-    <!-- MODAL -->
-    <div id="detailsModal" class="fixed inset-0 z-[100] hidden" aria-labelledby="detailsModalTitle" role="dialog"
-        aria-modal="true">
-        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onclick="closeDetailsModal()"></div>
+    <!-- MODAL JSON DO CALLBACK -->
+    <div id="callbackJsonModal" class="fixed inset-0 z-[100] hidden" aria-labelledby="callbackJsonModalTitle"
+        role="dialog" aria-modal="true">
 
+        <!-- Fundo escuro -->
+        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onclick="closeCallbackJsonModal()">
+        </div>
+
+        <!-- Área central do modal -->
         <div class="relative min-h-screen flex items-center justify-center p-4">
+
             <div
-                class="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden fade-in">
+                class="w-full max-w-6xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden fade-in">
+
+                <!-- Cabeçalho -->
                 <div
                     class="px-6 py-5 bg-gradient-to-r from-vertis-dark via-slate-900 to-slate-950 text-white flex items-start justify-between gap-4">
-                    <div>
+
+                    <div class="min-w-0">
                         <p class="text-xs uppercase tracking-[0.2em] text-orange-200 font-semibold">
-                            Detalhes do callback
+                            Conteúdo recebido
                         </p>
 
-                        <h2 id="detailsModalTitle" class="mt-1 text-xl font-bold">
-                            Registro selecionado
+                        <h2 id="callbackJsonModalTitle" class="mt-1 text-xl font-bold truncate">
+                            JSON do callback
                         </h2>
 
-                        <p id="detailsModalSubtitle" class="mt-1 text-sm text-slate-300"></p>
+                        <p id="callbackJsonModalSubtitle" class="mt-1 text-sm text-slate-300 truncate">
+                        </p>
                     </div>
 
-                    <button type="button" onclick="closeDetailsModal()"
-                        class="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 transition"
+                    <button type="button" onclick="closeCallbackJsonModal()"
+                        class="h-10 w-10 shrink-0 inline-flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 transition"
                         aria-label="Fechar modal">
+
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12">
+                            </path>
                         </svg>
                     </button>
                 </div>
 
-                <div class="p-6 bg-slate-50 max-h-[75vh] overflow-y-auto">
-                    <div id="detailsHighlights" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5"></div>
+                <!-- Conteúdo -->
+                <div class="p-6 bg-slate-50 max-h-[78vh] overflow-y-auto">
 
-                    <div id="detailsContent" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                    <!-- Carregamento -->
+                    <div id="callbackJsonLoading"
+                        class="hidden rounded-3xl border border-orange-100 bg-white p-6 shadow-sm">
+
+                        <div class="flex items-center gap-3">
+
+                            <div
+                                class="h-10 w-10 rounded-2xl bg-orange-50 text-vertis-orange flex items-center justify-center border border-orange-100">
+
+                                <svg class="h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24">
+
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4">
+                                    </circle>
+
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+                                    </path>
+                                </svg>
+                            </div>
+
+                            <div>
+                                <p class="font-black text-slate-800">
+                                    Buscando JSON do callback...
+                                </p>
+
+                                <p class="text-sm text-slate-500">
+                                    Consultando o endpoint pelo ID selecionado.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Erro -->
+                    <div id="callbackJsonError"
+                        class="hidden rounded-3xl border border-rose-200 bg-rose-50 p-6 shadow-sm">
+
+                        <p class="text-sm font-black text-rose-700">
+                            Não foi possível carregar o JSON.
+                        </p>
+
+                        <p id="callbackJsonErrorMessage" class="mt-1 text-sm text-rose-600">
+                        </p>
+                    </div>
+
+                    <!-- JSON -->
+                    <div id="callbackJsonResult"
+                        class="hidden rounded-3xl bg-slate-950 border border-slate-800 shadow-2xl overflow-hidden">
+
+                        <div
+                            class="px-5 py-4 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.18em] text-orange-300 font-black">
+                                    JSON completo
+                                </p>
+
+                                <p class="text-xs text-slate-400 mt-1">
+                                    Retorno integral recebido do endpoint
+                                </p>
+                            </div>
+
+                            <button id="copyCallbackJsonButton" type="button" onclick="copyCallbackJson()"
+                                class="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-bold text-white transition">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+
+                                    <rect x="9" y="9" width="11" height="11" rx="2">
+                                    </rect>
+
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1">
+                                    </path>
+                                </svg>
+
+                                <span id="copyCallbackJsonButtonText">
+                                    Copiar JSON
+                                </span>
+                            </button>
+                        </div>
+
+                        <pre id="callbackJsonRaw"
+                            class="json-viewer p-5 text-xs text-slate-100 overflow-auto max-h-[58vh]"></pre>
+                    </div>
                 </div>
             </div>
         </div>
@@ -828,7 +943,10 @@
          * dat_final=YYYY-MM-DD
          */
         const endpoint = "/api/callback";
+        const endpointCallbackJson = "/api/callback_json";
+
         //const endpoint = "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/get_callback";
+        //const endpointCallbackJson = "http://constellation.newvertis.com.br/constellation/IISConstellationAPI.dll/constellation-api/V1.1/callback_json";
 
         const PAGE_SIZE = 15;
         const PENDING_WARNING_MINUTES = 5;
@@ -842,6 +960,7 @@
 
         let currentTypeFilter = '';
         let currentStatusFilter = '';
+        let currentCallbackJsonRaw = '';
 
         const columns = [
             {
@@ -1937,7 +2056,7 @@
                             cell.innerHTML = `
                                 <button
                                     type="button"
-                                    onclick="openDetailsModal(${rowIndex})"
+                                    onclick="openCallbackJsonModal(${rowIndex})"
                                     title="Ver detalhes"
                                     class="group inline-flex items-center justify-center h-9 w-9 rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-orange-50 hover:text-vertis-orange hover:border-orange-200 transition"
                                 >
@@ -2182,7 +2301,7 @@
 
                                 <button
                                     type="button"
-                                    onclick="openDetailsModal(${rowIndex})"
+                                    onclick="openCallbackJsonModal(${rowIndex})"
                                     title="Ver detalhes"
                                     class="shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-2xl border border-orange-100 bg-orange-50 text-vertis-orange shadow-sm hover:bg-orange-100 transition"
                                 >
@@ -2390,157 +2509,335 @@
             );
         }
 
-        function createDetailCard(
-            label,
-            value,
-            extraClass = ''
-        ) {
-            const card =
-                document.createElement('div');
+        function resetCallbackJsonModal() {
+            currentCallbackJsonRaw = '';
 
-            card.className =
-                `rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ${extraClass}`;
+            const loading =
+                document.getElementById('callbackJsonLoading');
 
-            const labelElement =
-                document.createElement('p');
+            const error =
+                document.getElementById('callbackJsonError');
 
-            labelElement.className =
-                'text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-1';
+            const result =
+                document.getElementById('callbackJsonResult');
 
-            labelElement.textContent = label;
+            const errorMessage =
+                document.getElementById('callbackJsonErrorMessage');
 
-            const valueElement =
-                document.createElement('p');
+            const raw =
+                document.getElementById('callbackJsonRaw');
 
-            valueElement.className =
-                'text-sm font-semibold text-slate-800 break-words';
+            const copyButtonText =
+                document.getElementById(
+                    'copyCallbackJsonButtonText'
+                );
 
-            valueElement.textContent = value;
+            loading?.classList.add('hidden');
+            error?.classList.add('hidden');
+            result?.classList.add('hidden');
 
-            card.appendChild(labelElement);
-            card.appendChild(valueElement);
+            if (errorMessage) {
+                errorMessage.textContent = '';
+            }
 
-            return card;
+            if (raw) {
+                raw.textContent = '';
+            }
+
+            if (copyButtonText) {
+                copyButtonText.textContent = 'Copiar JSON';
+            }
         }
 
-        function openDetailsModal(rowIndex) {
+        function showCallbackJsonLoading() {
+            document
+                .getElementById('callbackJsonLoading')
+                ?.classList.remove('hidden');
+
+            document
+                .getElementById('callbackJsonError')
+                ?.classList.add('hidden');
+
+            document
+                .getElementById('callbackJsonResult')
+                ?.classList.add('hidden');
+        }
+
+        function showCallbackJsonError(message) {
+            const errorMessage =
+                document.getElementById(
+                    'callbackJsonErrorMessage'
+                );
+
+            if (errorMessage) {
+                errorMessage.textContent =
+                    message ||
+                    'Ocorreu um erro inesperado.';
+            }
+
+            document
+                .getElementById('callbackJsonLoading')
+                ?.classList.add('hidden');
+
+            document
+                .getElementById('callbackJsonResult')
+                ?.classList.add('hidden');
+
+            document
+                .getElementById('callbackJsonError')
+                ?.classList.remove('hidden');
+        }
+
+        function showCallbackJsonResult(data) {
+            /*
+             * Não existe nenhum mapeamento de campos.
+             *
+             * O retorno inteiro é transformado em texto,
+             * com indentação de quatro espaços.
+             */
+            currentCallbackJsonRaw =
+                JSON.stringify(data, null, 4);
+
+            const raw =
+                document.getElementById(
+                    'callbackJsonRaw'
+                );
+
+            if (raw) {
+                raw.textContent =
+                    currentCallbackJsonRaw;
+            }
+
+            document
+                .getElementById('callbackJsonLoading')
+                ?.classList.add('hidden');
+
+            document
+                .getElementById('callbackJsonError')
+                ?.classList.add('hidden');
+
+            document
+                .getElementById('callbackJsonResult')
+                ?.classList.remove('hidden');
+        }
+
+        async function openCallbackJsonModal(rowIndex) {
             const row = filteredData[rowIndex];
 
             if (!row) {
                 return;
             }
 
+            const idCallback =
+                row.id_callback ?? row.id;
+
             const modal =
-                document.getElementById('detailsModal');
+                document.getElementById(
+                    'callbackJsonModal'
+                );
 
             const title =
                 document.getElementById(
-                    'detailsModalTitle'
+                    'callbackJsonModalTitle'
                 );
 
             const subtitle =
                 document.getElementById(
-                    'detailsModalSubtitle'
+                    'callbackJsonModalSubtitle'
                 );
 
-            const highlights =
-                document.getElementById(
-                    'detailsHighlights'
-                );
+            resetCallbackJsonModal();
 
-            const content =
-                document.getElementById(
-                    'detailsContent'
-                );
+            if (title) {
+                title.textContent =
+                    `JSON do callback #${idCallback || '—'}`;
+            }
 
-            title.textContent =
-                `Callback #${row.id_callback}`;
+            if (subtitle) {
+                subtitle.textContent =
+                    row.nom_unid_oper ||
+                    `Unidade ${row.fkid_unid_negoc || 0} / ${row.cod_unid_oper || 0}`;
+            }
 
-            subtitle.textContent =
-                row.nom_unid_oper ||
-                `Unidade ${row.fkid_unid_negoc || 0} / ${row.cod_unid_oper || 0}`;
-
-            highlights.innerHTML = '';
-
-            highlights.appendChild(
-                createDetailCard(
-                    'Situação',
-                    getCallbackStatus(row) === 'integrado'
-                        ? 'Integrado'
-                        : getCallbackStatus(row) === 'atrasado'
-                            ? 'Pendente acima de 5 minutos'
-                            : 'Pendente',
-                    isIntegrated(row)
-                        ? 'border-emerald-200'
-                        : isDelayed(row)
-                            ? 'border-orange-200'
-                            : 'border-rose-200'
-                )
-            );
-
-            highlights.appendChild(
-                createDetailCard(
-                    'Tipo',
-                    formatValue(
-                        'ind_tip_callback',
-                        row.ind_tip_callback
-                    ),
-                    'border-orange-200'
-                )
-            );
-
-            highlights.appendChild(
-                createDetailCard(
-                    'Tempo de processamento',
-                    formatDuration(
-                        getElapsedMilliseconds(row)
-                    ),
-                    'border-sky-200'
-                )
-            );
-
-            content.innerHTML = '';
-
-            Object.entries(row).forEach(
-                ([key, value]) => {
-                    content.appendChild(
-                        createDetailCard(
-                            fieldLabels[key] || key,
-                            formatValue(key, value)
-                        )
-                    );
-                }
-            );
-
-            content.appendChild(
-                createDetailCard(
-                    'Situação calculada',
-                    getCallbackStatus(row)
-                )
-            );
-
-            content.appendChild(
-                createDetailCard(
-                    'Possui chave externa',
-                    hasExternalKey(row) ? 'Sim' : 'Não'
-                )
-            );
-
-            modal.classList.remove('hidden');
+            modal?.classList.remove('hidden');
 
             document.body.classList.add(
                 'overflow-hidden'
             );
+
+            if (
+                idCallback === null ||
+                idCallback === undefined ||
+                String(idCallback).trim() === ''
+            ) {
+                showCallbackJsonError(
+                    'O registro selecionado não possui id_callback.'
+                );
+
+                return;
+            }
+
+            showCallbackJsonLoading();
+
+            try {
+                const url =
+                    `${endpointCallbackJson}/${encodeURIComponent(idCallback)}`;
+
+                const response = await fetch(
+                    url,
+                    {
+                        cache: 'no-store'
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Erro HTTP ${response.status} ao consultar o callback.`
+                    );
+                }
+
+                /*
+                 * Primeiro capturamos como texto.
+                 * Isso permite tratar respostas inválidas
+                 * ou endpoints que não retornem JSON corretamente.
+                 */
+                const responseText =
+                    await response.text();
+
+                if (!responseText.trim()) {
+                    throw new Error(
+                        'O endpoint retornou uma resposta vazia.'
+                    );
+                }
+
+                let data;
+
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    throw new Error(
+                        'O endpoint respondeu, mas o conteúdo retornado não é um JSON válido.'
+                    );
+                }
+
+                showCallbackJsonResult(data);
+            } catch (error) {
+                console.error(
+                    'Erro ao consultar JSON do callback:',
+                    error
+                );
+
+                showCallbackJsonError(
+                    error?.message ||
+                    'Erro inesperado ao consultar o callback.'
+                );
+            }
         }
 
-        function closeDetailsModal() {
+        function closeCallbackJsonModal() {
             document
-                .getElementById('detailsModal')
-                .classList.add('hidden');
+                .getElementById('callbackJsonModal')
+                ?.classList.add('hidden');
 
             document.body.classList.remove(
                 'overflow-hidden'
             );
+
+            resetCallbackJsonModal();
+        }
+
+        async function copyCallbackJson() {
+            if (!currentCallbackJsonRaw) {
+                return;
+            }
+
+            const buttonText =
+                document.getElementById(
+                    'copyCallbackJsonButtonText'
+                );
+
+            try {
+                /*
+                 * Método moderno.
+                 * Em alguns navegadores exige HTTPS.
+                 */
+                if (
+                    navigator.clipboard &&
+                    window.isSecureContext
+                ) {
+                    await navigator.clipboard.writeText(
+                        currentCallbackJsonRaw
+                    );
+                } else {
+                    /*
+                     * Método alternativo para páginas HTTP
+                     * ou navegadores mais antigos.
+                     */
+                    const textarea =
+                        document.createElement('textarea');
+
+                    textarea.value =
+                        currentCallbackJsonRaw;
+
+                    textarea.setAttribute(
+                        'readonly',
+                        ''
+                    );
+
+                    textarea.style.position =
+                        'fixed';
+
+                    textarea.style.left =
+                        '-9999px';
+
+                    textarea.style.opacity =
+                        '0';
+
+                    document.body.appendChild(
+                        textarea
+                    );
+
+                    textarea.select();
+
+                    const copied =
+                        document.execCommand('copy');
+
+                    document.body.removeChild(
+                        textarea
+                    );
+
+                    if (!copied) {
+                        throw new Error(
+                            'O navegador não permitiu copiar automaticamente.'
+                        );
+                    }
+                }
+
+                if (buttonText) {
+                    buttonText.textContent =
+                        'JSON copiado!';
+
+                    setTimeout(() => {
+                        buttonText.textContent =
+                            'Copiar JSON';
+                    }, 1800);
+                }
+            } catch (error) {
+                console.error(
+                    'Erro ao copiar JSON:',
+                    error
+                );
+
+                if (buttonText) {
+                    buttonText.textContent =
+                        'Não foi possível copiar';
+
+                    setTimeout(() => {
+                        buttonText.textContent =
+                            'Copiar JSON';
+                    }, 2200);
+                }
+            }
         }
 
         function updateLastRefresh() {
@@ -2684,7 +2981,7 @@
             'keydown',
             event => {
                 if (event.key === 'Escape') {
-                    closeDetailsModal();
+                    closeCallbackJsonModal();
                 }
             }
         );

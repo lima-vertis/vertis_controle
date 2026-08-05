@@ -87,6 +87,10 @@
         {
             "source": "/api/status/nfse",
             "destination": "http://177.11.209.38:8080/api/status"
-        }
+        },
+        {
+            "source": "/api/consulta_laudos",
+            "destination": "http://177.11.209.38:8080/api/status"
+        }        
     ]
 }

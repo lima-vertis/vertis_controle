@@ -30,7 +30,7 @@
 
     <style>
         .fade-in {
-            animation: fadeInUp 0.25s ease-out;
+            animation: fadeInUp .25s ease-out;
         }
 
         @keyframes fadeInUp {
@@ -49,30 +49,27 @@
             transition: all .3s ease;
         }
 
-        /* rotação suave do ícone de troca */
         .rotate-180 {
             transform: rotate(180deg);
         }
 
-        /* Menu moderno (sem @apply) — compatível com Tailwind via CDN */
         .menu-item {
             display: flex;
             align-items: center;
             gap: .75rem;
             padding: .625rem 1.25rem;
-            /* px-5 py-2.5 */
             color: rgb(51 65 85);
-            /* slate-700 */
             text-decoration: none;
             position: relative;
-            transition: background-color .2s ease, color .2s ease, transform .2s ease;
+            transition:
+                background-color .2s ease,
+                color .2s ease,
+                transform .2s ease;
         }
 
         .menu-item:hover {
             background: rgb(241 245 249);
-            /* slate-100 */
             color: rgb(2 6 23);
-            /* near black */
             transform: translateX(4px);
         }
 
@@ -86,6 +83,64 @@
         .menu-item:hover .menu-icon {
             opacity: 1;
             transform: scale(1.1);
+        }
+
+        /* ===== MONITORAMENTO ===== */
+
+        .monitor-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgb(226 232 240);
+            background: rgba(255, 255, 255, .92);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, .055);
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease,
+                border-color .2s ease;
+        }
+
+        .monitor-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 38px rgba(15, 23, 42, .08);
+            border-color: rgb(203 213 225);
+        }
+
+        .monitor-dot {
+            box-shadow: 0 0 0 5px rgba(16, 185, 129, .09);
+        }
+
+        .monitor-dot-warning {
+            box-shadow: 0 0 0 5px rgba(245, 158, 11, .10);
+        }
+
+        .monitor-dot-error {
+            box-shadow: 0 0 0 5px rgba(244, 63, 94, .10);
+        }
+
+        .filter-segment {
+            transition:
+                background-color .2s ease,
+                color .2s ease,
+                box-shadow .2s ease;
+        }
+
+        .table-scroll::-webkit-scrollbar {
+            width: 9px;
+            height: 9px;
+        }
+
+        .table-scroll::-webkit-scrollbar-track {
+            background: rgb(248 250 252);
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: rgb(203 213 225);
+            border-radius: 999px;
+            border: 2px solid rgb(248 250 252);
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgb(148 163 184);
         }
     </style>
 </head>
@@ -166,7 +221,7 @@
                             Documentos Fiscais
                         </div>
 
-                        <!-- NFSe -->
+                        <!-- NFSE -->
                         <a href="../nfse/index.html" class="menu-item">
                             <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
                                 viewBox="0 0 24 24">
@@ -176,7 +231,7 @@
                             NFSe
                         </a>
 
-                        <!-- NFCe / NFe -->
+                        <!-- NFCE / NFE -->
                         <a href="../nfe/index.html" class="menu-item">
                             <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
                                 viewBox="0 0 24 24">
@@ -202,12 +257,6 @@
                             Callback (API)
                         </a>
 
-
-                        <!-- MONITORAMENTO -->
-                        <div class="mt-4 px-5 text-xs uppercase tracking-wider text-slate-400 font-semibold">
-                            Monitoramento
-                        </div>
-
                         <!-- AMBRA -->
                         <a href="../suporte/ambra/index.html" class="menu-item">
                             <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
@@ -218,49 +267,14 @@
                             Ambra | Número de Acesso
                         </a>
 
-                        <!-- VETEX -->
-                        <a href="../suporte/vetex/index.html" class="menu-item">
-                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 12h3l2-5 4 10 2-5h5" />
-                            </svg>
-                            Vetex (118)
-                        </a>
-
-                        <!-- LAPAVET -->
-                        <a href="../suporte/lapavet/index.html" class="menu-item">
-                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M7 3h7l5 5v13H7zM14 3v5h5M12 12h.01M12 16h.01" />
-                            </svg>
-                            Lapavet (91)
-                        </a>
-
-
-                        <!-- DESENVOLVIMENTO -->
-                        <div class="mt-4 px-5 text-xs uppercase tracking-wider text-slate-400 font-semibold">
-                            Desenvolvimento
-                        </div>
-
                         <!-- CHAVE PIX -->
                         <a href="../desenv/gerador_pix.html" class="menu-item">
                             <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M8.5 6.5l3.5-3.5 3.5 3.5M8.5 17.5L12 21l3.5-3.5M6.5 8.5L3 12l3.5 3.5M17.5 8.5L21 12l-3.5 3.5M9 9l3-3 3 3-3 3-3-3zm0 6l3-3 3 3-3 3-3-3z" />
+                                    d="M8.5 6.5L12 3l3.5 3.5M8.5 17.5L12 21l3.5-3.5M6.5 8.5L3 12l3.5 3.5M17.5 8.5L21 12l-3.5 3.5M9 9l3-3 3 3-3 3-3-3zm0 6 3-3 3 3-3 3-3-3z" />
                             </svg>
                             Chave PIX
-                        </a>
-
-                        <!-- LEITOR PDF -->
-                        <a href="../desenv/leitor_pdf.html" class="menu-item">
-                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h4M10 17h4" />
-                            </svg>
-                            Leitor PDF (PDF.js)
                         </a>
 
                     </div>
@@ -281,49 +295,6 @@
                 Atualizando...
             </span>
 
-            <!-- Logs e Erros (no header) -->
-            <a href="controle_nfe_logs.html" title="Logs e Erros" class="group relative inline-flex items-center justify-center
-            h-10 w-10 rounded-xl
-            bg-white/10 border border-white/15
-            hover:bg-white/15 hover:border-white/25
-            transition-all duration-200
-            focus:outline-none focus:ring-2 focus:ring-white/30">
-
-                <!-- Ping discreto -->
-                <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                    <span
-                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
-                </span>
-
-                <!-- Ícone -->
-                <button id="toggleViewBtn" class="group relative inline-flex items-center justify-center
-         h-10 w-10 rounded-xl
-         bg-white/10 border border-white/15
-         hover:bg-white/15 hover:border-white/25
-         transition-all duration-200
-         focus:outline-none focus:ring-2 focus:ring-white/30" title="Alternar visão">
-
-                    <svg id="toggleViewIcon" xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5 text-white/90 transition-transform duration-300 ease-in-out" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-
-                </button>
-
-                <!-- Tooltip -->
-                <span class="pointer-events-none absolute right-0 top-11
-                 opacity-0 translate-y-1
-                 group-hover:opacity-100 group-hover:translate-y-0
-                 transition-all duration-200
-                 text-[11px] px-2 py-1 rounded-lg
-                 bg-slate-900 text-white shadow-lg whitespace-nowrap">
-                    Logs e Erros
-                </span>
-            </a>
-
             <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" class="h-8" />
         </div>
 
@@ -331,212 +302,726 @@
 
 
 
-    <main class="p-6 flex-1 space-y-6">
+    <main class="flex-1">
 
-        <!-- KPIs + Modo (Hoje/Mês) -->
-        <section class="bg-white rounded-2xl shadow p-4">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-                <div>
-                    <h2 id="modeTitle" class="text-sm font-semibold text-slate-700">Hoje</h2>
-                    <p class="text-xs text-slate-500">Visão geral da publicação de laudos</p>
-                </div>
+        <!-- HERO / STATUS -->
+        <section class="border-b border-slate-200/80 bg-white/60 backdrop-blur">
+            <div class="max-w-[1800px] mx-auto px-6 py-6">
 
-                <!-- Toggle (segmentado) -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
-                        <button id="btnModeHoje" type="button"
-                            class="px-3 py-1.5 text-sm rounded-lg bg-white shadow-sm text-slate-800 font-semibold transition">
-                            Hoje
-                        </button>
-                        <button id="btnModeMes" type="button"
-                            class="px-3 py-1.5 text-sm rounded-lg text-slate-600 hover:text-slate-800 transition">
-                            Mês
-                        </button>
+                <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-5">
+
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span
+                                class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
+                                <span class="relative flex h-2 w-2">
+                                    <span
+                                        class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"></span>
+                                    <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                                </span>
+
+                                MONITORAMENTO ATIVO
+                            </span>
+
+                            <span id="lastRefreshLabel" class="text-[11px] font-medium text-slate-400">
+                                —
+                            </span>
+                        </div>
+
+                        <h2 class="text-2xl font-bold tracking-tight text-slate-900">
+                            Fila de publicação
+                        </h2>
+
+                        <p class="mt-1 max-w-2xl text-sm text-slate-500">
+                            Acompanhe a publicação de laudos por Internet e E-mail,
+                            identifique filas, erros e clientes sem comunicação recente.
+                        </p>
                     </div>
 
-                    <span class="text-xs text-slate-500 hidden sm:inline">Tabela e KPIs alternam conforme o modo</span>
-                </div>
-            </div>
 
-            <div class="mt-4 grid grid-cols-1 xl:grid-cols-2 gap-4">
-                <!-- Internet -->
-                <div class="rounded-2xl border border-slate-200 p-4">
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="inline-flex h-2.5 w-2.5 rounded-full bg-indigo-500"></span>
-                            <h3 class="text-sm font-semibold text-slate-700">Internet</h3>
+                    <!-- HOJE / MÊS -->
+                    <div class="flex items-center gap-3">
+
+                        <div class="inline-flex rounded-xl border border-slate-200 bg-slate-100/80 p-1 shadow-inner">
+
+                            <button id="btnModeHoje" type="button"
+                                class="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition">
+                                Hoje
+                            </button>
+
+                            <button id="btnModeMes" type="button"
+                                class="rounded-lg px-4 py-2 text-sm font-medium text-slate-500 transition hover:text-slate-800">
+                                Mês
+                            </button>
                         </div>
-                        <div class="text-right">
-                            <p class="text-[11px] text-slate-500">Total</p>
-                            <p id="kpi_lol_tot" class="text-xl font-bold text-slate-800 count">0</p>
-                            <svg id="spark_lol" class="mt-1 h-6 w-24 text-slate-400" viewBox="0 0 100 24"
-                                preserveAspectRatio="none" aria-label="Sparkline Internet">
-                                <polyline id="spark_lol_line" fill="none" stroke="currentColor" stroke-width="2"
-                                    points=""></polyline>
+
+                        <div
+                            class="hidden sm:flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+
+                            <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
                             </svg>
+
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wide text-slate-400">
+                                    Atualização
+                                </p>
+
+                                <p class="text-xs font-semibold text-slate-700">
+                                    A cada 5 min
+                                </p>
+                            </div>
+
                         </div>
+
                     </div>
 
-                    <div class="mt-3 grid grid-cols-3 gap-3">
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between">
-                                <p class="text-[11px] text-slate-500">Sucesso</p>
-                                <span id="kpi_lol_suc_pct"
-                                    class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium">0%</span>
-                            </div>
-                            <p id="kpi_lol_suc" class="text-2xl font-semibold text-emerald-600 count">0</p>
-                            <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div id="kpi_lol_suc_bar" class="h-full bg-emerald-500 w-0 transition-all duration-300">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between">
-                                <p class="text-[11px] text-slate-500">Fila</p>
-                                <span id="kpi_lol_fil_pct"
-                                    class="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-50 text-rose-700 font-medium">0%</span>
-                            </div>
-                            <p id="kpi_lol_fil" class="text-2xl font-semibold text-rose-600 count">0</p>
-                            <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div id="kpi_lol_fil_bar" class="h-full bg-rose-500 w-0 transition-all duration-300">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between">
-                                <p class="text-[11px] text-slate-500">Erro</p>
-                                <span id="kpi_lol_err_pct"
-                                    class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium">0%</span>
-                            </div>
-                            <p id="kpi_lol_err" class="text-2xl font-semibold text-amber-600 count">0</p>
-                            <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div id="kpi_lol_err_bar" class="h-full bg-amber-500 w-0 transition-all duration-300">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500">
-                        <span>Último envio</span>
-                        <span class="flex items-center gap-2">
-                            <span id="kpi_lol_stale"
-                                class="hidden text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">—</span>
-                            <span id="kpi_lol_ult" class="font-medium text-slate-700">—</span>
-                        </span>
-                    </div>
                 </div>
 
-                <!-- E-mail -->
-                <div class="rounded-2xl border border-slate-200 p-4">
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="inline-flex h-2.5 w-2.5 rounded-full bg-cyan-500"></span>
-                            <h3 class="text-sm font-semibold text-slate-700">E-mail</h3>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[11px] text-slate-500">Total</p>
-                            <p id="kpi_loe_tot" class="text-xl font-bold text-slate-800 count">0</p>
-                            <svg id="spark_loe" class="mt-1 h-6 w-24 text-slate-400" viewBox="0 0 100 24"
-                                preserveAspectRatio="none" aria-label="Sparkline E-mail">
-                                <polyline id="spark_loe_line" fill="none" stroke="currentColor" stroke-width="2"
-                                    points=""></polyline>
-                            </svg>
-                        </div>
-                    </div>
 
-                    <div class="mt-3 grid grid-cols-3 gap-3">
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between">
-                                <p class="text-[11px] text-slate-500">Sucesso</p>
-                                <span id="kpi_loe_suc_pct"
-                                    class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium">0%</span>
-                            </div>
-                            <p id="kpi_loe_suc" class="text-2xl font-semibold text-emerald-600 count">0</p>
-                            <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div id="kpi_loe_suc_bar" class="h-full bg-emerald-500 w-0 transition-all duration-300">
-                                </div>
-                            </div>
-                        </div>
+                <!-- STATUS GERAL -->
+                <div class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
 
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between">
-                                <p class="text-[11px] text-slate-500">Fila</p>
-                                <span id="kpi_loe_fil_pct"
-                                    class="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-50 text-rose-700 font-medium">0%</span>
-                            </div>
-                            <p id="kpi_loe_fil" class="text-2xl font-semibold text-rose-600 count">0</p>
-                            <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div id="kpi_loe_fil_bar" class="h-full bg-rose-500 w-0 transition-all duration-300">
-                                </div>
-                            </div>
-                        </div>
+                    <!-- CLIENTES MONITORADOS -->
+                    <div class="monitor-card rounded-2xl p-4">
+                        <div class="flex items-start justify-between">
 
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-between">
-                                <p class="text-[11px] text-slate-500">Erro</p>
-                                <span id="kpi_loe_err_pct"
-                                    class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium">0%</span>
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">
+                                    Clientes monitorados
+                                </p>
+
+                                <p id="kpi_clients_visible"
+                                    class="mt-2 text-3xl font-bold tracking-tight text-slate-900 count">
+                                    0
+                                </p>
+
+                                <p class="mt-1 text-[11px] text-slate-400">
+                                    conforme filtros ativos
+                                </p>
                             </div>
-                            <p id="kpi_loe_err" class="text-2xl font-semibold text-amber-600 count">0</p>
-                            <div class="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div id="kpi_loe_err_bar" class="h-full bg-amber-500 w-0 transition-all duration-300">
-                                </div>
+
+                            <div
+                                class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    viewBox="0 0 24 24">
+
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zm13 10v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+                                </svg>
+
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500">
-                        <span>Último envio</span>
-                        <span class="flex items-center gap-2">
-                            <span id="kpi_loe_stale"
-                                class="hidden text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">—</span>
-                            <span id="kpi_loe_ult" class="font-medium text-slate-700">—</span>
-                        </span>
+
+                    <!-- ATUALIZADOS -->
+                    <div class="monitor-card rounded-2xl p-4">
+
+                        <div class="flex items-start justify-between">
+
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">
+                                    Atualizados
+                                </p>
+
+                                <p id="kpi_clients_fresh"
+                                    class="mt-2 text-3xl font-bold tracking-tight text-emerald-600 count">
+                                    0
+                                </p>
+
+                                <p class="mt-1 text-[11px] text-slate-400">
+                                    comunicação ≤ 30 min
+                                </p>
+                            </div>
+
+                            <div
+                                class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+
+                                <span class="monitor-dot h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+
+                            </div>
+
+                        </div>
+
                     </div>
+
+
+                    <!-- DESATUALIZADOS -->
+                    <div class="monitor-card rounded-2xl p-4">
+
+                        <div class="flex items-start justify-between">
+
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">
+                                    Desatualizados
+                                </p>
+
+                                <p id="kpi_clients_stale"
+                                    class="mt-2 text-3xl font-bold tracking-tight text-amber-600 count">
+                                    0
+                                </p>
+
+                                <p class="mt-1 text-[11px] text-slate-400">
+                                    sem atualização recente
+                                </p>
+                            </div>
+
+                            <div
+                                class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+
+                                <span class="monitor-dot-warning h-2.5 w-2.5 rounded-full bg-amber-500"></span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- COM ERRO -->
+                    <div class="monitor-card rounded-2xl p-4">
+
+                        <div class="flex items-start justify-between">
+
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">
+                                    Clientes com erro
+                                </p>
+
+                                <p id="kpi_clients_error"
+                                    class="mt-2 text-3xl font-bold tracking-tight text-rose-600 count">
+                                    0
+                                </p>
+
+                                <p class="mt-1 text-[11px] text-slate-400">
+                                    Internet ou E-mail
+                                </p>
+                            </div>
+
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+
+                                <span class="monitor-dot-error h-2.5 w-2.5 rounded-full bg-rose-500"></span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
         </section>
-        <!-- FILTRO -->
-        <div class="bg-white rounded-2xl shadow p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-            <input id="filterInput" type="text" placeholder="🔍 Filtrar por código ou nome da unidade..."
-                class="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring" oninput="applyFilter()" />
-            <div class="flex items-center gap-2">
-                <span id="modeBadge"
-                    class="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">Modo:
-                    Hoje</span>
-                <button id="btnOnlyErrors" type="button"
-                    class="text-xs px-2 py-1 rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition">
-                    👀 Somente erro
-                </button>
-                <span class="text-sm text-slate-500 whitespace-nowrap">Auto-refresh 5 min</span>
-            </div>
-        </div>
 
-        <!-- TABELA -->
-        <div class="bg-white rounded-2xl shadow overflow-x-auto max-h-[70vh]">
-            <table class="min-w-full text-sm border-collapse">
-                <thead class="bg-slate-200 sticky top-0 z-40">
-                    <tr id="table-head"></tr>
-                </thead>
-                <tbody id="table-body" class="divide-y"></tbody>
-                <tfoot class="bg-slate-100 sticky bottom-0 font-semibold">
-                    <tr id="table-footer"></tr>
-                </tfoot>
-            </table>
-        </div>
 
-        <!-- PAGINAÇÃO -->
-        <div class="flex items-center justify-between px-2 text-sm text-slate-600">
-            <span id="pageInfo"></span>
-            <div id="pagination" class="flex gap-1"></div>
+        <div class="max-w-[1800px] mx-auto p-6 space-y-5">
+
+            <!-- INTERNET / EMAIL -->
+            <section class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+
+                <!-- INTERNET -->
+                <article id="cardInternet" class="monitor-card rounded-2xl p-5">
+
+                    <div class="flex items-start justify-between">
+
+                        <div class="flex items-center gap-3">
+
+                            <div
+                                class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    viewBox="0 0 24 24">
+
+                                    <circle cx="12" cy="12" r="9" />
+
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18" />
+                                </svg>
+
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold text-slate-900">
+                                    Publicação por Internet
+                                </h3>
+
+                                <p class="text-xs text-slate-400">
+                                    Laudos disponibilizados no Laudos Online
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="text-right">
+
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                                Processados
+                            </p>
+
+                            <div class="flex items-end justify-end gap-3">
+
+                                <p id="kpi_lol_tot" class="text-3xl font-bold tracking-tight text-slate-900 count">
+                                    0
+                                </p>
+
+                                <svg id="spark_lol" class="mb-1 h-7 w-28 text-indigo-400" viewBox="0 0 100 24"
+                                    preserveAspectRatio="none">
+
+                                    <polyline id="spark_lol_line" fill="none" stroke="currentColor" stroke-width="2"
+                                        points="">
+                                    </polyline>
+
+                                </svg>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="mt-5 grid grid-cols-3 gap-2">
+
+                        <!-- SUCESSO -->
+                        <div class="rounded-xl bg-emerald-50/70 p-3">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="text-[11px] font-medium text-emerald-700">
+                                    Sucesso
+                                </span>
+
+                                <span id="kpi_lol_suc_pct" class="text-[10px] font-semibold text-emerald-600">
+                                    0%
+                                </span>
+                            </div>
+
+                            <p id="kpi_lol_suc" class="mt-1 text-2xl font-bold text-emerald-700 count">
+                                0
+                            </p>
+
+                            <div class="mt-2 h-1 overflow-hidden rounded-full bg-emerald-100">
+                                <div id="kpi_lol_suc_bar"
+                                    class="h-full w-0 rounded-full bg-emerald-500 transition-all duration-300">
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- FILA -->
+                        <div class="rounded-xl bg-amber-50/70 p-3">
+
+                            <div class="flex items-center justify-between gap-1">
+
+                                <span class="text-[11px] font-medium text-amber-700">
+                                    Na fila
+                                </span>
+
+                                <span id="kpi_lol_fil_pct" class="text-[10px] font-semibold text-amber-600">
+
+                                    0%
+
+                                </span>
+
+                            </div>
+
+                            <p id="kpi_lol_fil" class="mt-1 text-2xl font-bold text-amber-700 count">
+
+                                0
+
+                            </p>
+
+                            <div class="mt-2 h-1 overflow-hidden rounded-full bg-amber-100">
+
+                                <div id="kpi_lol_fil_bar"
+                                    class="h-full w-0 rounded-full bg-amber-500 transition-all duration-300">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ERRO -->
+                        <div class="rounded-xl bg-rose-50/70 p-3">
+
+                            <div class="flex items-center justify-between gap-1">
+
+                                <span class="text-[11px] font-medium text-rose-700">
+                                    Erro
+                                </span>
+
+                                <span id="kpi_lol_err_pct" class="text-[10px] font-semibold text-rose-600">
+
+                                    0%
+
+                                </span>
+
+                            </div>
+
+                            <p id="kpi_lol_err" class="mt-1 text-2xl font-bold text-rose-700 count">
+
+                                0
+
+                            </p>
+
+                            <div class="mt-2 h-1 overflow-hidden rounded-full bg-rose-100">
+
+                                <div id="kpi_lol_err_bar"
+                                    class="h-full w-0 rounded-full bg-rose-500 transition-all duration-300">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+
+                        <span class="text-xs text-slate-400">
+                            Último envio
+                        </span>
+
+                        <div class="flex items-center gap-2">
+
+                            <span id="kpi_lol_stale" class="hidden rounded-full border px-2 py-0.5 text-[10px]">
+                                —
+                            </span>
+
+                            <span id="kpi_lol_ult" class="text-xs font-semibold text-slate-700">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- EMAIL -->
+                <article id="cardEmail" class="monitor-card rounded-2xl p-5">
+
+                    <div class="flex items-start justify-between">
+
+                        <div class="flex items-center gap-3">
+
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600">
+
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    viewBox="0 0 24 24">
+
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M3 6h18v12H3zM3 7l9 6 9-6" />
+                                </svg>
+
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold text-slate-900">
+                                    Publicação por E-mail
+                                </h3>
+
+                                <p class="text-xs text-slate-400">
+                                    Laudos enviados diretamente ao destinatário
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="text-right">
+
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                                Processados
+                            </p>
+
+                            <div class="flex items-end justify-end gap-3">
+
+                                <p id="kpi_loe_tot" class="text-3xl font-bold tracking-tight text-slate-900 count">
+                                    0
+                                </p>
+
+                                <svg id="spark_loe" class="mb-1 h-7 w-28 text-cyan-400" viewBox="0 0 100 24"
+                                    preserveAspectRatio="none">
+
+                                    <polyline id="spark_loe_line" fill="none" stroke="currentColor" stroke-width="2"
+                                        points="">
+                                    </polyline>
+
+                                </svg>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-5 grid grid-cols-3 gap-2">
+
+                        <div class="rounded-xl bg-emerald-50/70 p-3">
+
+                            <div class="flex items-center justify-between gap-1">
+
+                                <span class="text-[11px] font-medium text-emerald-700">
+                                    Sucesso
+                                </span>
+
+                                <span id="kpi_loe_suc_pct" class="text-[10px] font-semibold text-emerald-600">
+                                    0%
+                                </span>
+
+                            </div>
+
+                            <p id="kpi_loe_suc" class="mt-1 text-2xl font-bold text-emerald-700 count">
+                                0
+                            </p>
+
+                            <div class="mt-2 h-1 overflow-hidden rounded-full bg-emerald-100">
+                                <div id="kpi_loe_suc_bar"
+                                    class="h-full w-0 rounded-full bg-emerald-500 transition-all duration-300">
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="rounded-xl bg-rose-50/70 p-3">
+
+                            <div class="flex items-center justify-between gap-1">
+
+                                <span class="text-[11px] font-medium text-rose-700">
+                                    Na fila
+                                </span>
+
+                                <span id="kpi_loe_fil_pct" class="text-[10px] font-semibold text-rose-600">
+                                    0%
+                                </span>
+
+                            </div>
+
+                            <p id="kpi_loe_fil" class="mt-1 text-2xl font-bold text-rose-700 count">
+                                0
+                            </p>
+
+                            <div class="mt-2 h-1 overflow-hidden rounded-full bg-rose-100">
+                                <div id="kpi_loe_fil_bar"
+                                    class="h-full w-0 rounded-full bg-rose-500 transition-all duration-300">
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="rounded-xl bg-amber-50/70 p-3">
+
+                            <div class="flex items-center justify-between gap-1">
+
+                                <span class="text-[11px] font-medium text-amber-700">
+                                    Erro
+                                </span>
+
+                                <span id="kpi_loe_err_pct" class="text-[10px] font-semibold text-amber-600">
+                                    0%
+                                </span>
+
+                            </div>
+
+                            <p id="kpi_loe_err" class="mt-1 text-2xl font-bold text-amber-700 count">
+                                0
+                            </p>
+
+                            <div class="mt-2 h-1 overflow-hidden rounded-full bg-amber-100">
+                                <div id="kpi_loe_err_bar"
+                                    class="h-full w-0 rounded-full bg-amber-500 transition-all duration-300">
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+
+                        <span class="text-xs text-slate-400">
+                            Último envio
+                        </span>
+
+                        <div class="flex items-center gap-2">
+
+                            <span id="kpi_loe_stale" class="hidden rounded-full border px-2 py-0.5 text-[10px]">
+                                —
+                            </span>
+
+                            <span id="kpi_loe_ult" class="text-xs font-semibold text-slate-700">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            </section>
+
+
+            <!-- CENTRAL DE MONITORAMENTO -->
+            <section
+                class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,.05)]">
+
+                <!-- HEADER FILTROS -->
+                <div class="border-b border-slate-100 bg-gradient-to-r from-white via-white to-slate-50 px-5 py-4">
+
+                    <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+
+                        <div>
+                            <h3 class="font-semibold text-slate-900">
+                                Clientes monitorados
+                            </h3>
+
+                            <p class="mt-0.5 text-xs text-slate-400">
+                                Identifique rapidamente filas, falhas e clientes sem atualização.
+                            </p>
+                        </div>
+
+
+                        <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+
+                            <!-- BUSCA -->
+                            <div class="relative min-w-[280px] lg:w-[350px]">
+
+                                <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                                    fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+
+                                    <circle cx="11" cy="11" r="7" />
+
+                                    <path stroke-linecap="round" d="M20 20l-3-3" />
+
+                                </svg>
+
+                                <input id="filterInput" type="text" placeholder="Código ou nome do cliente..."
+                                    class="w-full rounded-xl border border-slate-200 bg-slate-50/80 py-2.5 pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                                    oninput="applyFilter()" />
+
+                            </div>
+
+
+                            <!-- STATUS ATUALIZAÇÃO -->
+                            <div class="inline-flex rounded-xl border border-slate-200 bg-slate-100 p-1">
+
+                                <button id="btnUpdateFresh" type="button"
+                                    class="filter-segment rounded-lg bg-white px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm">
+                                    Atualizados
+                                </button>
+
+                                <button id="btnUpdateAll" type="button"
+                                    class="filter-segment rounded-lg px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-800">
+                                    Todos
+                                </button>
+
+                                <button id="btnUpdateStale" type="button"
+                                    class="filter-segment rounded-lg px-3 py-2 text-xs font-medium text-slate-500 hover:text-rose-700">
+                                    Desatualizados
+                                </button>
+
+                            </div>
+
+
+                            <!-- ERRO -->
+                            <button id="btnOnlyErrors" type="button"
+                                class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700">
+
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    viewBox="0 0 24 24">
+
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 9v4m0 4h.01M10.3 4.6L2.8 18a2 2 0 001.7 3h15a2 2 0 001.7-3L13.7 4.6a2 2 0 00-3.4 0z" />
+
+                                </svg>
+
+                                Somente erro
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FILTROS ATIVOS -->
+                <div class="flex flex-wrap items-center gap-2 border-b border-slate-100 bg-slate-50/60 px-5 py-2.5">
+
+                    <span class="text-[11px] font-medium text-slate-400">
+                        Exibindo
+                    </span>
+
+                    <span id="modeBadge"
+                        class="rounded-full border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-600">
+                        Hoje
+                    </span>
+
+                    <span id="updateFilterBadge"
+                        class="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+                        Somente atualizados
+                    </span>
+
+                </div>
+
+
+                <!-- TABELA -->
+                <div class="table-scroll max-h-[65vh] overflow-auto">
+
+                    <table class="min-w-full border-collapse text-sm">
+
+                        <thead class="sticky top-0 z-40 border-b border-slate-200 bg-slate-100/95 backdrop-blur">
+
+                            <tr id="table-head"></tr>
+
+                        </thead>
+
+                        <tbody id="table-body" class="divide-y divide-slate-100">
+                        </tbody>
+
+                        <tfoot
+                            class="sticky bottom-0 z-30 border-t border-slate-200 bg-slate-100/95 font-semibold backdrop-blur">
+
+                            <tr id="table-footer"></tr>
+
+                        </tfoot>
+
+                    </table>
+
+                </div>
+
+
+                <!-- PAGINAÇÃO -->
+                <div
+                    class="flex items-center justify-between border-t border-slate-100 bg-white px-5 py-3 text-sm text-slate-500">
+
+                    <span id="pageInfo"></span>
+
+                    <div id="pagination" class="flex items-center gap-1">
+                    </div>
+
+                </div>
+
+            </section>
+
         </div>
 
     </main>
 
     <script>
         const endpoint = "/api/laudos/controle";
+        //const endpoint = "http://177.11.209.38/vertis/VertisConnect.dll/api/V1.1/get_publicacao_controle";
 
         const PAGE_SIZE = 10;
         let currentPage = 1;
@@ -544,45 +1029,71 @@
         const isNumeric = (k) => k.startsWith('lol_') || k.startsWith('loe_');
 
         const columnsHoje = [
-            { key: 'cod_unid_negoc', label: 'Neg', sticky: true, width: 50 },
-            { key: 'cod_unid_oper', label: 'Oper', sticky: true, width: 50 },
-            { key: 'nom_unid_oper', label: 'Cliente', sticky: true, width: 250 },
+            { key: 'cod_unid_negoc', label: 'Neg', sticky: true, width: 60 },
+            { key: 'cod_unid_oper', label: 'Oper', sticky: true, width: 60 },
+            { key: 'nom_unid_oper', label: 'Cliente', sticky: true, width: 280 },
 
-            { key: 'lol_hoj_fil', label: 'Internet • Fila', sum: true },
-            { key: 'lol_hoj_err', label: 'Internet • Erro', sum: true },
-            { key: 'lol_hoj_suc', label: 'Internet • Sucesso', sum: true },
-            { key: 'dth_ult_lol', label: 'Últ. Internet' },
+            {
+                key: 'internet',
+                label: 'Internet',
+                group: 'internet'
+            },
 
-            { key: 'loe_hoj_fil', label: 'E-mail • Fila', sum: true },
-            { key: 'loe_hoj_err', label: 'E-mail • Erro', sum: true },
-            { key: 'loe_hoj_suc', label: 'E-mail • Sucesso', sum: true },
-            { key: 'dth_ult_loe', label: 'Últ. E-mail' },
+            {
+                key: 'email',
+                label: 'E-mail',
+                group: 'email'
+            },
 
-            { key: 'dth_ult_atualizacao', label: 'Atualização' }
+            {
+                key: 'dth_ult_atualizacao',
+                label: 'Atualização'
+            }
         ];
 
         const columnsMes = [
-            { key: 'cod_unid_negoc', label: 'Neg', sticky: true, width: 50 },
-            { key: 'cod_unid_oper', label: 'Oper', sticky: true, width: 50 },
-            { key: 'nom_unid_oper', label: 'Cliente', sticky: true, width: 250 },
+            { key: 'cod_unid_negoc', label: 'Neg', sticky: true, width: 60 },
+            { key: 'cod_unid_oper', label: 'Oper', sticky: true, width: 60 },
+            { key: 'nom_unid_oper', label: 'Cliente', sticky: true, width: 280 },
 
-            { key: 'lol_mes_fil', label: 'Internet • Fila', sum: true },
-            { key: 'lol_mes_err', label: 'Internet • Erro', sum: true },
-            { key: 'lol_mes_suc', label: 'Internet • Sucesso', sum: true },
+            {
+                key: 'internet',
+                label: 'Internet',
+                group: 'internet'
+            },
 
-            { key: 'loe_mes_fil', label: 'E-mail • Fila', sum: true },
-            { key: 'loe_mes_err', label: 'E-mail • Erro', sum: true },
-            { key: 'loe_mes_suc', label: 'E-mail • Sucesso', sum: true },
+            {
+                key: 'email',
+                label: 'E-mail',
+                group: 'email'
+            },
 
-            { key: 'dth_ult_atualizacao', label: 'Atualização' }
+            {
+                key: 'dth_ult_atualizacao',
+                label: 'Atualização'
+            }
         ];
 
         let viewMode = 'hoje';
         let columns = columnsHoje;
 
-        let originalData = [], filteredData = [], sortKey = null, sortAsc = true;
+        let originalData = [];
+        let filteredData = [];
+
+        let sortKey = null;
+        let sortAsc = true;
+
         let modeBound = false;
         let onlyErrors = false;
+
+        /*
+            fresh = somente atualizados
+            all   = todos
+            stale = somente desatualizados
+        */
+        let updateFilterMode = 'fresh';
+
+        const UPDATE_MAX_MINUTES = 30;
         const HISTORY_KEY = 'laudos_pub_history_v1';
         const HISTORY_MAX = 60; // últimos pontos (auto-refresh 5 min)
 
@@ -655,28 +1166,134 @@
             return mins <= maxMinutes;
         };
 
+        const getRowUpdateDate = (row) => {
+            return parseIsoDateTime(row.dth_ult_atualizacao);
+        };
+
+
+        const rowIsFresh = (row) => {
+            const dt = getRowUpdateDate(row);
+
+            /*
+                Sem data = desatualizado
+            */
+            if (!dt) return false;
+
+            return isFresh(dt, UPDATE_MAX_MINUTES) === true;
+        };
+
+
+        const rowHasError = (row) => {
+            const errKeys = viewMode === 'hoje'
+                ? ['lol_hoj_err', 'loe_hoj_err']
+                : ['lol_mes_err', 'loe_mes_err'];
+
+            return errKeys.some(k => Number(row[k] || 0) > 0);
+        };
+
         const renderFreshIcon = (dt, maxMinutes = 30) => {
+
             const ok = isFresh(dt, maxMinutes);
+
             const dtBr = formatDateTimeBR(dt);
 
+
+            /*
+                SEM INFORMAÇÃO
+            */
             if (ok === null) {
-                return `<span class="inline-flex items-center gap-2 text-slate-400" title="Sem data">
-      <span class="h-2 w-2 rounded-full bg-slate-300"></span><span class="text-xs">—</span>
-    </span>`;
+
+                return `
+        <span
+            class="inline-flex items-center gap-1.5 rounded-full
+                   border border-slate-200 bg-slate-50
+                   px-2 py-1 text-[10px] font-semibold text-slate-400"
+            title="Sem informação de atualização">
+
+            <span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
+
+            Sem dados
+
+        </span>
+    `;
+
             }
 
+
+            /*
+                ATUALIZADO
+            */
             if (ok) {
-                return `<span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200"
-      title="${dtBr}">
-      ✓
-    </span>`;
+
+                const mins = minutesSince(dt);
+
+                const texto =
+                    mins <= 1
+                        ? 'Agora'
+                        : `${mins} min`;
+
+
+                return `
+        <span
+            class="inline-flex items-center gap-1.5 rounded-full
+                   border border-emerald-200 bg-emerald-50
+                   px-2 py-1 text-[10px] font-semibold text-emerald-700"
+            title="${dtBr}">
+
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+
+            ${texto}
+
+        </span>
+    `;
+
             }
 
+
+            /*
+                DESATUALIZADO
+            */
             const mins = minutesSince(dt);
-            return `<span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-rose-50 text-rose-700 border border-rose-200"
-    title="${dtBr}">
-    !
-  </span>`;
+
+            let texto;
+
+
+            if (mins >= 1440) {
+
+                const dias = Math.floor(mins / 1440);
+
+                texto = `${dias}d`;
+
+            }
+
+            else if (mins >= 60) {
+
+                const horas = Math.floor(mins / 60);
+
+                texto = `${horas}h`;
+
+            }
+
+            else {
+
+                texto = `${mins} min`;
+
+            }
+
+
+            return `
+    <span
+        class="inline-flex items-center gap-1.5 rounded-full
+               border border-rose-200 bg-rose-50
+               px-2 py-1 text-[10px] font-semibold text-rose-700"
+        title="${dtBr}">
+
+        <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+
+        ${texto}
+
+    </span>
+`;
         };
 
 
@@ -774,160 +1391,754 @@
             updateSpark('spark_loe_line', trimmed.map(p => p.loe_tot));
         };
 
+        function setText(id, value) {
+
+            const el =
+                document.getElementById(id);
+
+            if (!el) return;
+
+            if (typeof value === 'number') {
+
+                el.textContent =
+                    value.toLocaleString(
+                        'pt-BR'
+                    );
+
+            } else {
+
+                el.textContent =
+                    value ?? '—';
+
+            }
+        }
+
+
+        function getLatestDateValue(data, key) {
+
+            let latestValue = null;
+            let latestDate = null;
+
+
+            data.forEach(row => {
+
+                const value =
+                    row[key];
+
+                const date =
+                    parseIsoDateTime(value);
+
+
+                if (
+                    date &&
+                    (
+                        !latestDate ||
+                        date > latestDate
+                    )
+                ) {
+
+                    latestDate =
+                        date;
+
+                    latestValue =
+                        value;
+
+                }
+
+            });
+
+
+            return latestValue;
+        }
+
+
+        function formatLastSend(value) {
+
+            if (!value)
+                return '—';
+
+            const dt =
+                parseIsoDateTime(value);
+
+            if (!dt)
+                return value;
+
+
+            return formatDateTimeBR(dt);
+        }
+
+
+        function toggleMonitorError(
+            element,
+            hasError
+        ) {
+
+            if (!element)
+                return;
+
+
+            element.classList.toggle(
+                'ring-2',
+                hasError
+            );
+
+            element.classList.toggle(
+                'ring-rose-200',
+                hasError
+            );
+
+            element.classList.toggle(
+                'border-rose-200',
+                hasError
+            );
+        }
 
         function updateKPIs() {
-            const sum = (k) => filteredData.reduce((t, r) => t + Number(r[k] || 0), 0);
 
-            const prefix = viewMode === 'hoje' ? 'hoj' : 'mes';
+            const sum = (key) =>
+                filteredData.reduce(
+                    (total, row) =>
+                        total + Number(row[key] || 0),
+                    0
+                );
 
-            const lol_fil = sum(`lol_${prefix}_fil`);
-            const lol_err = sum(`lol_${prefix}_err`);
-            const lol_suc = sum(`lol_${prefix}_suc`);
-            const lol_tot = lol_fil + lol_err + lol_suc;
 
-            const loe_fil = sum(`loe_${prefix}_fil`);
-            const loe_err = sum(`loe_${prefix}_err`);
-            const loe_suc = sum(`loe_${prefix}_suc`);
-            const loe_tot = loe_fil + loe_err + loe_suc;
+            const prefix =
+                viewMode === 'hoje'
+                    ? 'hoj'
+                    : 'mes';
 
-            // Titles
-            const title = viewMode === 'hoje' ? 'Hoje' : 'Mês';
-            document.getElementById('modeTitle').textContent = title;
-            document.getElementById('modeBadge').textContent = `Modo: ${title}`;
 
-            // Internet
-            document.getElementById('kpi_lol_tot').textContent = lol_tot;
-            document.getElementById('kpi_lol_suc').textContent = lol_suc;
-            document.getElementById('kpi_lol_fil').textContent = lol_fil;
-            document.getElementById('kpi_lol_err').textContent = lol_err;
+            /*
+                INTERNET
+            */
+            const lol_fil =
+                sum(`lol_${prefix}_fil`);
 
-            document.getElementById('kpi_lol_suc_pct').textContent = pct(lol_suc, lol_tot);
-            document.getElementById('kpi_lol_fil_pct').textContent = pct(lol_fil, lol_tot);
-            document.getElementById('kpi_lol_err_pct').textContent = pct(lol_err, lol_tot);
+            const lol_err =
+                sum(`lol_${prefix}_err`);
 
-            setBar('kpi_lol_suc_bar', lol_suc, lol_tot);
-            setBar('kpi_lol_fil_bar', lol_fil, lol_tot);
-            setBar('kpi_lol_err_bar', lol_err, lol_tot);
+            const lol_suc =
+                sum(`lol_${prefix}_suc`);
 
-            // E-mail
-            document.getElementById('kpi_loe_tot').textContent = loe_tot;
-            document.getElementById('kpi_loe_suc').textContent = loe_suc;
-            document.getElementById('kpi_loe_fil').textContent = loe_fil;
-            document.getElementById('kpi_loe_err').textContent = loe_err;
+            const lol_tot =
+                lol_fil +
+                lol_err +
+                lol_suc;
 
-            document.getElementById('kpi_loe_suc_pct').textContent = pct(loe_suc, loe_tot);
-            document.getElementById('kpi_loe_fil_pct').textContent = pct(loe_fil, loe_tot);
-            document.getElementById('kpi_loe_err_pct').textContent = pct(loe_err, loe_tot);
 
-            setBar('kpi_loe_suc_bar', loe_suc, loe_tot);
-            setBar('kpi_loe_fil_bar', loe_fil, loe_tot);
-            setBar('kpi_loe_err_bar', loe_err, loe_tot);
+            /*
+                EMAIL
+            */
+            const loe_fil =
+                sum(`loe_${prefix}_fil`);
 
-            // Últimos (usado também para badge "sem envio há X min")
-            const lastLol = filteredData.map(r => r.dth_ult_lol).filter(Boolean).sort().slice(-1)[0] || '—';
-            const lastLoe = filteredData.map(r => r.dth_ult_loe).filter(Boolean).sort().slice(-1)[0] || '—';
+            const loe_err =
+                sum(`loe_${prefix}_err`);
 
-            document.getElementById('kpi_lol_ult').textContent = lastLol;
-            document.getElementById('kpi_loe_ult').textContent = lastLoe;
+            const loe_suc =
+                sum(`loe_${prefix}_suc`);
 
-            // Badge "sem envio há X min" (baseado nos últimos envios)
-            setStaleBadge('kpi_lol_stale', parseIsoDateTime(lastLol));
-            setStaleBadge('kpi_loe_stale', parseIsoDateTime(lastLoe));
+            const loe_tot =
+                loe_fil +
+                loe_err +
+                loe_suc;
 
-            // Highlight automático quando houver erro
-            const internetCard = document.getElementById('kpi_lol_err')?.closest('.rounded-2xl');
-            const emailCard = document.getElementById('kpi_loe_err')?.closest('.rounded-2xl');
 
-            const toggleErrCard = (el, hasErr) => {
-                if (!el) return;
-                el.classList.toggle('ring-2', hasErr);
-                el.classList.toggle('ring-rose-200', hasErr);
-                el.classList.toggle('bg-rose-50/40', hasErr);
-            };
+            /*
+                BADGE HOJE / MÊS
+            */
+            const modeBadge =
+                document.getElementById(
+                    'modeBadge'
+                );
 
-            toggleErrCard(internetCard, lol_err > 0);
-            toggleErrCard(emailCard, loe_err > 0);
+            if (modeBadge) {
 
-            // Sparklines (somente no modo HOJE)
+                modeBadge.textContent =
+                    viewMode === 'hoje'
+                        ? 'Hoje'
+                        : 'Mês';
+
+            }
+
+
+            /*
+                INTERNET
+            */
+            setText(
+                'kpi_lol_tot',
+                lol_tot
+            );
+
+            setText(
+                'kpi_lol_suc',
+                lol_suc
+            );
+
+            setText(
+                'kpi_lol_fil',
+                lol_fil
+            );
+
+            setText(
+                'kpi_lol_err',
+                lol_err
+            );
+
+
+            setText(
+                'kpi_lol_suc_pct',
+                pct(lol_suc, lol_tot)
+            );
+
+            setText(
+                'kpi_lol_fil_pct',
+                pct(lol_fil, lol_tot)
+            );
+
+            setText(
+                'kpi_lol_err_pct',
+                pct(lol_err, lol_tot)
+            );
+
+
+            setBar(
+                'kpi_lol_suc_bar',
+                lol_suc,
+                lol_tot
+            );
+
+            setBar(
+                'kpi_lol_fil_bar',
+                lol_fil,
+                lol_tot
+            );
+
+            setBar(
+                'kpi_lol_err_bar',
+                lol_err,
+                lol_tot
+            );
+
+
+            /*
+                EMAIL
+            */
+            setText(
+                'kpi_loe_tot',
+                loe_tot
+            );
+
+            setText(
+                'kpi_loe_suc',
+                loe_suc
+            );
+
+            setText(
+                'kpi_loe_fil',
+                loe_fil
+            );
+
+            setText(
+                'kpi_loe_err',
+                loe_err
+            );
+
+
+            setText(
+                'kpi_loe_suc_pct',
+                pct(loe_suc, loe_tot)
+            );
+
+            setText(
+                'kpi_loe_fil_pct',
+                pct(loe_fil, loe_tot)
+            );
+
+            setText(
+                'kpi_loe_err_pct',
+                pct(loe_err, loe_tot)
+            );
+
+
+            setBar(
+                'kpi_loe_suc_bar',
+                loe_suc,
+                loe_tot
+            );
+
+            setBar(
+                'kpi_loe_fil_bar',
+                loe_fil,
+                loe_tot
+            );
+
+            setBar(
+                'kpi_loe_err_bar',
+                loe_err,
+                loe_tot
+            );
+
+
+            /*
+                ÚLTIMO ENVIO
+            */
+            const lastLol =
+                getLatestDateValue(
+                    filteredData,
+                    'dth_ult_lol'
+                );
+
+            const lastLoe =
+                getLatestDateValue(
+                    filteredData,
+                    'dth_ult_loe'
+                );
+
+
+            setText(
+                'kpi_lol_ult',
+                formatLastSend(lastLol)
+            );
+
+            setText(
+                'kpi_loe_ult',
+                formatLastSend(lastLoe)
+            );
+
+
+            setStaleBadge(
+                'kpi_lol_stale',
+                parseIsoDateTime(lastLol)
+            );
+
+            setStaleBadge(
+                'kpi_loe_stale',
+                parseIsoDateTime(lastLoe)
+            );
+
+
+            /*
+                DESTAQUE DO CARD
+            */
+            toggleMonitorError(
+                document.getElementById(
+                    'cardInternet'
+                ),
+                lol_err > 0
+            );
+
+            toggleMonitorError(
+                document.getElementById(
+                    'cardEmail'
+                ),
+                loe_err > 0
+            );
+
+
+            /*
+                SPARKLINES
+            */
             updateSparklines({
                 t: Date.now(),
                 lol_tot,
-                loe_tot,
+                loe_tot
             });
+
         }
 
         /* ===== TABLE ===== */
         function createHeader() {
+
             const tr = document.getElementById('table-head');
+
+            if (!tr) return;
+
             tr.innerHTML = '';
+
             let left = 0;
 
             columns.forEach(col => {
+
                 const th = document.createElement('th');
-                let cls = 'px-3 py-2 whitespace-nowrap cursor-pointer';
-                if (isNumeric(col.key)) cls += ' text-center';
+
+                let cls =
+                    'px-4 py-3 whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-slate-500';
+
+                if (col.group) {
+                    cls += ' text-center';
+                }
+
+                if (col.key === 'dth_ult_atualizacao') {
+                    cls += ' text-center';
+                }
 
                 if (col.sticky) {
-                    cls += ' sticky bg-slate-200 z-50';
+
+                    cls += ' sticky bg-slate-100 z-50';
+
                     th.style.left = left + 'px';
                     th.style.width = col.width + 'px';
+                    th.style.minWidth = col.width + 'px';
+
                     left += col.width;
+
                 }
 
                 th.className = cls;
                 th.textContent = col.label;
-                th.onclick = () => sortBy(col.key);
+
+
+                /*
+                    Só permite ordenar colunas reais.
+                    Internet/E-mail agrupados não usam sort direto.
+                */
+                if (!col.group) {
+
+                    th.classList.add(
+                        'cursor-pointer',
+                        'hover:text-slate-800'
+                    );
+
+                    th.onclick = () =>
+                        sortBy(col.key);
+
+                }
+
                 tr.appendChild(th);
+
             });
         }
 
+        function renderPublicationGroup(row, type) {
+
+            const prefix = viewMode === 'hoje'
+                ? 'hoj'
+                : 'mes';
+
+            const base = type === 'internet'
+                ? 'lol'
+                : 'loe';
+
+            const fila = Number(row[`${base}_${prefix}_fil`] || 0);
+            const erro = Number(row[`${base}_${prefix}_err`] || 0);
+            const sucesso = Number(row[`${base}_${prefix}_suc`] || 0);
+
+            return `
+    <div class="flex items-center justify-center gap-2">
+
+        <!-- FILA -->
+        <div
+            class="inline-flex min-w-[58px] items-center justify-center gap-1.5
+                   rounded-lg border border-amber-200 bg-amber-50
+                   px-2 py-1.5"
+            title="Fila">
+
+            <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+
+            <span class="text-[10px] font-medium text-amber-600">
+                Fila
+            </span>
+
+            <span class="text-xs font-bold text-amber-700">
+                ${fila.toLocaleString('pt-BR')}
+            </span>
+
+        </div>
+
+
+        <!-- ERRO -->
+        <div
+            class="inline-flex min-w-[58px] items-center justify-center gap-1.5
+                   rounded-lg border border-rose-200 bg-rose-50
+                   px-2 py-1.5"
+            title="Erro">
+
+            <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+
+            <span class="text-[10px] font-medium text-rose-600">
+                Erro
+            </span>
+
+            <span class="text-xs font-bold text-rose-700">
+                ${erro.toLocaleString('pt-BR')}
+            </span>
+
+        </div>
+
+
+        <!-- SUCESSO -->
+        <div
+            class="inline-flex min-w-[58px] items-center justify-center gap-1.5
+                   rounded-lg border border-emerald-200 bg-emerald-50
+                   px-2 py-1.5"
+            title="Sucesso">
+
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+
+            <span class="text-[10px] font-medium text-emerald-600">
+                Sucesso
+            </span>
+
+            <span class="text-xs font-bold text-emerald-700">
+                ${sucesso.toLocaleString('pt-BR')}
+            </span>
+
+        </div>
+
+    </div>
+`;
+        }
+
         function renderTable() {
+
             const tbody = document.getElementById('table-body');
+
+            if (!tbody) return;
+
             tbody.innerHTML = '';
 
-            getPagedData().forEach((row, i) => {
+
+            const pagedData = getPagedData();
+
+
+            /*
+                SEM RESULTADOS
+            */
+            if (!pagedData.length) {
+
                 const tr = document.createElement('tr');
-                const errKeys = viewMode === 'hoje' ? ['lol_hoj_err', 'loe_hoj_err'] : ['lol_mes_err', 'loe_mes_err'];
-                const rowHasErr = errKeys.some(k => Number(row[k] || 0) > 0);
-                tr.className = `${i % 2 ? 'bg-slate-50' : 'bg-white'} hover:bg-slate-100 fade-in` + (rowHasErr ? ' border-l-4 border-rose-400' : '');
+
+                tr.innerHTML = `
+        <td
+            colspan="${columns.length}"
+            class="px-6 py-12 text-center">
+
+            <div class="flex flex-col items-center">
+
+                <div
+                    class="flex h-11 w-11 items-center justify-center
+                           rounded-xl bg-slate-100 text-slate-400">
+
+                    <svg
+                        class="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        viewBox="0 0 24 24">
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9 12h6m-3-3v6m9-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+
+                    </svg>
+
+                </div>
+
+                <p class="mt-3 text-sm font-semibold text-slate-600">
+                    Nenhum cliente encontrado
+                </p>
+
+                <p class="mt-1 text-xs text-slate-400">
+                    Tente alterar os filtros de monitoramento.
+                </p>
+
+            </div>
+
+        </td>
+    `;
+
+                tbody.appendChild(tr);
+
+                renderFooter();
+                updateKPIs();
+                updateOperationalKPIs();
+                renderPagination();
+
+                return;
+            }
+
+
+            pagedData.forEach((row, i) => {
+
+                const tr = document.createElement('tr');
+
+                const rowHasErr = rowHasError(row);
+
+                const bgClass =
+                    i % 2
+                        ? 'bg-slate-50/60'
+                        : 'bg-white';
+
+                tr.className =
+                    `${bgClass} hover:bg-slate-100/80 transition-colors fade-in`;
+
+                if (rowHasErr) {
+                    tr.classList.add(
+                        'border-l-4',
+                        'border-rose-400'
+                    );
+                }
+
+
                 let left = 0;
 
+
                 columns.forEach(col => {
+
                     const td = document.createElement('td');
-                    let cls = 'px-3 py-2 whitespace-nowrap';
 
-                    if (isNumeric(col.key)) cls += ' text-center font-medium';
+                    let cls =
+                        'px-4 py-3 whitespace-nowrap text-slate-600';
 
+
+                    /*
+                        STICKY
+                    */
                     if (col.sticky) {
-                        cls += ' sticky z-40 ' + (i % 2 ? 'bg-slate-50' : 'bg-white');
+
+                        cls +=
+                            ` sticky z-30 ${bgClass}`;
+
                         td.style.left = left + 'px';
                         td.style.width = col.width + 'px';
+                        td.style.minWidth = col.width + 'px';
+
                         left += col.width;
+
                     }
+
+
+                    /*
+                        NEG / OPER
+                    */
+                    if (
+                        col.key === 'cod_unid_negoc' ||
+                        col.key === 'cod_unid_oper'
+                    ) {
+
+                        cls +=
+                            ' text-center text-xs font-semibold text-slate-500';
+
+                        td.textContent =
+                            row[col.key] ?? '';
+
+                    }
+
+
+                    /*
+                        CLIENTE
+                    */
+                    else if (col.key === 'nom_unid_oper') {
+
+                        td.innerHTML = `
+                <div class="max-w-[280px]">
+
+                    <p
+                        class="truncate text-sm font-semibold text-slate-800"
+                        title="${row.nom_unid_oper ?? ''}">
+
+                        ${row.nom_unid_oper ?? '—'}
+
+                    </p>
+
+                    <p class="mt-0.5 text-[10px] text-slate-400">
+                        Neg ${row.cod_unid_negoc ?? '—'}
+                        •
+                        Oper ${row.cod_unid_oper ?? '—'}
+                    </p>
+
+                </div>
+            `;
+
+                    }
+
+
+                    /*
+                        INTERNET
+                    */
+                    else if (col.group === 'internet') {
+
+                        cls += ' text-center';
+
+                        td.innerHTML =
+                            renderPublicationGroup(
+                                row,
+                                'internet'
+                            );
+
+                    }
+
+
+                    /*
+                        EMAIL
+                    */
+                    else if (col.group === 'email') {
+
+                        cls += ' text-center';
+
+                        td.innerHTML =
+                            renderPublicationGroup(
+                                row,
+                                'email'
+                            );
+
+                    }
+
+
+                    /*
+                        ATUALIZAÇÃO
+                    */
+                    else if (
+                        col.key === 'dth_ult_atualizacao'
+                    ) {
+
+                        cls += ' text-center';
+
+                        const dt =
+                            parseIsoDateTime(
+                                row[col.key]
+                            );
+
+                        td.innerHTML = `
+                <div class="flex items-center justify-center">
+
+                    ${renderFreshIcon(
+                            dt,
+                            UPDATE_MAX_MINUTES
+                        )}
+
+                </div>
+            `;
+
+                    }
+
 
                     td.className = cls;
-                    if (col.key === 'dth_ult_atualizacao') {
-                        const dt = parseIsoDateTime(row[col.key]);
-                        const dtstr = (row[col.key]);
-                        td.innerHTML = `<div class="flex items-center justify-center">
-            ${renderFreshIcon(dt, 30)}
-            </div>`;
-                        td.classList.add('text-center');
-                    } else {
-                        td.textContent = row[col.key] ?? '';
-                    }
 
-                    const v = Number(row[col.key] || 0);
-                    if (col.key.includes('_err') && v > 0) {
-                        td.classList.add('bg-rose-50', 'text-rose-700', 'font-semibold');
-                    }
                     tr.appendChild(td);
+
                 });
+
+
                 tbody.appendChild(tr);
+
             });
 
+
             renderFooter();
+
+            /*
+                IMPORTANTE:
+                mesmo que um deles tenha erro,
+                a paginação ainda deve acontecer.
+            
+                updateKPIs corrigido abaixo.
+            */
             updateKPIs();
+            updateOperationalKPIs();
             renderPagination();
         }
 
@@ -959,53 +2170,303 @@
         }
 
         function renderPagination() {
-            const total = totalPages();
-            const delta = 1; // quantas páginas antes/depois da atual
-            const pages = [];
-            const range = [];
 
-            pageInfo.textContent =
-                `Página ${currentPage} de ${total} • ${filteredData.length} registros`;
+            const info =
+                document.getElementById(
+                    'pageInfo'
+                );
 
-            // Sempre inclui primeira e última
-            range.push(1);
-            if (total > 1) range.push(total);
+            const container =
+                document.getElementById(
+                    'pagination'
+                );
 
-            // Páginas ao redor da atual
-            for (let i = currentPage - delta; i <= currentPage + delta; i++) {
-                if (i > 1 && i < total) range.push(i);
+            if (
+                !info ||
+                !container
+            ) return;
+
+
+            const totalRecords =
+                filteredData.length;
+
+            const total =
+                totalPages();
+
+
+            /*
+                Corrige página inválida depois de filtros.
+            */
+            if (currentPage > total) {
+                currentPage = total;
             }
 
-            // Ordena e remove duplicados
-            [...new Set(range)].sort((a, b) => a - b).forEach(p => pages.push(p));
+            if (currentPage < 1) {
+                currentPage = 1;
+            }
 
-            pagination.innerHTML = '';
 
-            let last = 0;
-            pages.forEach(p => {
-                if (p - last > 1) {
-                    const dots = document.createElement('span');
-                    dots.textContent = '…';
-                    dots.className = 'px-2 text-slate-400';
-                    pagination.appendChild(dots);
+            const start =
+                totalRecords === 0
+                    ? 0
+                    : (
+                        (currentPage - 1) *
+                        PAGE_SIZE
+                    ) + 1;
+
+            const end =
+                Math.min(
+                    currentPage * PAGE_SIZE,
+                    totalRecords
+                );
+
+
+            info.textContent =
+                totalRecords > 0
+                    ? `${start}–${end} de ${totalRecords} clientes`
+                    : '0 clientes';
+
+
+            container.innerHTML = '';
+
+
+            /*
+                ANTERIOR
+            */
+            const prev =
+                document.createElement(
+                    'button'
+                );
+
+            prev.innerHTML = `
+    <svg
+        class="h-4 w-4"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24">
+
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15 18l-6-6 6-6" />
+
+    </svg>
+`;
+
+            prev.title =
+                'Página anterior';
+
+            prev.disabled =
+                currentPage === 1;
+
+            prev.className =
+                `inline-flex h-8 w-8 items-center justify-center rounded-lg border transition
+    ${currentPage === 1
+                    ? 'cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300'
+                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-100'
+                }`;
+
+            prev.onclick = () => {
+
+                if (currentPage <= 1)
+                    return;
+
+                currentPage--;
+
+                renderTable();
+
+            };
+
+            container.appendChild(
+                prev
+            );
+
+
+            /*
+                PÁGINAS
+            */
+            const pages =
+                getPaginationPages(
+                    currentPage,
+                    total
+                );
+
+
+            pages.forEach(item => {
+
+                if (item === '...') {
+
+                    const dots =
+                        document.createElement(
+                            'span'
+                        );
+
+                    dots.textContent =
+                        '…';
+
+                    dots.className =
+                        'flex h-8 w-6 items-center justify-center text-slate-400';
+
+                    container.appendChild(
+                        dots
+                    );
+
+                    return;
+
                 }
 
-                const btn = document.createElement('button');
-                btn.textContent = p;
+
+                const btn =
+                    document.createElement(
+                        'button'
+                    );
+
+                btn.textContent =
+                    item;
+
                 btn.className =
-                    `px-2 py-1 rounded ${p === currentPage
-                        ? 'bg-slate-700 text-white'
-                        : 'bg-slate-200 hover:bg-slate-300'
-                    }`;
+                    item === currentPage
+                        ? `
+                h-8 min-w-[32px] rounded-lg
+                bg-slate-900 px-2
+                text-xs font-semibold text-white
+                shadow-sm
+            `
+                        : `
+                h-8 min-w-[32px] rounded-lg
+                border border-slate-200
+                bg-white px-2
+                text-xs font-medium text-slate-600
+                transition
+                hover:bg-slate-100
+            `;
+
 
                 btn.onclick = () => {
-                    currentPage = p;
+
+                    currentPage =
+                        item;
+
                     renderTable();
+
                 };
 
-                pagination.appendChild(btn);
-                last = p;
+
+                container.appendChild(
+                    btn
+                );
+
             });
+
+
+            /*
+                PRÓXIMA
+            */
+            const next =
+                document.createElement(
+                    'button'
+                );
+
+            next.innerHTML = `
+    <svg
+        class="h-4 w-4"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24">
+
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 18l6-6-6-6" />
+
+    </svg>
+`;
+
+            next.title =
+                'Próxima página';
+
+            next.disabled =
+                currentPage === total;
+
+            next.className =
+                `inline-flex h-8 w-8 items-center justify-center rounded-lg border transition
+    ${currentPage === total
+                    ? 'cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300'
+                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-100'
+                }`;
+
+            next.onclick = () => {
+
+                if (currentPage >= total)
+                    return;
+
+                currentPage++;
+
+                renderTable();
+
+            };
+
+            container.appendChild(
+                next
+            );
+        }
+
+        function getPaginationPages(
+            current,
+            total
+        ) {
+
+            if (total <= 7) {
+
+                return Array.from(
+                    { length: total },
+                    (_, i) => i + 1
+                );
+
+            }
+
+
+            if (current <= 4) {
+
+                return [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    '...',
+                    total
+                ];
+
+            }
+
+
+            if (current >= total - 3) {
+
+                return [
+                    1,
+                    '...',
+                    total - 4,
+                    total - 3,
+                    total - 2,
+                    total - 1,
+                    total
+                ];
+
+            }
+
+
+            return [
+                1,
+                '...',
+                current - 1,
+                current,
+                current + 1,
+                '...',
+                total
+            ];
         }
 
 
@@ -1026,94 +2487,429 @@
         }
 
         function applyFilter() {
-            const v = filterInput.value.toLowerCase();
 
-            const base = originalData.filter(r =>
-                String(r.cod_unid_negoc).includes(v) ||
-                String(r.cod_unid_oper).includes(v) ||
-                String(r.nom_unid_oper).toLowerCase().includes(v)
-            );
+            const search = (filterInput?.value || '')
+                .trim()
+                .toLowerCase();
 
-            if (!onlyErrors) {
-                filteredData = base;
-            } else {
-                const errKeys = viewMode === 'hoje'
-                    ? ['lol_hoj_err', 'loe_hoj_err']
-                    : ['lol_mes_err', 'loe_mes_err'];
+            let data = [...originalData];
 
-                filteredData = base.filter(r => errKeys.some(k => Number(r[k] || 0) > 0));
+
+            /* =========================
+               BUSCA
+            ========================= */
+
+            if (search) {
+
+                data = data.filter(row => {
+
+                    const neg = String(row.cod_unid_negoc ?? '').toLowerCase();
+                    const oper = String(row.cod_unid_oper ?? '').toLowerCase();
+                    const nome = String(row.nom_unid_oper ?? '').toLowerCase();
+
+                    return (
+                        neg.includes(search) ||
+                        oper.includes(search) ||
+                        nome.includes(search)
+                    );
+
+                });
+
             }
 
+
+            /* =========================
+               STATUS DA ATUALIZAÇÃO
+            ========================= */
+
+            if (updateFilterMode === 'fresh') {
+
+                data = data.filter(row =>
+                    rowIsFresh(row)
+                );
+
+            }
+
+            else if (updateFilterMode === 'stale') {
+
+                data = data.filter(row =>
+                    !rowIsFresh(row)
+                );
+
+            }
+
+
+            /* =========================
+               SOMENTE ERROS
+            ========================= */
+
+            if (onlyErrors) {
+
+                data = data.filter(row =>
+                    rowHasError(row)
+                );
+
+            }
+
+
+            /* =========================
+               ORDENAÇÃO ATUAL
+            ========================= */
+
+            if (sortKey) {
+
+                data.sort((a, b) => {
+
+                    const n1 = Number(a[sortKey]);
+                    const n2 = Number(b[sortKey]);
+
+                    if (!isNaN(n1) && !isNaN(n2)) {
+                        return sortAsc
+                            ? n1 - n2
+                            : n2 - n1;
+                    }
+
+                    return sortAsc
+                        ? String(a[sortKey] ?? '').localeCompare(String(b[sortKey] ?? ''))
+                        : String(b[sortKey] ?? '').localeCompare(String(a[sortKey] ?? ''));
+
+                });
+
+            }
+
+
+            filteredData = data;
+
             currentPage = 1;
+
             renderTable();
+            updateOperationalKPIs();
         }
 
         function setMode(mode) {
-            viewMode = mode;
-            columns = viewMode === 'hoje' ? columnsHoje : columnsMes;
 
-            // Estilo dos botões (segmentado)
+            viewMode = mode;
+
+            columns =
+                viewMode === 'hoje'
+                    ? columnsHoje
+                    : columnsMes;
+
+
             const btnHoje = document.getElementById('btnModeHoje');
             const btnMes = document.getElementById('btnModeMes');
 
-            const activeCls = ['bg-white', 'shadow-sm', 'text-slate-800', 'font-semibold'];
-            const inactiveCls = ['text-slate-600'];
 
             if (viewMode === 'hoje') {
-                btnHoje.classList.add(...activeCls);
-                btnHoje.classList.remove(...inactiveCls);
-                btnMes.classList.remove(...activeCls);
-                btnMes.classList.add(...inactiveCls);
-            } else {
-                btnMes.classList.add(...activeCls);
-                btnMes.classList.remove(...inactiveCls);
-                btnHoje.classList.remove(...activeCls);
-                btnHoje.classList.add(...inactiveCls);
+
+                btnHoje.className =
+                    'rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition';
+
+                btnMes.className =
+                    'rounded-lg px-4 py-2 text-sm font-medium text-slate-500 transition hover:text-slate-800';
+
             }
 
-            // Reset sort/pagination
+            else {
+
+                btnMes.className =
+                    'rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition';
+
+                btnHoje.className =
+                    'rounded-lg px-4 py-2 text-sm font-medium text-slate-500 transition hover:text-slate-800';
+
+            }
+
+
+            document.getElementById('modeBadge').textContent =
+                viewMode === 'hoje'
+                    ? 'Hoje'
+                    : 'Mês';
+
+
             sortKey = null;
             sortAsc = true;
             currentPage = 1;
 
+
             createHeader();
-            renderTable();
+            applyFilter();
         }
 
         function bindModeToggle() {
+
             const btnHoje = document.getElementById('btnModeHoje');
             const btnMes = document.getElementById('btnModeMes');
+
             const btnOnly = document.getElementById('btnOnlyErrors');
-            if (!btnHoje || !btnMes) return;
 
-            btnHoje.addEventListener('click', () => setMode('hoje'));
-            btnMes.addEventListener('click', () => setMode('mes'));
+            const btnFresh = document.getElementById('btnUpdateFresh');
+            const btnAll = document.getElementById('btnUpdateAll');
+            const btnStale = document.getElementById('btnUpdateStale');
 
-            if (btnOnly) {
-                btnOnly.addEventListener('click', () => {
-                    onlyErrors = !onlyErrors;
-                    // estilo
-                    if (onlyErrors) {
-                        btnOnly.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
-                        btnOnly.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
-                    } else {
-                        btnOnly.classList.remove('bg-rose-50', 'text-rose-700', 'border-rose-200');
-                        btnOnly.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
-                    }
-                    applyFilter();
-                });
+            btnHoje?.addEventListener(
+                'click',
+                () => setMode('hoje')
+            );
+
+            btnMes?.addEventListener(
+                'click',
+                () => setMode('mes')
+            );
+
+            btnFresh?.addEventListener('click', () =>
+                setUpdateFilter('fresh')
+            );
+
+
+            btnAll?.addEventListener('click', () =>
+                setUpdateFilter('all')
+            );
+
+
+            btnStale?.addEventListener('click', () =>
+                setUpdateFilter('stale')
+            );
+
+
+            btnOnly?.addEventListener('click', () => {
+
+                onlyErrors = !onlyErrors;
+
+
+                if (onlyErrors) {
+
+                    btnOnly.classList.add(
+                        'bg-rose-50',
+                        'text-rose-700',
+                        'border-rose-200'
+                    );
+
+                    btnOnly.classList.remove(
+                        'bg-white',
+                        'text-slate-600',
+                        'border-slate-200'
+                    );
+
+                }
+
+                else {
+
+                    btnOnly.classList.remove(
+                        'bg-rose-50',
+                        'text-rose-700',
+                        'border-rose-200'
+                    );
+
+                    btnOnly.classList.add(
+                        'bg-white',
+                        'text-slate-600',
+                        'border-slate-200'
+                    );
+
+                }
+
+
+                applyFilter();
+
+            });
+
+        }
+
+        function updateOperationalKPIs() {
+
+            const freshCount = originalData.filter(row =>
+                rowIsFresh(row)
+            ).length;
+
+
+            const staleCount = originalData.length - freshCount;
+
+
+            const errorCount = originalData.filter(row =>
+                rowHasError(row)
+            ).length;
+
+
+            const visibleCount = filteredData.length;
+
+
+            const elVisible = document.getElementById('kpi_clients_visible');
+            const elFresh = document.getElementById('kpi_clients_fresh');
+            const elStale = document.getElementById('kpi_clients_stale');
+            const elError = document.getElementById('kpi_clients_error');
+
+
+            if (elVisible)
+                elVisible.textContent = visibleCount.toLocaleString('pt-BR');
+
+            if (elFresh)
+                elFresh.textContent = freshCount.toLocaleString('pt-BR');
+
+            if (elStale)
+                elStale.textContent = staleCount.toLocaleString('pt-BR');
+
+            if (elError)
+                elError.textContent = errorCount.toLocaleString('pt-BR');
+        }
+
+        function setUpdateFilter(mode) {
+
+            updateFilterMode = mode;
+
+
+            const btnFresh = document.getElementById('btnUpdateFresh');
+            const btnAll = document.getElementById('btnUpdateAll');
+            const btnStale = document.getElementById('btnUpdateStale');
+
+            const badge = document.getElementById('updateFilterBadge');
+
+
+            /*
+                RESET
+            */
+            [btnFresh, btnAll, btnStale].forEach(btn => {
+
+                if (!btn) return;
+
+                btn.className =
+                    'filter-segment rounded-lg px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-800';
+
+            });
+
+
+            /*
+                ATUALIZADOS
+            */
+            if (mode === 'fresh') {
+
+                btnFresh.className =
+                    'filter-segment rounded-lg bg-white px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm';
+
+                badge.textContent = 'Somente atualizados';
+
+                badge.className =
+                    'rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700';
+
             }
+
+
+            /*
+                TODOS
+            */
+            else if (mode === 'all') {
+
+                btnAll.className =
+                    'filter-segment rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-800 shadow-sm';
+
+                badge.textContent = 'Todos os clientes';
+
+                badge.className =
+                    'rounded-full border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-600';
+
+            }
+
+
+            /*
+                DESATUALIZADOS
+            */
+            else if (mode === 'stale') {
+
+                btnStale.className =
+                    'filter-segment rounded-lg bg-white px-3 py-2 text-xs font-semibold text-rose-700 shadow-sm';
+
+                badge.textContent = 'Somente desatualizados';
+
+                badge.className =
+                    'rounded-full border border-rose-200 bg-rose-50 px-2 py-1 text-[10px] font-semibold text-rose-700';
+
+            }
+
+
+            applyFilter();
         }
 
         async function loadData() {
-            refreshIndicator.classList.remove('opacity-0');
-            const r = await fetch(endpoint);
-            originalData = await r.json();
-            filteredData = [...originalData];
-            if (!modeBound) { bindModeToggle(); modeBound = true; }
-            // Garante que o layout principal abre em HOJE
-            setMode(viewMode);
-            setTimeout(() => refreshIndicator.classList.add('opacity-0'), 800);
+
+            try {
+
+                refreshIndicator.classList.remove('opacity-0');
+
+
+                const response = await fetch(endpoint);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+
+                originalData = await response.json();
+
+
+                if (!Array.isArray(originalData)) {
+                    originalData = [];
+                }
+
+
+                if (!modeBound) {
+
+                    bindModeToggle();
+
+                    modeBound = true;
+
+                }
+
+
+                createHeader();
+
+                /*
+                    IMPORTANTE:
+            
+                    Não copia originalData direto para filteredData.
+            
+                    applyFilter() aplica automaticamente:
+                    updateFilterMode = 'fresh'
+            
+                    Portanto a página abre mostrando apenas
+                    clientes atualizados.
+                */
+                applyFilter();
+
+
+                const label = document.getElementById('lastRefreshLabel');
+
+                if (label) {
+
+                    const agora = new Date();
+
+                    label.textContent =
+                        `Atualizado às ${agora.toLocaleTimeString('pt-BR', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        })}`;
+
+                }
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    'Erro ao carregar monitoramento:',
+                    error
+                );
+
+            }
+
+            finally {
+
+                setTimeout(() =>
+                    refreshIndicator.classList.add('opacity-0'),
+                    800
+                );
+
+            }
         }
 
         loadData();

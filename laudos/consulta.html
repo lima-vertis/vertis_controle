@@ -1107,7 +1107,9 @@
             ).size;
 
             const totalUnidOpers = new Set(
-                filteredData.map(row => row.cod_unid_oper)
+                filteredData.map(row =>
+                    `${row.cod_unid_negoc}-${row.cod_unid_oper}`
+                )
             ).size;
 
             /*

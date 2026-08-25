@@ -1,0 +1,2629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Solicitações de Exames | Vertis</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vertis: {
+                            orange: '#F97316',
+                            dark: '#0B1220'
+                        }
+                    },
+                    boxShadow: {
+                        soft: '0 10px 30px rgba(2, 6, 23, 0.10)',
+                        card: '0 8px 20px rgba(2, 6, 23, 0.08)'
+                    }
+                }
+            }
+        };
+    </script>
+
+    <link rel="apple-touch-icon" href="https://v1.laudosonline.com.br/assets/images/apple-touch-icon.png"
+        sizes="180x180">
+
+    <link rel="icon" type="image/png" href="https://v1.laudosonline.com.br/assets/images/favicon.png" sizes="32x32">
+
+    <style>
+        html,
+        body {
+            max-width: 100%;
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.25s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 1.25rem;
+            color: rgb(51 65 85);
+            text-decoration: none;
+            position: relative;
+            transition:
+                background-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background: rgb(241 245 249);
+            color: rgb(2 6 23);
+            transform: translateX(4px);
+        }
+
+        .menu-icon {
+            width: 18px;
+            height: 18px;
+            opacity: 0.8;
+        }
+
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+
+            border: 1px solid rgba(226, 232, 240, 0.95);
+
+            background:
+                linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.98),
+                    rgba(248, 250, 252, 0.92));
+
+            box-shadow:
+                0 12px 30px rgba(15, 23, 42, 0.08);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 18px 42px rgba(15, 23, 42, 0.12);
+
+            border-color:
+                rgba(249, 115, 22, 0.28);
+        }
+
+        .metric-card::after {
+            content: '';
+
+            position: absolute;
+            right: -28px;
+            top: -28px;
+
+            width: 96px;
+            height: 96px;
+
+            border-radius: 999px;
+
+            background:
+                radial-gradient(circle,
+                    rgba(249, 115, 22, 0.14),
+                    transparent 68%);
+
+            pointer-events: none;
+        }
+
+        .exam-table {
+            width: 100%;
+            min-width: 820px;
+            table-layout: auto;
+        }
+
+        #mobileCardsContainer {
+            display: none;
+        }
+
+        .exam-mobile-card {
+            border: 1px solid rgba(226, 232, 240, 0.95);
+
+            background:
+                linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.98),
+                    rgba(248, 250, 252, 0.94));
+
+            box-shadow:
+                0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        @media (max-width: 767px) {
+            .desktop-table-wrap {
+                display: none !important;
+            }
+
+            #mobileCardsContainer {
+                display: grid;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .app-header {
+                padding: 0.75rem 0.875rem !important;
+            }
+
+            #menuPanel {
+                position: fixed !important;
+
+                left: 0.75rem !important;
+                right: 0.75rem !important;
+                top: 3.75rem !important;
+
+                width: auto !important;
+
+                max-height:
+                    calc(100vh - 5rem);
+
+                overflow-y: auto;
+            }
+
+            .metric-card {
+                border-radius: 1.25rem !important;
+                padding: 1rem !important;
+            }
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.35rem;
+
+            font-size: 0.68rem;
+            line-height: 1rem;
+
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+
+            color: rgb(100 116 139);
+
+            font-weight: 800;
+        }
+
+        .input-default {
+            width: 100%;
+
+            border: 1px solid rgb(226 232 240);
+            border-radius: 0.75rem;
+
+            padding: 0.65rem 0.8rem;
+
+            background: white;
+            color: rgb(30 41 59);
+
+            outline: none;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .input-default:focus {
+            border-color:
+                rgb(253 186 116);
+
+            box-shadow:
+                0 0 0 3px rgba(249, 115, 22, 0.12);
+        }
+    </style>
+</head>
+
+<body class="
+        bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.12),_transparent_30%),linear-gradient(135deg,_#f8fafc_0%,_#e2e8f0_100%)]
+        min-h-screen
+        flex
+        flex-col
+        overflow-x-hidden
+    ">
+
+    <!-- HEADER -->
+    <header class="
+            app-header
+            sticky
+            top-0
+            z-50
+            backdrop-blur
+            bg-gradient-to-r
+            from-vertis-dark
+            via-slate-900
+            to-slate-950/95
+            text-white
+            px-4
+            sm:px-6
+            py-3
+            sm:py-4
+            flex
+            justify-between
+            items-center
+            shadow-lg
+            shadow-black/10
+            border-b
+            border-white/10
+        ">
+
+        <div class="flex items-center gap-2 sm:gap-4 min-w-0">
+
+            <nav class="relative">
+
+                <button id="menuBtn" class="
+                        p-2
+                        rounded-lg
+                        hover:bg-slate-800
+                        transition
+                    " aria-label="Abrir menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <div id="menuPanel" class="
+                        absolute
+                        left-0
+                        mt-3
+                        w-80
+                        rounded-2xl
+                        bg-white
+                        text-slate-800
+                        shadow-2xl
+                        hidden
+                        overflow-hidden
+                        border
+                        border-slate-200
+                        z-50
+                    ">
+
+                    <div class="
+                            px-5
+                            py-4
+                            border-b
+                            bg-gradient-to-r
+                            from-slate-50
+                            to-white
+                        ">
+                        <div class="
+                                text-xs
+                                uppercase
+                                tracking-wider
+                                text-slate-500
+                                font-semibold
+                            ">
+                            Navegação
+                        </div>
+                    </div>
+
+                    <div class="py-3 text-sm">
+
+                        <a href="index.html" class="menu-item">
+
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M3 10.75L12 4l9 6.75M5 10v9h14v-9" />
+                            </svg>
+
+                            Início
+                        </a>
+
+                        <a href="solicitacao_exame.html" class="menu-item bg-orange-50 text-orange-700">
+                            <svg class="menu-icon" fill="none" stroke="currentColor" stroke-width="1.8"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 3h6m-5 4h4m-7 4h10m-10 4h10m-10 4h6" />
+
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M6 3h12a2 2 0 012 2v16H4V5a2 2 0 012-2z" />
+                            </svg>
+
+                            Solicitações de Exames
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </nav>
+
+            <div class="min-w-0">
+
+                <h1 class="
+                        text-base
+                        sm:text-lg
+                        font-semibold
+                        tracking-wide
+                        whitespace-nowrap
+                        truncate
+                    ">
+                    Vertis
+
+                    <span class="text-vertis-orange">
+                        •
+                    </span>
+
+                    Solicitações
+                </h1>
+
+                <p class="
+                        hidden
+                        sm:block
+                        text-[11px]
+                        text-slate-400
+                    ">
+                    Consulta de solicitações de exames via portal
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="
+                flex
+                items-center
+                gap-2
+                sm:gap-4
+                shrink-0
+            ">
+
+            <div class="
+                    hidden
+                    md:flex
+                    items-center
+                    gap-2
+                    text-xs
+                    text-slate-300
+                ">
+                <span id="statusDot" class="
+                        h-2
+                        w-2
+                        rounded-full
+                        bg-slate-400
+                    "></span>
+
+                <span id="lastUpdateText">
+                    Aguardando consulta
+                </span>
+            </div>
+
+            <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis"
+                class="h-7 sm:h-8">
+
+        </div>
+
+    </header>
+
+    <main class="
+            p-3
+            sm:p-4
+            md:p-6
+            flex-1
+            space-y-5
+        ">
+
+        <!-- ERRO -->
+        <div id="messageContainer" class="hidden"></div>
+
+        <!-- KPIS -->
+        <section class="
+                grid
+                grid-cols-1
+                sm:grid-cols-2
+                xl:grid-cols-4
+                gap-3
+                sm:gap-4
+            ">
+
+            <div class="
+                    metric-card
+                    rounded-3xl
+                    p-4
+                    sm:p-5
+                ">
+
+                <p class="
+                        text-xs
+                        uppercase
+                        tracking-[0.18em]
+                        text-slate-400
+                        font-bold
+                    ">
+                    Solicitações
+                </p>
+
+                <p id="kpiTotal" class="
+                        mt-2
+                        text-3xl
+                        font-black
+                        text-slate-900
+                    ">
+                    0
+                </p>
+
+                <p class="
+                        mt-1
+                        text-xs
+                        text-slate-500
+                    ">
+                    total no período
+                </p>
+
+            </div>
+
+            <div class="
+                    metric-card
+                    rounded-3xl
+                    p-4
+                    sm:p-5
+                ">
+
+                <p class="
+                        text-xs
+                        uppercase
+                        tracking-[0.18em]
+                        text-slate-400
+                        font-bold
+                    ">
+                    Unidades
+                </p>
+
+                <p id="kpiUnits" class="
+                        mt-2
+                        text-3xl
+                        font-black
+                        text-sky-600
+                    ">
+                    0
+                </p>
+
+                <p class="
+                        mt-1
+                        text-xs
+                        text-slate-500
+                    ">
+                    unidades operacionais
+                </p>
+
+            </div>
+
+            <div class="
+                    metric-card
+                    rounded-3xl
+                    p-4
+                    sm:p-5
+                ">
+
+                <p class="
+                        text-xs
+                        uppercase
+                        tracking-[0.18em]
+                        text-slate-400
+                        font-bold
+                    ">
+                    Maior volume
+                </p>
+
+                <p id="kpiLargest" class="
+                        mt-2
+                        text-3xl
+                        font-black
+                        text-orange-600
+                    ">
+                    0
+                </p>
+
+                <p id="kpiLargestUnit" class="
+                        mt-1
+                        text-xs
+                        text-slate-500
+                        truncate
+                    ">
+                    —
+                </p>
+
+            </div>
+
+            <div class="
+                    metric-card
+                    rounded-3xl
+                    p-4
+                    sm:p-5
+                ">
+
+                <p class="
+                        text-xs
+                        uppercase
+                        tracking-[0.18em]
+                        text-slate-400
+                        font-bold
+                    ">
+                    Média
+                </p>
+
+                <p id="kpiAverage" class="
+                        mt-2
+                        text-3xl
+                        font-black
+                        text-emerald-600
+                    ">
+                    0
+                </p>
+
+                <p class="
+                        mt-1
+                        text-xs
+                        text-slate-500
+                    ">
+                    solicitações por unidade
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- FILTROS -->
+        <section class="
+bg-white
+rounded-2xl
+shadow-card
+border
+border-slate-200
+p-3
+sm:p-4
+">
+
+            <div class="
+    grid
+    grid-cols-1
+    md:grid-cols-2
+    xl:grid-cols-[1fr_180px_180px_auto]
+    gap-3
+    items-end
+">
+
+                <!-- FILTRO DA TABELA -->
+                <label>
+                    <span class="input-label">
+                        Filtrar resultados
+                    </span>
+
+                    <input id="filterInput" type="text" placeholder="🔍 Filtrar por código ou unidade operacional..."
+                        class="input-default" oninput="applyFilter()">
+                </label>
+
+                <!-- DATA INICIAL -->
+                <label>
+                    <span class="input-label">
+                        Data inicial
+                    </span>
+
+                    <input id="dataInicioInput" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY"
+                        class="input-default">
+                </label>
+
+                <!-- DATA FINAL -->
+                <label>
+                    <span class="input-label">
+                        Data final
+                    </span>
+
+                    <input id="dataFimInput" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY"
+                        class="input-default">
+                </label>
+
+                <!-- BOTÃO CONSULTAR -->
+                <button id="searchBtn" type="button" onclick="loadData()" class="
+        inline-flex
+        items-center
+        justify-center
+        gap-2
+        px-6
+        py-2.5
+        rounded-xl
+        bg-slate-900
+        text-white
+        text-sm
+        font-bold
+        hover:bg-slate-700
+        transition
+        shadow-sm
+        h-[42px]
+    ">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+
+                        <path stroke-linecap="round" d="M21 21l-4.35-4.35" />
+                    </svg>
+
+                    Consultar
+
+                </button>
+
+            </div>
+
+            <!-- CONTADOR -->
+            <div class="
+    mt-3
+    flex
+    justify-end
+">
+
+                <span id="resultCounter" class="
+        whitespace-nowrap
+        text-xs
+        text-slate-500
+        font-semibold
+    ">
+                    0 registros
+                </span>
+
+            </div>
+
+        </section>
+
+        <!-- TABELA DESKTOP -->
+        <div class="
+                desktop-table-wrap
+                bg-white
+                rounded-2xl
+                shadow-card
+                border
+                border-slate-200
+                overflow-x-auto
+                max-h-[65vh]
+            ">
+
+            <table class="
+                    exam-table
+                    text-xs
+                    sm:text-sm
+                    border-collapse
+                ">
+
+                <thead class="
+                        bg-slate-200
+                        sticky
+                        top-0
+                        z-20
+                    ">
+
+                    <tr id="tableHead"></tr>
+
+                </thead>
+
+                <tbody id="tableBody" class="divide-y"></tbody>
+
+                <tfoot class="
+                        bg-slate-100
+                        sticky
+                        bottom-0
+                        font-semibold
+                    ">
+
+                    <tr id="tableFooter"></tr>
+
+                </tfoot>
+
+            </table>
+
+        </div>
+
+        <div id="paginationContainer" class="
+        hidden
+        md:flex
+        items-center
+        justify-between
+        gap-3
+        bg-white
+        rounded-2xl
+        shadow-card
+        border
+        border-slate-200
+        px-4
+        py-3
+    ">
+
+            <span id="paginationInfo" class="text-xs text-slate-500 font-semibold">
+                Página 1 de 1
+            </span>
+
+            <div class="flex items-center gap-2">
+
+                <button id="prevPageBtn" type="button" onclick="previousPage()" class="
+                px-4
+                py-2
+                rounded-xl
+                border
+                border-slate-200
+                bg-white
+                text-sm
+                font-bold
+                text-slate-700
+                hover:bg-slate-50
+                disabled:opacity-40
+                disabled:cursor-not-allowed
+            ">
+                    Anterior
+                </button>
+
+                <span id="pageNumber" class="
+                min-w-[38px]
+                h-[38px]
+                inline-flex
+                items-center
+                justify-center
+                rounded-xl
+                bg-slate-900
+                text-white
+                text-sm
+                font-black
+            ">
+                    1
+                </span>
+
+                <button id="nextPageBtn" type="button" onclick="nextPage()" class="
+                px-4
+                py-2
+                rounded-xl
+                border
+                border-slate-200
+                bg-white
+                text-sm
+                font-bold
+                text-slate-700
+                hover:bg-slate-50
+                disabled:opacity-40
+                disabled:cursor-not-allowed
+            ">
+                    Próxima
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- MOBILE -->
+        <div id="mobileCardsContainer" class="
+                grid
+                grid-cols-1
+                gap-3
+            "></div>
+
+    </main>
+
+    <script>
+
+        //const endpoint = 'http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/get_solicitacao_exame';
+        //const endpoint = 'http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/get_solicitacao_exame_lista';
+        const endpoint = '/api/solicitacao_exames_lista';
+
+        let originalData = [];
+        let filteredData = [];
+
+        let sortKey = 'count';
+        let sortAsc = false;
+        let currentPage = 1;
+        const recordsPerPage = 10;
+
+        const columns = [
+            {
+                key: 'cod_unid_negoc',
+                label: 'Unid. Negócio'
+            },
+            {
+                key: 'cod_unid_oper',
+                label: 'Unid. Oper.'
+            },
+            {
+                key: 'nom_unid_oper',
+                label: 'Unidade operacional'
+            },
+            {
+                key: 'count',
+                label: 'Solicitações'
+            }
+        ];
+
+        const normalizeText = value =>
+            String(value ?? '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim()
+                .toLowerCase();
+
+        const escapeHtml = value =>
+            String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+
+        const formatNumber = value =>
+            new Intl.NumberFormat(
+                'pt-BR'
+            ).format(
+                Number(value) || 0
+            );
+
+        /*
+         * Adiciona automaticamente as barras.
+         *
+         * 25082026
+         * vira
+         * 25/08/2026
+         */
+        function applyDateMask(input) {
+
+            let value =
+                input.value.replace(/\D/g, '');
+
+            value =
+                value.substring(0, 8);
+
+            if (value.length > 4) {
+
+                value =
+                    value.replace(
+                        /^(\d{2})(\d{2})(\d+)/,
+                        '$1/$2/$3'
+                    );
+
+            } else if (value.length > 2) {
+
+                value =
+                    value.replace(
+                        /^(\d{2})(\d+)/,
+                        '$1/$2'
+                    );
+
+            }
+
+            input.value = value;
+        }
+
+        /*
+         * Converte:
+         *
+         * 25/08/2026
+         *
+         * para:
+         *
+         * 2026-08-25
+         */
+        function convertBRDateToISO(value) {
+
+            const match =
+                String(value || '')
+                    .trim()
+                    .match(
+                        /^(\d{2})\/(\d{2})\/(\d{4})$/
+                    );
+
+            if (!match) {
+                return null;
+            }
+
+            const [
+                ,
+                day,
+                month,
+                year
+            ] = match;
+
+            const date =
+                new Date(
+                    Number(year),
+                    Number(month) - 1,
+                    Number(day)
+                );
+
+            if (
+                date.getFullYear() !== Number(year) ||
+                date.getMonth() !== Number(month) - 1 ||
+                date.getDate() !== Number(day)
+            ) {
+                return null;
+            }
+
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDateBR(date) {
+
+            const pad = value =>
+                String(value).padStart(
+                    2,
+                    '0'
+                );
+
+            return (
+                `${pad(date.getDate())}/` +
+                `${pad(date.getMonth() + 1)}/` +
+                `${date.getFullYear()}`
+            );
+        }
+
+        function initializeDates() {
+
+            const today =
+                new Date();
+
+            const todayFormatted =
+                formatDateBR(today);
+
+            const startInput =
+                document.getElementById(
+                    'dataInicioInput'
+                );
+
+            const endInput =
+                document.getElementById(
+                    'dataFimInput'
+                );
+
+            if (!startInput.value) {
+                startInput.value =
+                    todayFormatted;
+            }
+
+            if (!endInput.value) {
+                endInput.value =
+                    todayFormatted;
+            }
+
+        }
+
+        function getPayload() {
+
+            const startDate =
+                convertBRDateToISO(
+                    document.getElementById(
+                        'dataInicioInput'
+                    ).value
+                );
+
+            const endDate =
+                convertBRDateToISO(
+                    document.getElementById(
+                        'dataFimInput'
+                    ).value
+                );
+
+            if (!startDate) {
+
+                throw new Error(
+                    'Informe uma data inicial válida no formato DD/MM/YYYY.'
+                );
+
+            }
+
+            if (!endDate) {
+
+                throw new Error(
+                    'Informe uma data final válida no formato DD/MM/YYYY.'
+                );
+
+            }
+
+            if (startDate > endDate) {
+
+                throw new Error(
+                    'A data inicial não pode ser maior que a data final.'
+                );
+
+            }
+
+            return {
+                dth_inicio:
+                    `${startDate} 00:00:00`,
+
+                dth_fim:
+                    `${endDate} 23:59:59`
+            };
+
+        }
+
+        function showMessage(
+            message,
+            type = 'error'
+        ) {
+
+            const container =
+                document.getElementById(
+                    'messageContainer'
+                );
+
+            container.classList.remove(
+                'hidden'
+            );
+
+            const classes =
+                type === 'success'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                    : type === 'warning'
+                        ? 'bg-orange-50 border-orange-200 text-orange-700'
+                        : 'bg-rose-50 border-rose-200 text-rose-700';
+
+            container.innerHTML = `
+                <div
+                    class="
+                        rounded-2xl
+                        border
+                        px-4
+                        py-3
+                        text-sm
+                        font-semibold
+                        ${classes}
+                    "
+                >
+                    ${escapeHtml(message)}
+                </div>
+            `;
+
+        }
+
+        function hideMessage() {
+
+            const container =
+                document.getElementById(
+                    'messageContainer'
+                );
+
+            container.classList.add(
+                'hidden'
+            );
+
+            container.innerHTML = '';
+
+        }
+
+        function clearFilters() {
+
+            document.getElementById(
+                'dataInicioInput'
+            ).value = '';
+
+            document.getElementById(
+                'dataFimInput'
+            ).value = '';
+
+            document.getElementById(
+                'filterInput'
+            ).value = '';
+
+            originalData = [];
+            filteredData = [];
+
+            initializeDates();
+            renderTable();
+            hideMessage();
+
+            document.getElementById(
+                'lastUpdateText'
+            ).textContent =
+                'Aguardando consulta';
+
+            const dot =
+                document.getElementById(
+                    'statusDot'
+                );
+
+            dot.className =
+                'h-2 w-2 rounded-full bg-slate-400';
+
+        }
+
+        /*
+         * ============================================
+         * KPIS
+         * ============================================
+         */
+
+        function updateKPIs() {
+
+            const total =
+                filteredData.reduce(
+                    (
+                        accumulator,
+                        row
+                    ) =>
+                        accumulator +
+                        (
+                            Number(
+                                row.count
+                            ) || 0
+                        ),
+                    0
+                );
+
+            const units =
+                filteredData.length;
+
+            const largest =
+                filteredData.reduce(
+                    (
+                        currentLargest,
+                        row
+                    ) => {
+
+                        if (
+                            !currentLargest ||
+                            Number(row.count) >
+                            Number(currentLargest.count)
+                        ) {
+
+                            return row;
+
+                        }
+
+                        return currentLargest;
+
+                    },
+                    null
+                );
+
+            const average =
+                units > 0
+                    ? total / units
+                    : 0;
+
+            document.getElementById(
+                'kpiTotal'
+            ).textContent =
+                formatNumber(total);
+
+            document.getElementById(
+                'kpiUnits'
+            ).textContent =
+                formatNumber(units);
+
+            document.getElementById(
+                'kpiLargest'
+            ).textContent =
+                largest
+                    ? formatNumber(
+                        largest.count
+                    )
+                    : '0';
+
+            document.getElementById(
+                'kpiLargestUnit'
+            ).textContent =
+                largest
+                    ? (
+                        largest.nom_unid_oper ||
+                        'Unidade não informada'
+                    )
+                    : '—';
+
+            document.getElementById(
+                'kpiAverage'
+            ).textContent =
+                average.toLocaleString(
+                    'pt-BR',
+                    {
+                        maximumFractionDigits: 1
+                    }
+                );
+
+            document.getElementById(
+                'resultCounter'
+            ).textContent =
+                `${filteredData.length} registro${filteredData.length === 1
+                    ? ''
+                    : 's'
+                }`;
+
+        }
+
+        /*
+         * ============================================
+         * FILTRO
+         * ============================================
+         */
+
+        function applyFilter() {
+
+            const filter =
+                normalizeText(
+                    document.getElementById(
+                        'filterInput'
+                    ).value
+                );
+
+            filteredData =
+                originalData.filter(
+                    row => {
+
+                        if (!filter) {
+                            return true;
+                        }
+
+                        return [
+                            row.cod_unid_negoc,
+                            row.cod_unid_oper,
+                            row.nom_unid_oper,
+                            row.count
+                        ].some(
+                            value =>
+                                normalizeText(
+                                    value
+                                ).includes(
+                                    filter
+                                )
+                        );
+
+                    }
+                );
+
+
+            currentPage = 1;
+            sortData();
+            renderTable();
+
+        }
+
+        /*
+         * ============================================
+         * ORDENAÇÃO
+         * ============================================
+         */
+
+        function getSortValue(
+            row,
+            key
+        ) {
+
+            if (
+                key === 'count' ||
+                key === 'cod_unid_negoc' ||
+                key === 'cod_unid_oper'
+            ) {
+
+                return Number(
+                    row[key]
+                ) || 0;
+
+            }
+
+            return normalizeText(
+                row[key]
+            );
+
+        }
+
+        function sortData() {
+
+            filteredData.sort(
+                (
+                    first,
+                    second
+                ) => {
+
+                    const a =
+                        getSortValue(
+                            first,
+                            sortKey
+                        );
+
+                    const b =
+                        getSortValue(
+                            second,
+                            sortKey
+                        );
+
+                    let comparison = 0;
+
+                    if (
+                        typeof a === 'number' &&
+                        typeof b === 'number'
+                    ) {
+
+                        comparison =
+                            a - b;
+
+                    } else {
+
+                        comparison =
+                            String(a)
+                                .localeCompare(
+                                    String(b),
+                                    'pt-BR'
+                                );
+
+                    }
+
+                    return sortAsc
+                        ? comparison
+                        : -comparison;
+
+                }
+            );
+
+        }
+
+        function sortBy(key) {
+
+            if (sortKey === key) {
+
+                sortAsc =
+                    !sortAsc;
+
+            } else {
+
+                sortKey =
+                    key;
+
+                sortAsc =
+                    true;
+
+            }
+
+            currentPage = 1;
+            sortData();
+            renderTable();
+
+        }
+
+        /*
+         * ============================================
+         * TABELA
+         * ============================================
+         */
+
+        function createHeader() {
+
+            const headerRow =
+                document.getElementById(
+                    'tableHead'
+                );
+
+            headerRow.innerHTML = '';
+
+            /*
+             * Duas unidades por linha.
+             */
+            for (let group = 0; group < 2; group++) {
+
+                columns.forEach(
+                    column => {
+
+                        const th =
+                            document.createElement(
+                                'th'
+                            );
+
+                        th.className = `
+                px-4
+                py-3
+                text-left
+                text-[11px]
+                uppercase
+                tracking-wide
+                text-slate-600
+                cursor-pointer
+                hover:bg-slate-300
+                transition
+                whitespace-nowrap
+            `;
+
+                        /*
+                         * Cria uma pequena separação
+                         * entre o resultado 1 e o 2.
+                         */
+                        if (
+                            group === 1 &&
+                            column === columns[0]
+                        ) {
+
+                            th.classList.add(
+                                'border-l-4',
+                                'border-white'
+                            );
+
+                        }
+
+                        th.onclick =
+                            () =>
+                                sortBy(
+                                    column.key
+                                );
+
+                        const indicator =
+                            sortKey === column.key
+                                ? (
+                                    sortAsc
+                                        ? ' ▲'
+                                        : ' ▼'
+                                )
+                                : '';
+
+                        th.textContent =
+                            column.label +
+                            indicator;
+
+                        headerRow.appendChild(
+                            th
+                        );
+
+                    }
+                );
+
+            }
+
+        }
+
+        function appendRecordCells(
+            tr,
+            row,
+            secondGroup = false
+        ) {
+
+            /*
+             * Unidade de negócio
+             */
+            const tdNeg =
+                document.createElement(
+                    'td'
+                );
+
+            tdNeg.className =
+                `
+            px-4
+            py-3
+            text-slate-700
+            font-semibold
+            ${secondGroup
+                    ? 'border-l-4 border-slate-100'
+                    : ''
+                }
+        `;
+
+            tdNeg.textContent =
+                row.cod_unid_negoc ??
+                '—';
+
+            tr.appendChild(
+                tdNeg
+            );
+
+            /*
+             * Unidade operacional
+             */
+            const tdOper =
+                document.createElement(
+                    'td'
+                );
+
+            tdOper.className =
+                'px-4 py-3 text-slate-700 font-semibold';
+
+            tdOper.textContent =
+                row.cod_unid_oper ??
+                '—';
+
+            tr.appendChild(
+                tdOper
+            );
+
+            /*
+             * Nome da unidade
+             */
+            const tdName =
+                document.createElement(
+                    'td'
+                );
+
+            tdName.className =
+                'px-4 py-3';
+
+            tdName.innerHTML = `
+        <p
+            class="
+                font-bold
+                text-slate-900
+                whitespace-nowrap
+            "
+        >
+            ${escapeHtml(
+                row.nom_unid_oper ||
+                'Unidade não informada'
+            )}
+        </p>
+    `;
+
+            tr.appendChild(
+                tdName
+            );
+
+            /*
+             * Solicitações
+             */
+            const tdCount =
+                document.createElement(
+                    'td'
+                );
+
+            tdCount.className =
+                'px-4 py-3';
+
+            tdCount.innerHTML = `
+        <span
+            class="
+                inline-flex
+                items-center
+                justify-center
+                min-w-[72px]
+                px-3
+                py-1.5
+                rounded-full
+                bg-orange-50
+                text-orange-700
+                border
+                border-orange-200
+                text-sm
+                font-black
+            "
+        >
+            ${formatNumber(
+                row.count
+            )}
+        </span>
+    `;
+
+            tr.appendChild(
+                tdCount
+            );
+
+        }
+
+        function renderTable() {
+
+            createHeader();
+
+            const tbody =
+                document.getElementById(
+                    'tableBody'
+                );
+
+            tbody.innerHTML = '';
+
+            /*
+             * Quantidade total de páginas.
+             */
+            const totalPages =
+                Math.max(
+                    1,
+                    Math.ceil(
+                        filteredData.length /
+                        recordsPerPage
+                    )
+                );
+
+            /*
+             * Garante que a página atual
+             * nunca seja maior que o total.
+             */
+            if (
+                currentPage >
+                totalPages
+            ) {
+
+                currentPage =
+                    totalPages;
+
+            }
+
+            /*
+             * Pega somente os 10 registros
+             * da página atual.
+             */
+            const startIndex =
+                (
+                    currentPage - 1
+                ) *
+                recordsPerPage;
+
+            const endIndex =
+                startIndex +
+                recordsPerPage;
+
+            const pageData =
+                filteredData.slice(
+                    startIndex,
+                    endIndex
+                );
+
+            if (
+                pageData.length === 0
+            ) {
+
+                tbody.innerHTML = `
+        <tr>
+            <td
+                colspan="8"
+                class="
+                    px-4
+                    py-14
+                    text-center
+                    text-sm
+                    text-slate-500
+                    bg-white
+                "
+            >
+                Nenhum resultado para exibir.
+            </td>
+        </tr>
+    `;
+
+            } else {
+
+                /*
+                 * Como queremos 2 registros
+                 * por linha, avançamos de 2 em 2.
+                 */
+                for (
+                    let index = 0;
+                    index < pageData.length;
+                    index += 2
+                ) {
+
+                    const first =
+                        pageData[index];
+
+                    const second =
+                        pageData[index + 1];
+
+                    const tr =
+                        document.createElement(
+                            'tr'
+                        );
+
+                    tr.className = `
+            hover:bg-orange-50/40
+            transition
+            fade-in
+        `;
+
+                    /*
+                     * Primeiro registro.
+                     */
+                    appendRecordCells(
+                        tr,
+                        first,
+                        false
+                    );
+
+                    /*
+                     * Segundo registro.
+                     *
+                     * Caso não exista, adicionamos
+                     * quatro células vazias.
+                     */
+                    if (second) {
+
+                        appendRecordCells(
+                            tr,
+                            second,
+                            true
+                        );
+
+                    } else {
+
+                        for (
+                            let empty = 0;
+                            empty < 4;
+                            empty++
+                        ) {
+
+                            const td =
+                                document.createElement(
+                                    'td'
+                                );
+
+                            td.className =
+                                empty === 0
+                                    ? 'px-4 py-3 border-l-4 border-slate-100'
+                                    : 'px-4 py-3';
+
+                            tr.appendChild(
+                                td
+                            );
+
+                        }
+
+                    }
+
+                    tbody.appendChild(
+                        tr
+                    );
+
+                }
+
+            }
+
+            renderFooter();
+            renderMobileCards();
+            updateKPIs();
+            renderPagination();
+
+        }
+
+        function renderPagination() {
+
+            const totalPages =
+                Math.max(
+                    1,
+                    Math.ceil(
+                        filteredData.length /
+                        recordsPerPage
+                    )
+                );
+
+            const container =
+                document.getElementById(
+                    'paginationContainer'
+                );
+
+            const info =
+                document.getElementById(
+                    'paginationInfo'
+                );
+
+            const pageNumber =
+                document.getElementById(
+                    'pageNumber'
+                );
+
+            const prevButton =
+                document.getElementById(
+                    'prevPageBtn'
+                );
+
+            const nextButton =
+                document.getElementById(
+                    'nextPageBtn'
+                );
+
+            /*
+             * Esconde paginação caso não
+             * existam registros.
+             */
+            if (
+                filteredData.length === 0
+            ) {
+
+                container.classList.add(
+                    'hidden'
+                );
+
+                return;
+
+            }
+
+            container.classList.remove(
+                'hidden'
+            );
+
+            /*
+             * Mantém md:flex do Tailwind.
+             */
+            container.classList.add(
+                'md:flex'
+            );
+
+            const start =
+                (
+                    currentPage - 1
+                ) *
+                recordsPerPage +
+                1;
+
+            const end =
+                Math.min(
+                    currentPage *
+                    recordsPerPage,
+                    filteredData.length
+                );
+
+            info.textContent =
+                `${start}–${end} de ${filteredData.length} registros`;
+
+            pageNumber.textContent =
+                currentPage;
+
+            prevButton.disabled =
+                currentPage <= 1;
+
+            nextButton.disabled =
+                currentPage >= totalPages;
+
+        }
+
+
+        function previousPage() {
+
+            if (
+                currentPage <= 1
+            ) {
+                return;
+            }
+
+            currentPage--;
+
+            renderTable();
+
+            scrollToTable();
+
+        }
+
+
+        function nextPage() {
+
+            const totalPages =
+                Math.ceil(
+                    filteredData.length /
+                    recordsPerPage
+                );
+
+            if (
+                currentPage >=
+                totalPages
+            ) {
+                return;
+            }
+
+            currentPage++;
+
+            renderTable();
+
+            scrollToTable();
+
+        }
+
+
+        function scrollToTable() {
+
+            const table =
+                document.querySelector(
+                    '.desktop-table-wrap'
+                );
+
+            if (!table) {
+                return;
+            }
+
+            table.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+        }
+
+        function renderFooter() {
+
+            const footer =
+                document.getElementById(
+                    'tableFooter'
+                );
+
+            const total =
+                filteredData.reduce(
+                    (
+                        accumulator,
+                        row
+                    ) =>
+                        accumulator +
+                        (
+                            Number(
+                                row.count
+                            ) || 0
+                        ),
+                    0
+                );
+
+            footer.innerHTML = `
+                <td
+                    class="
+                        px-4
+                        py-3
+                        text-slate-700
+                    "
+                >
+                    Total
+                </td>
+
+                <td></td>
+
+                <td
+                    class="
+                        px-4
+                        py-3
+                        text-slate-500
+                    "
+                >
+                    ${filteredData.length}
+                    unidade${filteredData.length === 1
+                    ? ''
+                    : 's'
+                }
+                </td>
+
+                <td
+                    class="
+                        px-4
+                        py-3
+                        font-black
+                        text-orange-700
+                    "
+                >
+                    ${formatNumber(total)}
+                </td>
+            `;
+
+        }
+
+        function renderMobileCards() {
+
+            const container =
+                document.getElementById(
+                    'mobileCardsContainer'
+                );
+
+            if (
+                filteredData.length === 0
+            ) {
+
+                container.innerHTML = `
+                    <div
+                        class="
+                            rounded-2xl
+                            border
+                            border-slate-200
+                            bg-white
+                            p-5
+                            text-center
+                            text-sm
+                            text-slate-500
+                            shadow-card
+                        "
+                    >
+                        Nenhum resultado para exibir.
+                    </div>
+                `;
+
+                return;
+
+            }
+
+            container.innerHTML =
+                filteredData
+                    .map(
+                        row => `
+                            <article
+                                class="
+                                    exam-mobile-card
+                                    rounded-3xl
+                                    p-4
+                                    fade-in
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        flex
+                                        items-start
+                                        justify-between
+                                        gap-3
+                                    "
+                                >
+
+                                    <div
+                                        class="
+                                            min-w-0
+                                        "
+                                    >
+
+                                        <p
+                                            class="
+                                                text-[10px]
+                                                uppercase
+                                                tracking-[0.16em]
+                                                text-slate-400
+                                                font-black
+                                            "
+                                        >
+                                            Unidade operacional
+                                        </p>
+
+                                        <h3
+                                            class="
+                                                mt-1
+                                                text-base
+                                                font-black
+                                                text-slate-900
+                                            "
+                                        >
+                                            ${escapeHtml(
+                            row.nom_unid_oper ||
+                            'Unidade não informada'
+                        )}
+                                        </h3>
+
+                                    </div>
+
+                                    <span
+                                        class="
+                                            shrink-0
+                                            inline-flex
+                                            items-center
+                                            justify-center
+                                            min-w-[64px]
+                                            px-3
+                                            py-1.5
+                                            rounded-full
+                                            bg-orange-50
+                                            text-orange-700
+                                            border
+                                            border-orange-200
+                                            text-sm
+                                            font-black
+                                        "
+                                    >
+                                        ${formatNumber(
+                            row.count
+                        )}
+                                    </span>
+
+                                </div>
+
+                                <div
+                                    class="
+                                        mt-4
+                                        grid
+                                        grid-cols-2
+                                        gap-3
+                                    "
+                                >
+
+                                    <div
+                                        class="
+                                            rounded-2xl
+                                            bg-slate-50
+                                            border
+                                            border-slate-100
+                                            p-3
+                                        "
+                                    >
+
+                                        <p
+                                            class="
+                                                text-[10px]
+                                                uppercase
+                                                tracking-wide
+                                                text-slate-400
+                                                font-bold
+                                            "
+                                        >
+                                            Unid. negócio
+                                        </p>
+
+                                        <p
+                                            class="
+                                                mt-1
+                                                text-lg
+                                                font-black
+                                                text-slate-800
+                                            "
+                                        >
+                                            ${escapeHtml(
+                            row.cod_unid_negoc
+                        )}
+                                        </p>
+
+                                    </div>
+
+                                    <div
+                                        class="
+                                            rounded-2xl
+                                            bg-slate-50
+                                            border
+                                            border-slate-100
+                                            p-3
+                                        "
+                                    >
+
+                                        <p
+                                            class="
+                                                text-[10px]
+                                                uppercase
+                                                tracking-wide
+                                                text-slate-400
+                                                font-bold
+                                            "
+                                        >
+                                            Unid. operacional
+                                        </p>
+
+                                        <p
+                                            class="
+                                                mt-1
+                                                text-lg
+                                                font-black
+                                                text-slate-800
+                                            "
+                                        >
+                                            ${escapeHtml(
+                            row.cod_unid_oper
+                        )}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <div
+                                    class="
+                                        mt-3
+                                        rounded-2xl
+                                        bg-orange-50
+                                        border
+                                        border-orange-100
+                                        p-3
+                                    "
+                                >
+
+                                    <p
+                                        class="
+                                            text-[10px]
+                                            uppercase
+                                            tracking-wide
+                                            text-orange-500
+                                            font-bold
+                                        "
+                                    >
+                                        Solicitações
+                                    </p>
+
+                                    <p
+                                        class="
+                                            mt-1
+                                            text-2xl
+                                            font-black
+                                            text-orange-700
+                                        "
+                                    >
+                                        ${formatNumber(
+                            row.count
+                        )}
+                                    </p>
+
+                                </div>
+
+                            </article>
+                        `
+                    )
+                    .join('');
+
+        }
+
+        /*
+         * ============================================
+         * ENDPOINT
+         * ============================================
+         */
+
+        async function loadData() {
+
+            hideMessage();
+
+            let payload;
+
+            try {
+
+                payload =
+                    getPayload();
+
+            } catch (error) {
+
+                showMessage(
+                    error.message
+                );
+
+                return;
+
+            }
+
+            const button =
+                document.getElementById(
+                    'searchBtn'
+                );
+
+            const dot =
+                document.getElementById(
+                    'statusDot'
+                );
+
+            const updateText =
+                document.getElementById(
+                    'lastUpdateText'
+                );
+
+            button.disabled =
+                true;
+
+            button.classList.add(
+                'opacity-60',
+                'cursor-not-allowed'
+            );
+
+            button.innerHTML = `
+                <svg
+                    class="
+                        animate-spin
+                        h-4
+                        w-4
+                    "
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                    ></circle>
+
+                    <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                </svg>
+
+                Consultando...
+            `;
+
+            dot.className =
+                'h-2 w-2 rounded-full bg-orange-400 animate-pulse';
+
+            updateText.textContent =
+                'Consultando...';
+
+            console.log(
+                'POST:',
+                endpoint
+            );
+
+            console.log(
+                'Payload:',
+                payload
+            );
+
+            try {
+
+                const response =
+                    await fetch(
+                        endpoint,
+                        {
+                            method:
+                                'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    payload
+                                ),
+
+                            cache:
+                                'no-store'
+                        }
+                    );
+
+                if (
+                    !response.ok
+                ) {
+
+                    throw new Error(
+                        `Erro HTTP ${response.status}`
+                    );
+
+                }
+
+                const data =
+                    await response.json();
+
+                if (
+                    !Array.isArray(data)
+                ) {
+
+                    throw new Error(
+                        'O endpoint retornou um formato inesperado.'
+                    );
+
+                }
+
+                originalData =
+                    data.map(
+                        row => ({
+                            ...row,
+
+                            count:
+                                Number(
+                                    row.count
+                                ) || 0
+                        })
+                    );
+
+                filteredData =
+                    [...originalData];
+
+                currentPage = 1;
+
+                /*
+                 * Maior quantidade primeiro.
+                 */
+                sortKey =
+                    'count';
+
+                sortAsc =
+                    false;
+
+                sortData();
+                renderTable();
+
+                const now =
+                    new Date();
+
+                updateText.textContent =
+                    `Atualizado às ${now.toLocaleTimeString(
+                        'pt-BR',
+                        {
+                            hour:
+                                '2-digit',
+                            minute:
+                                '2-digit',
+                            second:
+                                '2-digit'
+                        }
+                    )
+                    }`;
+
+                dot.className =
+                    'h-2 w-2 rounded-full bg-emerald-400';
+
+                if (
+                    data.length === 0
+                ) {
+
+                    showMessage(
+                        'A consulta foi concluída, mas não retornou solicitações para os parâmetros informados.',
+                        'warning'
+                    );
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    'Erro ao consultar solicitações:',
+                    error
+                );
+
+                originalData =
+                    [];
+
+                filteredData =
+                    [];
+
+                renderTable();
+
+                showMessage(
+                    `Não foi possível realizar a consulta: ${error.message}`
+                );
+
+                updateText.textContent =
+                    'Erro na consulta';
+
+                dot.className =
+                    'h-2 w-2 rounded-full bg-rose-400';
+
+            } finally {
+
+                button.disabled =
+                    false;
+
+                button.classList.remove(
+                    'opacity-60',
+                    'cursor-not-allowed'
+                );
+
+                button.innerHTML = `
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle
+                            cx="11"
+                            cy="11"
+                            r="8"
+                        ></circle>
+
+                        <path
+                            stroke-linecap="round"
+                            d="M21 21l-4.35-4.35"
+                        />
+                    </svg>
+
+                    Consultar
+                `;
+
+                dot.classList.remove(
+                    'animate-pulse'
+                );
+
+            }
+
+        }
+
+        /*
+         * ============================================
+         * EVENTOS
+         * ============================================
+         */
+
+        document.getElementById(
+            'dataInicioInput'
+        ).addEventListener(
+            'input',
+            event =>
+                applyDateMask(
+                    event.target
+                )
+        );
+
+        document.getElementById(
+            'dataFimInput'
+        ).addEventListener(
+            'input',
+            event =>
+                applyDateMask(
+                    event.target
+                )
+        );
+
+        /*
+         * Enter faz a consulta.
+         */
+        [
+            'dataInicioInput',
+            'dataFimInput'
+        ].forEach(
+            id => {
+
+                document.getElementById(
+                    id
+                ).addEventListener(
+                    'keydown',
+                    event => {
+
+                        if (
+                            event.key ===
+                            'Enter'
+                        ) {
+
+                            loadData();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+        /*
+         * Menu principal
+         */
+        const menuBtn =
+            document.getElementById(
+                'menuBtn'
+            );
+
+        const menuPanel =
+            document.getElementById(
+                'menuPanel'
+            );
+
+        menuBtn.addEventListener(
+            'click',
+            event => {
+
+                event.stopPropagation();
+
+                menuPanel.classList.toggle(
+                    'hidden'
+                );
+
+            }
+        );
+
+        document.addEventListener(
+            'click',
+            event => {
+
+                if (
+                    !menuPanel.contains(
+                        event.target
+                    ) &&
+                    !menuBtn.contains(
+                        event.target
+                    )
+                ) {
+
+                    menuPanel.classList.add(
+                        'hidden'
+                    );
+
+                }
+
+            }
+        );
+
+        document.addEventListener(
+            'keydown',
+            event => {
+
+            }
+        );
+
+        /*
+         * Inicialização.
+         *
+         * Não faço a consulta automaticamente
+         * porque primeiro precisamos dos códigos.
+         */
+        initializeDates();
+        renderTable();
+
+    </script>
+
+</body>
+
+</html>

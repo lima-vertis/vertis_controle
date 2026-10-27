@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vertis | Histórico de Tarefas</title>
+  <meta name="theme-color" content="#ff7a00" />
+  <style>
+    :root {
+      --orange: #ff7a00;
+      --orange-2: #ff9a3c;
+      --orange-soft: #fff3e8;
+      --black: #151515;
+      --black-2: #2a2a2a;
+      --text: #222222;
+      --muted: #747474;
+      --line: #e9e9e9;
+      --surface: #ffffff;
+      --surface-2: #fafafa;
+      --success: #159447;
+      --success-bg: #eaf8ef;
+      --danger: #d64545;
+      --danger-bg: #fff0f0;
+      --warning: #c57a00;
+      --warning-bg: #fff5df;
+      --info: #2767c7;
+      --info-bg: #edf4ff;
+      --shadow: 0 16px 44px rgba(0, 0, 0, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(255,122,0,.06), transparent 32%),
+        linear-gradient(180deg, #fff 0%, #f7f7f7 100%);
+      overflow-x: hidden;
+    }
+
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .ambient-blob {
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 122, 0, .055);
+      filter: blur(8px);
+      will-change: transform;
+    }
+
+    .ambient-blob.one {
+      width: 430px;
+      height: 430px;
+      left: -120px;
+      top: 8%;
+      animation: ambientFloatOne 18s ease-in-out infinite alternate;
+    }
+
+    .ambient-blob.two {
+      width: 560px;
+      height: 560px;
+      right: -180px;
+      top: 34%;
+      background: rgba(255, 145, 55, .045);
+      animation: ambientFloatTwo 24s ease-in-out infinite alternate;
+    }
+
+    .ambient-blob.three {
+      width: 360px;
+      height: 360px;
+      left: 38%;
+      bottom: -160px;
+      background: rgba(255, 122, 0, .04);
+      animation: ambientFloatThree 21s ease-in-out infinite alternate;
+    }
+
+    button, input { font: inherit; }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      width: min(1520px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 26px 0 56px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 24px 28px;
+      border-radius: 24px;
+      background: var(--black);
+      box-shadow: var(--shadow);
+      animation: rise .55s ease both;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      right: -60px;
+      top: -130px;
+      background: rgba(255, 122, 0, .18);
+      filter: blur(1px);
+      transform-origin: center;
+      animation: heroOrbFloat 7s ease-in-out infinite alternate;
+      will-change: transform, opacity;
+    }
+
+    .brand {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .brand img {
+      width: 120px;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .hero-copy h1 {
+      margin: 0 0 4px;
+      color: #fff;
+      font-size: clamp(1.25rem, 2vw, 1.7rem);
+      letter-spacing: -.02em;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      color: #bfbfbf;
+      font-size: .92rem;
+    }
+
+    .hero-pill {
+      position: relative;
+      z-index: 1;
+      padding: 9px 13px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(255,255,255,.06);
+      font-size: .78rem;
+      white-space: nowrap;
+    }
+
+    .filters-card {
+      margin-top: 20px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.94);
+      box-shadow: 0 12px 30px rgba(0,0,0,.05);
+      animation: rise .55s .05s ease both;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr 1.1fr auto;
+      gap: 14px;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--black-2);
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .field input {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      border: 1px solid #dedede;
+      border-radius: 12px;
+      outline: none;
+      color: var(--text);
+      background: #fff;
+      transition: .2s ease;
+    }
+
+    .field input:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 4px rgba(255,122,0,.12);
+    }
+
+    .primary-btn {
+      height: 46px;
+      padding: 0 20px;
+      border: 0;
+      border-radius: 12px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--orange), #ff922b);
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 9px 24px rgba(255,122,0,.24);
+      transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+    }
+
+    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(255,122,0,.3); }
+    .primary-btn:active { transform: translateY(0); }
+    .primary-btn:disabled { opacity: .6; cursor: progress; transform: none; }
+
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+      animation: rise .55s .08s ease both;
+    }
+
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 118px;
+      padding: 18px 18px 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 12px 30px rgba(0,0,0,.045);
+      backdrop-filter: blur(8px);
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,122,0,.25);
+      box-shadow: 0 16px 34px rgba(0,0,0,.065);
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      width: 92px;
+      height: 92px;
+      right: -32px;
+      bottom: -40px;
+      border-radius: 50%;
+      background: rgba(255,122,0,.07);
+    }
+
+    .stat-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #737373;
+      font-size: .74rem;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 0 4px rgba(255,122,0,.08);
+    }
+
+    .stat-card.finalizadas .stat-dot { background: var(--success); box-shadow: 0 0 0 4px rgba(21,148,71,.08); }
+    .stat-card.pendentes .stat-dot { background: var(--warning); box-shadow: 0 0 0 4px rgba(197,122,0,.09); }
+    .stat-card.execucao .stat-dot { background: var(--info); box-shadow: 0 0 0 4px rgba(39,103,199,.08); }
+    .stat-card.reprovadas .stat-dot { background: var(--danger); box-shadow: 0 0 0 4px rgba(214,69,69,.08); }
+
+    .stat-value {
+      position: relative;
+      z-index: 1;
+      margin-top: 10px;
+      color: var(--black);
+      font-size: 2rem;
+      line-height: 1;
+      font-weight: 950;
+      letter-spacing: -.045em;
+    }
+
+    .stat-sub {
+      position: relative;
+      z-index: 1;
+      margin-top: 8px;
+      color: #9a9a9a;
+      font-size: .72rem;
+      font-weight: 650;
+    }
+
+    .table-card {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow: 0 12px 30px rgba(0,0,0,.05);
+      animation: rise .55s .1s ease both;
+    }
+
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .table-toolbar h2 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--black);
+    }
+
+    .result-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--orange-soft);
+      color: #9a4d00;
+      font-size: .78rem;
+      font-weight: 800;
+    }
+
+    .result-count::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 0 0 rgba(255,122,0,.28);
+      animation: statusPulse 1.9s ease-out infinite;
+    }
+
+    .table-card::before {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,122,0,.15) 25%, var(--orange) 50%, rgba(255,122,0,.15) 75%, transparent 100%);
+      background-size: 240% 100%;
+      animation: movingAccent 4.5s linear infinite;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      position: relative;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1150px;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 13px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      background: #fbfbfb;
+      color: #5a5a5a;
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .045em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 14px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+      font-size: .87rem;
+    }
+
+    tbody tr {
+      transition: background .18s ease, transform .18s ease;
+      animation: rowIn .3s ease both;
+    }
+
+    tbody tr:nth-child(odd) { background: #ffffff; }
+    tbody tr:nth-child(even) { background: #f7f7f7; }
+    tbody tr:hover { background: #fff4e8; }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .task-id {
+      font-weight: 900;
+      color: var(--black);
+    }
+
+    .client-code {
+      display: inline-block;
+      padding: 5px 8px;
+      border-radius: 8px;
+      background: #f2f2f2;
+      color: #3f3f3f;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+
+    .unit-name {
+      max-width: 255px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status.finalizada { color: var(--success); background: var(--success-bg); }
+    .status.pendente { color: var(--warning); background: var(--warning-bg); }
+    .status.reprovada { color: var(--danger); background: var(--danger-bg); }
+    .status.execucao { color: var(--info); background: var(--info-bg); }
+    .status.neutra { color: #666; background: #f1f1f1; }
+
+    .mini-btn, .link-btn, .task-more {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 7px 10px;
+      border: 1px solid #dedede;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--black-2);
+      font-weight: 800;
+      font-size: .77rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: .18s ease;
+    }
+
+    .mini-btn:hover, .task-more:hover { border-color: var(--orange); color: #b95800; background: var(--orange-soft); }
+
+    .link-btn {
+      border-color: transparent;
+      background: var(--black);
+      color: #fff;
+    }
+
+    .link-btn:hover { background: var(--orange); transform: translateY(-1px); }
+
+    .task-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 230px;
+    }
+
+    .task-preview {
+      max-width: 170px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #444;
+    }
+
+    .last-interaction { white-space: nowrap; color: #4d4d4d; }
+
+    .date-popover-wrap { position: relative; display: inline-block; }
+
+    .date-popover {
+      pointer-events: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+      transform: translate(-50%, -100%) scale(.98);
+      width: 285px;
+      z-index: 9999;
+      padding: 14px;
+      border: 1px solid #ececec;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 18px 45px rgba(0,0,0,.16);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+    }
+
+    .date-popover.is-visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .date-popover.open-up {
+      transform: translate(-50%, calc(-100% - 10px)) scale(1);
+    }
+
+    .date-popover.open-down {
+      transform: translate(-50%, 10px) scale(1);
+    }
+
+    .date-popover::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    .date-popover.open-up::after {
+      top: 100%;
+      margin-top: -5px;
+      border-right: 1px solid #ececec;
+      border-bottom: 1px solid #ececec;
+    }
+
+    .date-popover.open-down::after {
+      bottom: 100%;
+      margin-bottom: -5px;
+      border-left: 1px solid #ececec;
+      border-top: 1px solid #ececec;
+    }
+
+    .date-line {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 10px;
+      padding: 7px 0;
+      font-size: .78rem;
+    }
+
+    .date-line + .date-line { border-top: 1px solid #f1f1f1; }
+    .date-line span:first-child { color: #878787; font-weight: 800; }
+    .date-line span:last-child { color: #303030; font-weight: 700; }
+
+
+    .pagination {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .pagination.active { display: flex; }
+
+    .pagination-info {
+      color: #7b7b7b;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .page-btn {
+      min-width: 36px;
+      height: 36px;
+      padding: 0 10px;
+      border: 1px solid #dedede;
+      border-radius: 10px;
+      background: #fff;
+      color: #333;
+      font-size: .78rem;
+      font-weight: 850;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      border-color: var(--orange);
+      color: #a84f00;
+      background: var(--orange-soft);
+      transform: translateY(-1px);
+    }
+
+    .page-btn.active {
+      border-color: var(--orange);
+      background: var(--orange);
+      color: #fff;
+      box-shadow: 0 7px 18px rgba(255,122,0,.2);
+    }
+
+    .page-btn:disabled {
+      opacity: .38;
+      cursor: not-allowed;
+    }
+
+    .state {
+      display: none;
+      padding: 42px 22px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .state.active { display: block; }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      margin: 0 auto 14px;
+      border: 4px solid #efefef;
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    .error-box {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 14px 16px;
+      border: 1px solid #ffd0d0;
+      border-radius: 12px;
+      color: #9f2f2f;
+      background: #fff5f5;
+      font-size: .86rem;
+      line-height: 1.45;
+      text-align: left;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0,0,0,.58);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: .2s ease;
+    }
+
+    .modal-backdrop.open { opacity: 1; visibility: visible; }
+
+    .modal {
+      width: min(900px, 100%);
+      max-height: min(80vh, 820px);
+      overflow: hidden;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 28px 80px rgba(0,0,0,.3);
+      transform: translateY(12px) scale(.98);
+      transition: .2s ease;
+    }
+
+    .modal-backdrop.open .modal { transform: translateY(0) scale(1); }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 17px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .modal-head strong { font-size: .96rem; }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 10px;
+      background: #f2f2f2;
+      color: #333;
+      cursor: pointer;
+      font-size: 1.25rem;
+    }
+
+    .modal-body {
+      max-height: calc(min(80vh, 820px) - 71px);
+      overflow: auto;
+      padding: 22px;
+      line-height: 1.6;
+      color: #303030;
+    }
+
+    .modal-body h1, .modal-body h2, .modal-body h3 { color: var(--black); }
+    .modal-body p { margin: .7em 0; }
+    .modal-body code { padding: 2px 5px; border-radius: 5px; background: #f1f1f1; }
+    .modal-body a { color: #d56500; }
+    .modal-body table { min-width: 0; width: 100%; }
+    .modal-body img { max-width: 100%; height: auto; }
+
+    .footer-note {
+      margin-top: 14px;
+      color: #8b8b8b;
+      font-size: .74rem;
+      text-align: right;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes rowIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes heroOrbFloat {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: .72;
+      }
+      45% {
+        transform: translate3d(-34px, 32px, 0) scale(1.08);
+        opacity: 1;
+      }
+      100% {
+        transform: translate3d(-10px, 58px, 0) scale(.96);
+        opacity: .82;
+      }
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes movingAccent {
+      from { background-position: 100% 0; }
+      to { background-position: -140% 0; }
+    }
+
+    @keyframes statusPulse {
+      0% { box-shadow: 0 0 0 0 rgba(255,122,0,.28); }
+      70% { box-shadow: 0 0 0 7px rgba(255,122,0,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,122,0,0); }
+    }
+
+    @keyframes ambientFloatOne {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(120px, 70px, 0) scale(1.08); }
+      100% { transform: translate3d(250px, 20px, 0) scale(.96); }
+    }
+
+    @keyframes ambientFloatTwo {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(-160px, 100px, 0) scale(.94); }
+      100% { transform: translate3d(-290px, -40px, 0) scale(1.1); }
+    }
+
+    @keyframes ambientFloatThree {
+      0% { transform: translate3d(0, 0, 0) scale(.96); }
+      50% { transform: translate3d(-180px, -120px, 0) scale(1.08); }
+      100% { transform: translate3d(220px, -210px, 0) scale(1); }
+    }
+
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 900px) {
+      .filters-grid { grid-template-columns: 1fr 1fr; }
+      .primary-btn { width: 100%; }
+      .hero { align-items: flex-start; }
+      .hero-pill { display: none; }
+    }
+
+    @media (max-width: 620px) {
+      .app-shell { width: min(100% - 18px, 1520px); padding-top: 10px; }
+      .hero { padding: 18px; border-radius: 18px; }
+      .brand { align-items: flex-start; gap: 14px; }
+      .brand img { width: 90px; margin-top: 3px; }
+      .hero-copy p { display: none; }
+      .filters-card { padding: 15px; }
+      .filters-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-card { min-height: 102px; padding: 15px; }
+      .stat-value { font-size: 1.65rem; }
+      .table-toolbar { align-items: flex-start; }
+      .pagination { align-items: flex-start; flex-direction: column; }
+      .pagination-controls { justify-content: flex-start; }
+      .footer-note { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg" aria-hidden="true">
+    <span class="ambient-blob one"></span>
+    <span class="ambient-blob two"></span>
+    <span class="ambient-blob three"></span>
+  </div>
+
+  <main class="app-shell">
+    <section class="hero">
+      <div class="brand">
+        <img src="https://v1.laudosonline.com.br/assets/images/logo-primary-white.png" alt="Vertis" />
+        <div class="hero-copy">
+          <h1>Histórico de Tarefas</h1>
+          <p>Consulta de tarefas por usuário e período</p>
+        </div>
+      </div>
+      <div class="hero-pill">Constellation API · V1.1</div>
+    </section>
+
+    <section class="filters-card">
+      <form id="searchForm" class="filters-grid" autocomplete="off">
+        <div class="field">
+          <label for="codUsuario">Código do usuário</label>
+          <input id="codUsuario" name="codUsuario" type="number" min="1" step="1" value="4" placeholder="Ex.: 4" required />
+        </div>
+
+        <div class="field">
+          <label for="dataInicio">Data de início</label>
+          <input id="dataInicio" name="dataInicio" type="date" value="2026-10-13" required />
+        </div>
+
+        <div class="field">
+          <label for="dataFim">Data de fim</label>
+          <input id="dataFim" name="dataFim" type="date" required />
+        </div>
+
+        <button id="searchBtn" class="primary-btn" type="submit">Consultar tarefas</button>
+      </form>
+    </section>
+
+    <section class="stats-grid" aria-label="Resumo das tarefas">
+      <article class="stat-card total">
+        <div class="stat-label"><span class="stat-dot"></span>Total de chamados</div>
+        <div id="statTotal" class="stat-value">0</div>
+        <div id="statTotalSub" class="stat-sub">Aguardando consulta</div>
+      </article>
+      <article class="stat-card finalizadas">
+        <div class="stat-label"><span class="stat-dot"></span>Finalizadas</div>
+        <div id="statFinalizadas" class="stat-value">0</div>
+        <div id="statFinalizadasSub" class="stat-sub">0% do total</div>
+      </article>
+      <article class="stat-card pendentes">
+        <div class="stat-label"><span class="stat-dot"></span>Pendentes</div>
+        <div id="statPendentes" class="stat-value">0</div>
+        <div id="statPendentesSub" class="stat-sub">0% do total</div>
+      </article>
+      <article class="stat-card execucao">
+        <div class="stat-label"><span class="stat-dot"></span>Em execução</div>
+        <div id="statExecucao" class="stat-value">0</div>
+        <div id="statExecucaoSub" class="stat-sub">0% do total</div>
+      </article>
+      <article class="stat-card reprovadas">
+        <div class="stat-label"><span class="stat-dot"></span>Reprovadas</div>
+        <div id="statReprovadas" class="stat-value">0</div>
+        <div id="statReprovadasSub" class="stat-sub">0% do total</div>
+      </article>
+    </section>
+
+    <section class="table-card">
+      <header class="table-toolbar">
+        <h2>Resultado da consulta</h2>
+        <span id="resultCount" class="result-count">0 tarefas</span>
+      </header>
+
+      <div id="loadingState" class="state">
+        <div class="spinner"></div>
+        <strong>Consultando tarefas...</strong>
+      </div>
+
+      <div id="emptyState" class="state active">
+        Informe os filtros acima e clique em <strong>Consultar tarefas</strong>.
+      </div>
+
+      <div id="errorState" class="state"></div>
+
+      <div id="tableWrap" class="table-wrap" hidden>
+        <table>
+          <thead>
+            <tr>
+              <th>ID Tarefa</th>
+              <th>Cod. Cliente</th>
+              <th>Unidade</th>
+              <th>Situação</th>
+              <th>Datas</th>
+              <th>Tarefa</th>
+              <th>Ult. Interação</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody id="taskBody"></tbody>
+        </table>
+      </div>
+
+      <div id="pagination" class="pagination" aria-label="Paginação da tabela">
+        <div id="paginationInfo" class="pagination-info"></div>
+        <div id="paginationControls" class="pagination-controls"></div>
+      </div>
+    </section>
+
+    <div class="footer-note">Vertis · Histórico de tarefas</div>
+  </main>
+
+  <div id="taskModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <section class="modal">
+      <header class="modal-head">
+        <strong id="modalTitle">Detalhes da tarefa</strong>
+        <button id="modalClose" class="modal-close" type="button" aria-label="Fechar">×</button>
+      </header>
+      <div id="modalBody" class="modal-body"></div>
+    </section>
+  </div>
+
+  <script>
+    const API_URL = 'http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/tarefa_hist';
+
+    const form = document.getElementById('searchForm');
+    const codUsuario = document.getElementById('codUsuario');
+    const dataInicio = document.getElementById('dataInicio');
+    const dataFim = document.getElementById('dataFim');
+    const searchBtn = document.getElementById('searchBtn');
+    const resultCount = document.getElementById('resultCount');
+    const loadingState = document.getElementById('loadingState');
+    const emptyState = document.getElementById('emptyState');
+    const errorState = document.getElementById('errorState');
+    const tableWrap = document.getElementById('tableWrap');
+    const taskBody = document.getElementById('taskBody');
+    const pagination = document.getElementById('pagination');
+    const paginationInfo = document.getElementById('paginationInfo');
+    const paginationControls = document.getElementById('paginationControls');
+    const modal = document.getElementById('taskModal');
+    const modalBody = document.getElementById('modalBody');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalClose = document.getElementById('modalClose');
+    const statTotal = document.getElementById('statTotal');
+    const statFinalizadas = document.getElementById('statFinalizadas');
+    const statPendentes = document.getElementById('statPendentes');
+    const statExecucao = document.getElementById('statExecucao');
+    const statReprovadas = document.getElementById('statReprovadas');
+    const statTotalSub = document.getElementById('statTotalSub');
+    const statFinalizadasSub = document.getElementById('statFinalizadasSub');
+    const statPendentesSub = document.getElementById('statPendentesSub');
+    const statExecucaoSub = document.getElementById('statExecucaoSub');
+    const statReprovadasSub = document.getElementById('statReprovadasSub');
+
+    const PAGE_SIZE = 10;
+    let currentTasks = [];
+    let currentPage = 1;
+
+    // Tooltip global de datas: fica diretamente no <body> para não ser cortado
+    // pelo overflow/stacking context da tabela.
+    const globalDatePopover = document.createElement('div');
+    globalDatePopover.className = 'date-popover';
+    globalDatePopover.setAttribute('role', 'tooltip');
+    globalDatePopover.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(globalDatePopover);
+
+    let activeDateButton = null;
+
+    function hideGlobalDatePopover() {
+      globalDatePopover.classList.remove('is-visible', 'open-up', 'open-down');
+      globalDatePopover.setAttribute('aria-hidden', 'true');
+      if (activeDateButton) activeDateButton.setAttribute('aria-expanded', 'false');
+      activeDateButton = null;
+    }
+
+    function showGlobalDatePopover(button, task, preferredDirection = 'up') {
+      activeDateButton = button;
+      button.setAttribute('aria-expanded', 'true');
+
+      globalDatePopover.innerHTML = `
+        <div class="date-line"><span>Abertura</span><span>${escapeHtml(task.dth_abertura || '-')}</span></div>
+        <div class="date-line"><span>Prev. entrega</span><span>${escapeHtml(task.dth_prev_entrega || '-')}</span></div>
+        <div class="date-line"><span>Encerramento</span><span>${escapeHtml(task.dth_encerramento || '-')}</span></div>
+      `;
+
+      // Torna mensurável antes do posicionamento, sem exibir visualmente.
+      globalDatePopover.classList.remove('open-up', 'open-down');
+      globalDatePopover.style.visibility = 'hidden';
+      globalDatePopover.style.opacity = '0';
+      globalDatePopover.style.display = 'block';
+
+      const rect = button.getBoundingClientRect();
+      const popoverWidth = globalDatePopover.offsetWidth || 285;
+      const popoverHeight = globalDatePopover.offsetHeight || 125;
+      const edgePadding = 12;
+      const gap = 10;
+
+      let direction = preferredDirection;
+      const spaceAbove = rect.top - edgePadding;
+      const spaceBelow = window.innerHeight - rect.bottom - edgePadding;
+
+      // Mantém as duas primeiras linhas preferencialmente para baixo, mas evita
+      // qualquer corte caso não haja espaço suficiente no viewport.
+      if (direction === 'down' && spaceBelow < popoverHeight + gap && spaceAbove > spaceBelow) direction = 'up';
+      if (direction === 'up' && spaceAbove < popoverHeight + gap && spaceBelow > spaceAbove) direction = 'down';
+
+      let centerX = rect.left + rect.width / 2;
+      centerX = Math.max(
+        edgePadding + popoverWidth / 2,
+        Math.min(window.innerWidth - edgePadding - popoverWidth / 2, centerX)
+      );
+
+      globalDatePopover.style.left = `${centerX}px`;
+      globalDatePopover.style.top = direction === 'down' ? `${rect.bottom}px` : `${rect.top}px`;
+      globalDatePopover.classList.add(direction === 'down' ? 'open-down' : 'open-up');
+      globalDatePopover.style.visibility = '';
+      globalDatePopover.style.opacity = '';
+      globalDatePopover.setAttribute('aria-hidden', 'false');
+
+      requestAnimationFrame(() => globalDatePopover.classList.add('is-visible'));
+    }
+
+    window.addEventListener('scroll', hideGlobalDatePopover, true);
+    window.addEventListener('resize', hideGlobalDatePopover);
+
+    const today = new Date();
+    dataFim.value = formatDateInput(today);
+
+    function formatDateInput(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function setState(state, message = '') {
+      loadingState.classList.toggle('active', state === 'loading');
+      emptyState.classList.toggle('active', state === 'empty');
+      errorState.classList.toggle('active', state === 'error');
+      tableWrap.hidden = state !== 'table';
+      pagination.classList.toggle('active', state === 'table' && currentTasks.length > PAGE_SIZE);
+
+      if (state === 'error') {
+        errorState.innerHTML = `<div class="error-box">${escapeHtml(message)}</div>`;
+      }
+    }
+
+    function escapeHtml(value = '') {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function htmlToText(html = '') {
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      return (temp.textContent || temp.innerText || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function shortTaskTitle(html = '') {
+      const text = htmlToText(html);
+      if (!text) return 'Sem descrição';
+      return text.length > 20 ? `${text.slice(0, 20)}...` : text;
+    }
+
+    function sanitizeTaskHtml(html = '') {
+      const template = document.createElement('template');
+      template.innerHTML = html;
+
+      template.content.querySelectorAll('script, iframe, object, embed, style, link, meta, form, input, button, textarea, select').forEach(el => el.remove());
+
+      template.content.querySelectorAll('*').forEach(el => {
+        [...el.attributes].forEach(attr => {
+          const name = attr.name.toLowerCase();
+          const value = attr.value.trim().toLowerCase();
+          if (name.startsWith('on') || value.startsWith('javascript:')) {
+            el.removeAttribute(attr.name);
+          }
+        });
+
+        if (el.tagName === 'A') {
+          el.setAttribute('target', '_blank');
+          el.setAttribute('rel', 'noopener noreferrer');
+        }
+      });
+
+      return template.innerHTML;
+    }
+
+    function statusClass(status = '') {
+      const s = status.toLowerCase();
+      if (s.includes('final')) return 'finalizada';
+      if (s.includes('pend')) return 'pendente';
+      if (s.includes('reprov')) return 'reprovada';
+      if (s.includes('exec')) return 'execucao';
+      return 'neutra';
+    }
+
+    function normalizeTaskLink(value = '') {
+      let url = String(value || '').trim();
+      if (!url) return '';
+
+      url = url.replace(/^http:\/\/+/, 'http://').replace(/^https:\/\/+/, 'https://');
+      url = url.replace(/([^:])\/{2,}/g, '$1/');
+
+      try {
+        const parsed = new URL(url);
+        return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
+      } catch {
+        return '';
+      }
+    }
+
+    function showTaskModal(task) {
+      modalTitle.textContent = `Tarefa #${task.id_tarefa ?? ''}`;
+      modalBody.innerHTML = sanitizeTaskHtml(task.titulo_tarefa || '<p>Sem conteúdo.</p>');
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      modalClose.focus();
+    }
+
+    function closeModal() {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
+    });
+
+
+    function updateStats(tasks = []) {
+      const total = tasks.length;
+      const counts = tasks.reduce((acc, task) => {
+        const status = String(task.des_sit_tarefa || '').toLowerCase();
+        if (status.includes('final')) acc.finalizadas += 1;
+        else if (status.includes('pend')) acc.pendentes += 1;
+        else if (status.includes('exec')) acc.execucao += 1;
+        else if (status.includes('reprov')) acc.reprovadas += 1;
+        return acc;
+      }, { finalizadas: 0, pendentes: 0, execucao: 0, reprovadas: 0 });
+
+      const percent = (value) => total ? Math.round((value / total) * 100) : 0;
+
+      statTotal.textContent = total;
+      statFinalizadas.textContent = counts.finalizadas;
+      statPendentes.textContent = counts.pendentes;
+      statExecucao.textContent = counts.execucao;
+      statReprovadas.textContent = counts.reprovadas;
+
+      statTotalSub.textContent = total ? `${total === 1 ? '1 chamado encontrado' : `${total} chamados encontrados`}` : 'Nenhum chamado encontrado';
+      statFinalizadasSub.textContent = `${percent(counts.finalizadas)}% do total`;
+      statPendentesSub.textContent = `${percent(counts.pendentes)}% do total`;
+      statExecucaoSub.textContent = `${percent(counts.execucao)}% do total`;
+      statReprovadasSub.textContent = `${percent(counts.reprovadas)}% do total`;
+    }
+
+    function renderTasks(tasks) {
+      currentTasks = Array.isArray(tasks) ? tasks : [];
+      currentPage = 1;
+      updateStats(currentTasks);
+      resultCount.textContent = `${currentTasks.length} ${currentTasks.length === 1 ? 'tarefa' : 'tarefas'}`;
+
+      if (!currentTasks.length) {
+        taskBody.innerHTML = '';
+        pagination.classList.remove('active');
+        emptyState.innerHTML = 'Nenhuma tarefa encontrada para os filtros informados.';
+        setState('empty');
+        return;
+      }
+
+      renderCurrentPage();
+      setState('table');
+    }
+
+    function renderCurrentPage() {
+      hideGlobalDatePopover();
+      taskBody.innerHTML = '';
+
+      const totalPages = Math.max(1, Math.ceil(currentTasks.length / PAGE_SIZE));
+      currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const pageTasks = currentTasks.slice(startIndex, startIndex + PAGE_SIZE);
+
+      pageTasks.forEach((task, index) => {
+        const row = document.createElement('tr');
+        row.style.animationDelay = `${Math.min(index * 25, 225)}ms`;
+
+        const safeStatus = escapeHtml(task.des_sit_tarefa || 'Desconhecida');
+        const taskLink = normalizeTaskLink(task.link_tarefa);
+
+        row.innerHTML = `
+          <td><span class="task-id">#${escapeHtml(task.id_tarefa ?? '')}</span></td>
+          <td><span class="client-code">${escapeHtml(task.fkid_unid_negoc ?? '')}|${escapeHtml(task.cod_unid_oper ?? '')}</span></td>
+          <td><div class="unit-name">${escapeHtml(task.nom_unid_oper || '-')}</div></td>
+          <td><span class="status ${statusClass(task.des_sit_tarefa || '')}">${safeStatus}</span></td>
+          <td>
+            <div class="date-popover-wrap" data-popover-direction="${index < 2 ? 'down' : 'up'}">
+              <button class="mini-btn" type="button" aria-haspopup="true" aria-expanded="false">Datas</button>
+            </div>
+          </td>
+          <td>
+            <div class="task-cell">
+              <span class="task-preview" title="${escapeHtml(htmlToText(task.titulo_tarefa || ''))}">${escapeHtml(shortTaskTitle(task.titulo_tarefa || ''))}</span>
+              <button class="task-more" type="button">Ver</button>
+            </div>
+          </td>
+          <td><span class="last-interaction">${escapeHtml(task.dth_ult_interacao || '-')}</span></td>
+          <td>
+            ${taskLink
+              ? `<a class="link-btn" href="${escapeHtml(taskLink)}" target="_blank" rel="noopener noreferrer">Abrir ↗</a>`
+              : `<button class="link-btn" type="button" disabled style="opacity:.4; cursor:not-allowed">Sem link</button>`
+            }
+          </td>
+        `;
+
+        row.querySelector('.task-more').addEventListener('click', () => showTaskModal(task));
+
+        const dateWrap = row.querySelector('.date-popover-wrap');
+        const dateButton = dateWrap.querySelector('.mini-btn');
+        const preferredDirection = dateWrap.dataset.popoverDirection || 'up';
+
+        const showDatePopover = () => showGlobalDatePopover(dateButton, task, preferredDirection);
+        const hideDatePopover = () => {
+          if (activeDateButton === dateButton) hideGlobalDatePopover();
+        };
+
+        dateButton.addEventListener('mouseenter', showDatePopover);
+        dateButton.addEventListener('mouseleave', hideDatePopover);
+        dateButton.addEventListener('focus', showDatePopover);
+        dateButton.addEventListener('blur', hideDatePopover);
+        dateButton.addEventListener('click', (event) => {
+          event.preventDefault();
+          if (activeDateButton === dateButton && globalDatePopover.classList.contains('is-visible')) {
+            hideGlobalDatePopover();
+          } else {
+            showDatePopover();
+          }
+        });
+
+        taskBody.appendChild(row);
+      });
+
+      renderPagination(totalPages, startIndex, pageTasks.length);
+    }
+
+    function renderPagination(totalPages, startIndex, visibleCount) {
+      paginationControls.innerHTML = '';
+      paginationInfo.textContent = `Exibindo ${startIndex + 1}–${startIndex + visibleCount} de ${currentTasks.length}`;
+      pagination.classList.toggle('active', currentTasks.length > PAGE_SIZE);
+
+      if (currentTasks.length <= PAGE_SIZE) return;
+
+      const createButton = (label, page, options = {}) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `page-btn${options.active ? ' active' : ''}`;
+        button.textContent = label;
+        button.disabled = Boolean(options.disabled);
+        if (!button.disabled && !options.active) {
+          button.addEventListener('click', () => {
+            currentPage = page;
+            renderCurrentPage();
+            document.querySelector('.table-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
+        paginationControls.appendChild(button);
+      };
+
+      createButton('‹', currentPage - 1, { disabled: currentPage === 1 });
+
+      const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+      const validPages = [...pages].filter(p => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+      let previous = 0;
+
+      validPages.forEach(page => {
+        if (previous && page - previous > 1) {
+          const dots = document.createElement('span');
+          dots.textContent = '…';
+          dots.style.padding = '0 4px';
+          dots.style.color = '#9a9a9a';
+          paginationControls.appendChild(dots);
+        }
+        createButton(String(page), page, { active: page === currentPage });
+        previous = page;
+      });
+
+      createButton('›', currentPage + 1, { disabled: currentPage === totalPages });
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const userCode = Number(codUsuario.value);
+      const start = dataInicio.value;
+      const end = dataFim.value;
+
+      if (!userCode || !start || !end) {
+        setState('error', 'Preencha o código do usuário, a data inicial e a data final.');
+        return;
+      }
+
+      if (start > end) {
+        setState('error', 'A data de início não pode ser posterior à data de fim.');
+        return;
+      }
+
+      const payload = {
+        cod_usuario: userCode,
+        dth_inicio: start,
+        dth_fim: end
+      };
+
+      searchBtn.disabled = true;
+      searchBtn.textContent = 'Consultando...';
+      resultCount.textContent = '...';
+      setState('loading');
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+
+        const rawText = await response.text();
+        let data;
+
+        try {
+          data = rawText ? JSON.parse(rawText) : [];
+        } catch {
+          throw new Error(`A API respondeu HTTP ${response.status}, mas o conteúdo retornado não é um JSON válido.`);
+        }
+
+        if (!response.ok) {
+          const apiMessage = data?.msg || data?.message || data?.error || `HTTP ${response.status}`;
+          throw new Error(`Falha na consulta: ${apiMessage}`);
+        }
+
+        const tasks = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+            ? data.data
+            : Array.isArray(data?.result)
+              ? data.result
+              : [];
+
+        renderTasks(tasks);
+      } catch (error) {
+        console.error(error);
+
+        let message = error.name === 'AbortError'
+          ? 'A consulta excedeu 30 segundos e foi cancelada.'
+          : error.message || 'Não foi possível consultar a API.';
+
+        if (/failed to fetch/i.test(message)) {
+          message += ' Verifique também se o servidor permite CORS e, caso esta página esteja hospedada em HTTPS, lembre que navegadores bloqueiam chamadas para uma API HTTP por Mixed Content.';
+        }
+
+        resultCount.textContent = '0 tarefas';
+        setState('error', message);
+      } finally {
+        clearTimeout(timeout);
+        searchBtn.disabled = false;
+        searchBtn.textContent = 'Consultar tarefas';
+      }
+    });
+  </script>
+</body>
+</html>

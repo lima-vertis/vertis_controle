@@ -102,7 +102,7 @@
         },
         {
             "source": "/whatsapp/qrcode",
-            "destination": "http://painelwhatsapp.agilemakers.com.br/instance/connect/"
+            "destination": "http://constellation.newvertis.com.br/vertis/VertisConnect.dll/api/V1.1/whatsapp_qrcode"
         }
     ]
 }

@@ -99,6 +99,10 @@
         {
             "source": "/suporte/tarefa_hist",
             "destination": "http://177.11.209.38:80/constellation/IISConstellationAPI.dll/constellation-api/V1.1/tarefa_hist"
+        },
+        {
+            "source": "/whatsapp/qrcode",
+            "destination": "http://painelwhatsapp.agilemakers.com.br/instance/connect/"
         }
     ]
 }

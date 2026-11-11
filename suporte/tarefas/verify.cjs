@@ -1,0 +1,28 @@
+const {chromium}=require('C:/Users/Administrador/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+(async()=>{
+ const browser=await chromium.launch({headless:true,channel:'msedge'});
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/tarefa_hist',route=>route.fulfill({json:Array.from({length:23},(_,i)=>({id_tarefa:i+1,nom_recurso:i%2?'João':'Maria',nom_unid_oper:'Unidade Centro',des_sit_tarefa:i%2?'Pendente':'Finalizada',titulo_tarefa:'Atendimento '+i,dth_ult_interacao:'11/11/2026 10:00'}))}));
+ await page.goto('file:///C:/GPI/Projetos/Web/pVertisVerso/tarefas.html');
+ await page.locator('[data-days="6"]').click();
+ await page.locator('#searchBtn').click();
+ await page.waitForFunction(()=>document.querySelector('#resultCount').textContent==='23 de 23 tarefas');
+ if(await page.locator('#taskBody tr').count()!==10) throw Error('Pagination');
+ await page.locator('#resourceFilter').selectOption('João');
+ if(await page.locator('#statTotal').textContent()!=='11') throw Error('Resource filter');
+ await page.locator('#textFilter').fill('joao');
+ if(await page.locator('#statTotal').textContent()!=='11') throw Error('Accent search');
+ await page.locator('.stat-card.finalizadas').click();
+ if(!await page.locator('#emptyState').isVisible()) throw Error('Empty filter');
+ await page.locator('#clearFilters').click();
+ await page.locator('[data-sort-key="nom_recurso"]').click();
+ if(await page.locator('.resource-name').first().textContent()!=='João') throw Error('Sort');
+ await page.screenshot({path:'tarefas-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('Mobile overflow');
+ await page.screenshot({path:'tarefas-mobile.png',fullPage:true});
+ if(errors.length)throw Error(errors.join('\n'));
+ console.log('OK: consulta simulada, recurso, busca sem acentos, cartões, estado vazio, paginação, ordenação e largura mobile.');
+ await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});
